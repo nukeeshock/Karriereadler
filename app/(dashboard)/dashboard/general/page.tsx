@@ -222,11 +222,12 @@ export default function GeneralPage() {
   );
 
   const birthDateValue = useMemo(() => {
-    if (user?.birthDate instanceof Date) {
-      return user.birthDate.toISOString().split('T')[0];
+    const raw = user?.birthDate;
+    if (raw instanceof Date) {
+      return raw.toISOString().split('T')[0];
     }
-    if (typeof user?.birthDate === 'string' && user.birthDate) {
-      return user.birthDate.split('T')[0];
+    if (typeof raw === 'string' && raw) {
+      return raw.split('T')[0];
     }
     return '';
   }, [user?.birthDate]);
