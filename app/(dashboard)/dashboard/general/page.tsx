@@ -222,17 +222,22 @@ export default function GeneralPage() {
   );
 
   const birthDateValue = useMemo(() => {
-    const birthDateValue = useMemo(() => {
-  const raw = user?.birthDate;
-  if (!raw) return "";
-  return raw.split("T")[0];
-}, [user?.birthDate]);
+    const raw = user?.birthDate;
 
+    if (typeof raw === 'string' && raw) {
+      // Erwartetes Format: "YYYY-MM-DD" oder "YYYY-MM-DDTHH:MM:SSZ"
+      return raw.split('T')[0];
+    }
+
+    return '';
+  }, [user?.birthDate]);
 
   return (
     <section className="flex-1 p-8 lg:p-12">
       <div className="mb-8">
-        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Allgemeine Einstellungen</h1>
+        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+          Allgemeine Einstellungen
+        </h1>
         <p className="text-gray-600">Verwalte deine Account-Informationen</p>
       </div>
 
@@ -278,7 +283,9 @@ export default function GeneralPage() {
             )}
             {state.success && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-green-600 text-sm font-medium">{state.success}</p>
+                <p className="text-green-600 text-sm font-medium">
+                  {state.success}
+                </p>
               </div>
             )}
             <Button

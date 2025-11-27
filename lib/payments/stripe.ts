@@ -10,7 +10,7 @@ import {
 // Pin to stable Stripe API version to prevent unexpected breaking changes
 // Update this version periodically after testing
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia'
+  apiVersion: '2025-04-30.basil'
 });
 
 // LEGACY: This subscription-based checkout is no longer used.

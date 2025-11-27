@@ -217,11 +217,12 @@ export default function NewCvPage() {
       return;
     }
     setPrefillError('');
+    const rawBirthDate = user.birthDate as unknown;
     const birthDateValue =
-      user.birthDate instanceof Date
-        ? user.birthDate.toISOString().split('T')[0]
-        : typeof user.birthDate === 'string' && user.birthDate
-          ? user.birthDate.split('T')[0]
+      rawBirthDate instanceof Date
+        ? rawBirthDate.toISOString().split('T')[0]
+        : typeof rawBirthDate === 'string' && rawBirthDate
+          ? rawBirthDate.split('T')[0]
           : '';
 
     setFirstName(user.firstName || firstName);
