@@ -223,17 +223,23 @@ export default function GeneralPage() {
 
   const birthDateValue = useMemo(() => {
     const birthDateValue = useMemo(() => {
-  const raw = user?.birthDate as unknown;
+  const raw = user?.birthDate;
 
-  if (raw instanceof Date) {
-    return raw.toISOString().split('T')[0];
+  // Fall 1: ISO-String aus der DB
+  if (typeof raw === "string" && raw) {
+    return raw.split("T")[0];
   }
 
-  if (typeof raw === 'string' && raw) {
-    return raw.split('T')[0];
+  // Optionaler Fallback, falls raw irgendwann doch mal ein Date ist
+  if (raw && (raw as any).toISOString) {
+    try {
+      return (raw as any).toISOString().split("T")[0];
+    } catch {
+      return "";
+    }
   }
 
-  return '';
+  return "";
 }, [user?.birthDate]);
 
 
