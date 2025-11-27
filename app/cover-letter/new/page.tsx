@@ -199,6 +199,7 @@ export default function NewCoverLetterPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Jobtitel *</label>
                 <input
+                  autoComplete="off"
                   type="text"
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
@@ -210,6 +211,7 @@ export default function NewCoverLetterPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Firmenname *</label>
                 <input
+                  autoComplete="off"
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
@@ -223,6 +225,7 @@ export default function NewCoverLetterPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Ort</label>
                 <input
+                  autoComplete="off"
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -254,6 +257,7 @@ export default function NewCoverLetterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Link zur Stellenanzeige (optional)</label>
               <input
+                  autoComplete="off"
                 type="url"
                 value={jobPostingUrl}
                 onChange={(e) => setJobPostingUrl(e.target.value)}
@@ -265,6 +269,7 @@ export default function NewCoverLetterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Stellenbeschreibung</label>
               <textarea
+                  autoComplete="off"
                 value={jobDescriptionText}
                 onChange={(e) => setJobDescriptionText(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -291,6 +296,7 @@ export default function NewCoverLetterPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Telefon *</label>
                 <input
+                  autoComplete="off"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -305,6 +311,7 @@ export default function NewCoverLetterPage() {
               <label className="text-sm font-medium">E-Mail *</label>
               <div className="flex items-center gap-2 mb-2">
                 <input
+                  autoComplete="off"
                   type="checkbox"
                   id="useAccountEmailLetter"
                   checked={useAccountEmail}
@@ -316,6 +323,7 @@ export default function NewCoverLetterPage() {
                 </label>
               </div>
               <input
+                  autoComplete="off"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -340,6 +348,7 @@ export default function NewCoverLetterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Erfahrungen / Projekte, die betont werden sollen</label>
               <textarea
+                  autoComplete="off"
                 value={experiencesToHighlight}
                 onChange={(e) => setExperiencesToHighlight(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -351,6 +360,7 @@ export default function NewCoverLetterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Besondere Stärken / Relevante Fähigkeiten</label>
               <textarea
+                  autoComplete="off"
                 value={strengths}
                 onChange={(e) => setStrengths(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -362,6 +372,7 @@ export default function NewCoverLetterPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Zusätzliche Hinweise (optional)</label>
               <textarea
+                  autoComplete="off"
                 value={additionalNotes}
                 onChange={(e) => setAdditionalNotes(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"

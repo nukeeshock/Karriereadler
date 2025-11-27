@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 
 const products = [
   {
-    name: 'Lebenslauf-Service (manuell)',
+    name: 'Lebenslauf-Service',
     priceEuro: 20,
-    description: 'Dein Lebenslauf wird manuell von Bewerbungsexperten erstellt/überarbeitet.',
+    description: 'Dein Lebenslauf wird professionell von uns gefertigt.',
     features: ['1x Lebenslauf', 'Individuell erstellt von Experten', 'Kein Abo'],
     productType: 'cv'
   },
@@ -18,7 +18,7 @@ const products = [
     productType: 'letter'
   },
   {
-    name: 'Bundle: Lebenslauf + Anschreiben (manuell)',
+    name: 'Bundle: Lebenslauf + Anschreiben',
     priceEuro: 30,
     description: 'Lebenslauf-Service und zwei Anschreiben zusammen zum Vorteilspreis.',
     features: ['1x Lebenslauf', '2x Anschreiben', '10 € gespart gegenüber Einzelkauf'],

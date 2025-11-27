@@ -4,6 +4,14 @@ const FROM_ADDRESS =
   process.env.EMAIL_FROM || 'Karriereadler <noreply@karriereadler.com>';
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
+// Validate that RESEND_API_KEY is set in production
+if (process.env.NODE_ENV === 'production' && !process.env.RESEND_API_KEY) {
+  throw new Error(
+    'RESEND_API_KEY is required in production for email verification. ' +
+    'Sign up at https://resend.com and add the API key to environment variables.'
+  );
+}
+
 export function generateVerificationToken(): string {
   return randomBytes(32).toString('hex');
 }

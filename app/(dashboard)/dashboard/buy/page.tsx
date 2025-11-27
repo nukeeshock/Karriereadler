@@ -21,14 +21,14 @@ const products: {
 }[] = [
   {
     key: 'cv',
-    title: 'Lebenslauf-Service (manuell)',
-    description: 'Dein Lebenslauf wird manuell von Bewerbungsexperten erstellt/überarbeitet',
+    title: 'Lebenslauf-Service',
+    description: 'Dein Lebenslauf wird professionell von uns gefertigt',
     priceLabel: '20 €',
     price: 20,
     cta: 'Jetzt kaufen',
     icon: FileText,
     features: [
-      '1x Lebenslauf (manuell erstellt)',
+      '1x Lebenslauf',
       'Individuell auf deine Zielposition',
       'Korrekturen/Feinschliff inklusive',
       'Kein Abo, einmalig zahlen'
@@ -37,7 +37,7 @@ const products: {
   {
     key: 'letter',
     title: 'Anschreiben-Service',
-    description: 'Zwei individuelle Anschreiben für unterschiedliche Stellen (manuell erstellt)',
+    description: 'Zwei individuelle Anschreiben für unterschiedliche Stellen',
     priceLabel: '20 €',
     price: 20,
     cta: 'Jetzt kaufen',
@@ -46,7 +46,7 @@ const products: {
       '2x individuelle Anschreiben',
       'Ton & Struktur nach Vorgabe',
       'Für verschiedene Stellenangebote',
-      'Manuell formuliert von Experten'
+      'Professionell formuliert von Experten'
     ]
   },
   {
@@ -58,7 +58,7 @@ const products: {
     cta: 'Jetzt Bundle kaufen',
     icon: Package,
     features: [
-      '1x Lebenslauf (manuell)',
+      '1x Lebenslauf',
       '2x individuelle Anschreiben',
       '10 € gespart gegenüber Einzelkauf',
       'Komplett-Paket für deine Bewerbung'

@@ -315,7 +315,8 @@ function TeamMembers() {
               </div>
               {isOwner && member.role !== 'owner' ? (
                 <form action={removeAction}>
-                  <input type="hidden" name="memberId" value={member.id} />
+                  <input
+            autoComplete="off" type="hidden" name="memberId" value={member.id} />
                   <Button
                     type="submit"
                     variant="outline"

@@ -23,6 +23,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Wrap entire webhook processing in try-catch for critical error alerting
+  try {
+
   switch (event.type) {
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted': {
@@ -120,4 +123,21 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
+  } catch (error) {
+    // CRITICAL: Log webhook processing failures for manual recovery
+    console.error('CRITICAL: Stripe webhook processing failed', {
+      eventId: event?.id,
+      eventType: event?.type,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+
+    // TODO: Add Sentry.captureException(error) or email notification for production alerting
+
+    // Return 500 so Stripe will retry the webhook
+    return NextResponse.json(
+      { error: 'Webhook processing failed' },
+      { status: 500 }
+    );
+  }
 }

@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db/drizzle';
-import { analyticsEvents } from '@/lib/db/schema';
+import { analyticsEvents, UserRole } from '@/lib/db/schema';
 import { and, eq, gte, sql } from 'drizzle-orm';
 import { getUser } from '@/lib/db/queries';
 
 export async function GET(request: Request) {
   const user = await getUser();
-  if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+  if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.OWNER)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 

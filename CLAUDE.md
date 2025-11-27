@@ -17,9 +17,14 @@ This is a Next.js 15 SaaS application called "Karriereadler" that provides AI-po
 ## Development Commands
 
 ### Essential Commands
-- `pnpm dev` — Start Next.js dev server with Turbopack
+- `pnpm dev` — Start Next.js dev server (Webpack, not Turbopack - see note below)
 - `pnpm build` — Build production bundle
 - `pnpm start` — Run production server
+
+**Important**: This project uses **Tailwind CSS 4.x** which has compatibility issues with Turbopack in Next.js 15. The dev server runs with Webpack. If you encounter HMR errors or PostCSS issues:
+1. Stop the dev server (`Ctrl+C`)
+2. Clean caches: `rm -rf .next .turbo node_modules/.cache`
+3. Restart: `pnpm dev`
 
 ### Database Commands
 - `pnpm db:setup` — Interactive setup to create `.env` file with database credentials

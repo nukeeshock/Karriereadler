@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
-import { letterRequests, users } from '@/lib/db/schema';
+import { letterRequests, users, UserRole } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
 
 export async function GET() {
   try {
     const user = await getUser();
-    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.OWNER)) {
       return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 });
     }
 

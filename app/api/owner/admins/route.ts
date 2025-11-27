@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
-import { users } from '@/lib/db/schema';
+import { users, UserRole } from '@/lib/db/schema';
 import { eq, inArray } from 'drizzle-orm';
 
 const actionSchema = z.object({
@@ -11,7 +11,7 @@ const actionSchema = z.object({
 });
 
 function isOwner(userRole: string | null | undefined) {
-  return userRole === 'owner';
+  return userRole === UserRole.OWNER;
 }
 
 export async function GET() {
@@ -28,7 +28,7 @@ export async function GET() {
       role: users.role
     })
     .from(users)
-    .where(inArray(users.role, ['admin', 'owner']));
+    .where(inArray(users.role, [UserRole.ADMIN, UserRole.OWNER]));
 
   return NextResponse.json({ admins });
 }
@@ -49,15 +49,15 @@ export async function POST(request: Request) {
     }
 
     if (data.action === 'add') {
-      await db.update(users).set({ role: 'admin' }).where(eq(users.id, target.id));
+      await db.update(users).set({ role: UserRole.ADMIN }).where(eq(users.id, target.id));
       return NextResponse.json({ ok: true, message: 'Admin role granted' });
     }
 
-    if (target.role === 'owner') {
+    if (target.role === UserRole.OWNER) {
       return NextResponse.json({ error: 'Cannot demote another owner' }, { status: 400 });
     }
 
-    await db.update(users).set({ role: 'member' }).where(eq(users.id, target.id));
+    await db.update(users).set({ role: UserRole.MEMBER }).where(eq(users.id, target.id));
     return NextResponse.json({ ok: true, message: 'Admin role removed' });
   } catch (error) {
     console.error('Owner admin update failed', error);

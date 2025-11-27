@@ -1,0 +1,23 @@
+{
+  "name": "Karriereadler",
+  "short_name": "Karriereadler",
+  "description": "Manuelle Lebensläufe & Anschreiben vom Profi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "/karriereadler-favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/karriereadler-favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

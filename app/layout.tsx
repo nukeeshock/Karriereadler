@@ -10,14 +10,28 @@ export const metadata: Metadata = {
   title: 'Karriereadler – Manuelle Lebensläufe & Anschreiben vom Profi',
   description:
     'Karriereadler erstellt deinen Lebenslauf und dein Anschreiben manuell: individuelle Beratung, klare Texte, professionelles Ergebnis.',
+  manifest: '/manifest.json',
   icons: {
     icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon.png', type: 'image/png', sizes: '512x512' },
-      { url: '/karriereadler-favicon.png', type: 'image/png', sizes: '1024x1024' }
+      { url: '/karriereadler-favicon.png', type: 'image/png', sizes: '512x512' },
+      { url: '/favicon.png', type: 'image/png', sizes: '192x192' },
+      { url: '/favicon.ico', sizes: '48x48' }
     ],
-    apple: { url: '/karriereadler-favicon.png', type: 'image/png' },
-    shortcut: '/favicon.ico'
+    apple: [
+      { url: '/karriereadler-favicon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/karriereadler-favicon.png', sizes: '167x167', type: 'image/png' },
+      { url: '/karriereadler-favicon.png', sizes: '152x152', type: 'image/png' },
+      { url: '/karriereadler-favicon.png', sizes: '120x120', type: 'image/png' }
+    ],
+    shortcut: '/karriereadler-favicon.png',
+    other: [
+      { rel: 'apple-touch-icon-precomposed', url: '/karriereadler-favicon.png' }
+    ]
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'Karriereadler',
+    statusBarStyle: 'default'
   }
 };
 

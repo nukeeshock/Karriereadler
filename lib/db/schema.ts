@@ -11,6 +11,12 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
+export enum UserRole {
+  MEMBER = 'member',
+  ADMIN = 'admin',
+  OWNER = 'owner'
+}
+
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }),
@@ -24,7 +30,7 @@ export const users = pgTable('users', {
   country: varchar('country', { length: 100 }),
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
-  role: varchar('role', { length: 20 }).notNull().default('member'),
+  role: varchar('role', { length: 20 }).notNull().default(UserRole.MEMBER),
   cvCredits: integer('cv_credits').notNull().default(0),
   letterCredits: integer('letter_credits').notNull().default(0),
   emailVerified: boolean('email_verified').notNull().default(false),

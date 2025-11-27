@@ -92,6 +92,7 @@ function AccountForm({
           <Input
             id="firstName"
             name="firstName"
+            autoComplete="given-name"
             placeholder="Vorname"
             defaultValue={state.firstName || firstNameValue}
             required
@@ -104,6 +105,7 @@ function AccountForm({
           <Input
             id="lastName"
             name="lastName"
+            autoComplete="family-name"
             placeholder="Nachname"
             defaultValue={state.lastName || lastNameValue}
             required
@@ -119,6 +121,7 @@ function AccountForm({
           id="birthDate"
           name="birthDate"
           type="date"
+          autoComplete="bday"
           defaultValue={state.birthDate || birthDateValue}
           required
         />
@@ -132,6 +135,7 @@ function AccountForm({
           id="email"
           name="email"
           type="email"
+          autoComplete="email"
           placeholder="Email"
           defaultValue={emailValue}
           required
@@ -146,6 +150,7 @@ function AccountForm({
           <Input
             id="street"
             name="street"
+            autoComplete="address-line1"
             placeholder="Straße"
             defaultValue={state.street || streetValue}
           />
@@ -158,6 +163,7 @@ function AccountForm({
             <Input
               id="houseNumber"
               name="houseNumber"
+              autoComplete="off"
               placeholder="1a"
               defaultValue={state.houseNumber || houseNumberValue}
             />
@@ -169,6 +175,7 @@ function AccountForm({
             <Input
               id="zipCode"
               name="zipCode"
+              autoComplete="postal-code"
               placeholder="10115"
               defaultValue={state.zipCode || zipCodeValue}
             />
@@ -184,6 +191,7 @@ function AccountForm({
           <Input
             id="city"
             name="city"
+            autoComplete="address-level2"
             placeholder="Berlin"
             defaultValue={state.city || cityValue}
           />
@@ -195,6 +203,7 @@ function AccountForm({
           <select
             id="country"
             name="country"
+            autoComplete="country-name"
             defaultValue={state.country || countryValue}
             className="w-full rounded-full border border-input bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           >

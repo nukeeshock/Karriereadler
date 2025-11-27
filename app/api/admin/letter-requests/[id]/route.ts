@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
-import { letterRequests, users, cvRequests } from '@/lib/db/schema';
+import { letterRequests, users, cvRequests, UserRole } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 function extractId(req: Request) {
@@ -14,7 +14,7 @@ function extractId(req: Request) {
 export async function GET(req: NextRequest) {
   try {
     const user = await getUser();
-    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.OWNER)) {
       return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 });
     }
 
@@ -46,7 +46,7 @@ export async function PATCH(
 ) {
   try {
     const user = await getUser();
-    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+    if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.OWNER)) {
       return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 });
     }
 

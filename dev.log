@@ -1,0 +1,93 @@
+
+> @ dev /Users/mauricebeaujean/ai-saas
+> next dev
+
+   ▲ Next.js 15.4.0-canary.47
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.92:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     ✓ ppr
+     ✓ nodeMiddleware
+     ✓ clientSegmentCache
+
+ ✓ Starting...
+ ✓ Ready in 1112ms
+ ✓ Compiled /middleware in 251ms (174 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 3.1s (2572 modules)
+(node:41667) Warning: `--localstorage-file` was provided without a valid path
+(Use `node --trace-warnings ...` to show where the warning was created)
+ GET / 200 in 5657ms
+ ✓ Compiled /api/user in 308ms (2579 modules)
+ GET /api/user 200 in 1018ms
+ GET / 200 in 763ms
+ ✓ Compiled /cv in 177ms (2572 modules)
+ GET /cv 200 in 258ms
+ ✓ Compiled /cv/new in 190ms (2591 modules)
+ GET /cv/new 200 in 240ms
+ GET /cv/new 200 in 5ms
+ GET /api/user 200 in 624ms
+ GET /api/user 200 in 127ms
+ ✓ Compiled /cover-letter in 228ms (2598 modules)
+ GET /cover-letter 200 in 279ms
+ ✓ Compiled /cover-letter/new in 185ms (2607 modules)
+ GET /cover-letter/new 200 in 235ms
+ GET /cover-letter/new 200 in 6ms
+ ○ Compiling /api/cv-requests ...
+ ✓ Compiled /api/cv-requests in 618ms (2620 modules)
+ GET /api/user 200 in 1336ms
+ GET /api/cv-requests 200 in 1456ms
+ ○ Compiling /dashboard/buy ...
+ ✓ Compiled /dashboard/buy in 761ms (2861 modules)
+ GET /dashboard/buy 200 in 850ms
+ ✓ Compiled /dashboard in 428ms (3088 modules)
+ GET /dashboard 200 in 516ms
+ ✓ Compiled /api/purchases in 329ms (3090 modules)
+ GET /api/user 200 in 996ms
+ GET /api/purchases 200 in 1109ms
+ GET /api/user 200 in 122ms
+ GET /api/purchases 200 in 253ms
+ GET /api/user 200 in 116ms
+ GET /api/purchases 200 in 246ms
+ GET / 200 in 178ms
+ ✓ Compiled in 264ms (3099 modules)
+ GET / 200 in 904ms
+ ✓ Compiled in 204ms (3078 modules)
+ GET / 200 in 806ms
+ ✓ Compiled in 370ms (3059 modules)
+ GET / 200 in 909ms
+ ✓ Compiled /api/user in 233ms (2012 modules)
+ GET /api/user 200 in 940ms
+ ✓ Compiled in 524ms (3065 modules)
+ GET / 200 in 919ms
+ ✓ Compiled in 98ms (1053 modules)
+ GET / 200 in 234ms
+ ✓ Compiled in 227ms (3059 modules)
+ GET / 200 in 924ms
+ ✓ Compiled /api/user in 139ms (2012 modules)
+ GET /api/user 200 in 855ms
+ GET /api/user 200 in 126ms
+ GET / 200 in 948ms
+ GET /api/user 200 in 115ms
+ ✓ Compiled /cv in 215ms (2017 modules)
+ GET /cv 200 in 271ms
+ GET /cv 200 in 729ms
+ GET /cv/new 200 in 24ms
+ GET /cv/new 200 in 13ms
+ GET /api/user 200 in 122ms
+ GET /dashboard 200 in 24ms
+ ✓ Compiled /api/purchases in 238ms (2030 modules)
+ GET /api/user 200 in 1102ms
+ GET /api/purchases 200 in 1206ms
+ GET /api/user 200 in 208ms
+ GET /api/purchases 200 in 318ms
+ GET /dashboard 200 in 923ms
+ GET /api/user 200 in 120ms
+ GET /api/purchases 200 in 248ms
+ ✓ Compiled in 159ms (1053 modules)
+ GET /dashboard 200 in 302ms
+ GET /api/user 200 in 110ms
+ GET /api/purchases 200 in 228ms
+ GET / 200 in 389ms
+ GET /api/user 200 in 129ms

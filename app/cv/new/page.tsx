@@ -124,6 +124,7 @@ export default function NewCvPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
 
   // Auto-fill email from account when checkbox is checked
   useEffect(() => {
@@ -133,6 +134,136 @@ export default function NewCvPage() {
       setEmail('');
     }
   }, [useAccountEmail, user?.email]);
+
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined' || draftLoaded) return;
+
+    try {
+      const savedDraft = localStorage.getItem('cv-form-draft');
+      if (savedDraft) {
+        const draft = JSON.parse(savedDraft);
+        // Restore all form fields from draft
+        if (draft.firstName) setFirstName(draft.firstName);
+        if (draft.lastName) setLastName(draft.lastName);
+        if (draft.birthDate) setBirthDate(draft.birthDate);
+        if (draft.phone) setPhone(draft.phone);
+        if (draft.email) setEmail(draft.email);
+        if (draft.street) setStreet(draft.street);
+        if (draft.houseNumber) setHouseNumber(draft.houseNumber);
+        if (draft.zipCode) setZipCode(draft.zipCode);
+        if (draft.city) setCity(draft.city);
+        if (draft.country) setCountry(draft.country);
+        if (draft.workExperience) setWorkExperience(draft.workExperience);
+        if (draft.education) setEducation(draft.education);
+        if (draft.volunteerWork) setVolunteerWork(draft.volunteerWork);
+        if (draft.technicalSkills) setTechnicalSkills(draft.technicalSkills);
+        if (draft.softSkills) setSoftSkills(draft.softSkills);
+        if (draft.languages) setLanguages(draft.languages);
+        if (draft.certificates) setCertificates(draft.certificates);
+        if (draft.driverLicense) setDriverLicense(draft.driverLicense);
+        if (draft.availability) setAvailability(draft.availability);
+        if (draft.photoPath) setPhotoPath(draft.photoPath);
+        if (draft.jobDescription) setJobDescription(draft.jobDescription);
+        if (draft.language) setLanguage(draft.language);
+      }
+    } catch (err) {
+      console.error('Failed to load draft:', err);
+    }
+    setDraftLoaded(true);
+  }, [draftLoaded]);
+
+  // Auto-save draft to localStorage
+  useEffect(() => {
+    if (!draftLoaded || typeof window === 'undefined') return;
+
+    const draft = {
+      firstName,
+      lastName,
+      birthDate,
+      phone,
+      email,
+      street,
+      houseNumber,
+      zipCode,
+      city,
+      country,
+      workExperience,
+      education,
+      volunteerWork,
+      technicalSkills,
+      softSkills,
+      languages,
+      certificates,
+      driverLicense,
+      availability,
+      photoPath,
+      jobDescription,
+      language
+    };
+
+    try {
+      localStorage.setItem('cv-form-draft', JSON.stringify(draft));
+    } catch (err) {
+      console.error('Failed to save draft:', err);
+    }
+  }, [
+    draftLoaded,
+    firstName,
+    lastName,
+    birthDate,
+    phone,
+    email,
+    street,
+    houseNumber,
+    zipCode,
+    city,
+    country,
+    workExperience,
+    education,
+    volunteerWork,
+    technicalSkills,
+    softSkills,
+    languages,
+    certificates,
+    driverLicense,
+    availability,
+    photoPath,
+    jobDescription,
+    language
+  ]);
+
+  const clearDraft = () => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.removeItem('cv-form-draft');
+      // Reset form to initial state
+      setFirstName('');
+      setLastName('');
+      setBirthDate('');
+      setPhone('');
+      setEmail('');
+      setStreet('');
+      setHouseNumber('');
+      setZipCode('');
+      setCity('');
+      setCountry('');
+      setWorkExperience([{ jobTitle: '', employer: '', location: '', startDate: '', endDate: '', description: '' }]);
+      setEducation([{ degree: '', institution: '', location: '', startDate: '', endDate: '' }]);
+      setVolunteerWork([{ organization: '', role: '', location: '', startDate: '', endDate: '', description: '' }]);
+      setTechnicalSkills('');
+      setSoftSkills('');
+      setLanguages('');
+      setCertificates('');
+      setDriverLicense('');
+      setAvailability('');
+      setPhotoPath('');
+      setJobDescription('');
+      setLanguage('Deutsch');
+    } catch (err) {
+      console.error('Failed to clear draft:', err);
+    }
+  };
 
   const addWorkExperience = () => {
     setWorkExperience([
@@ -281,6 +412,11 @@ export default function NewCvPage() {
         throw new Error(data.error || 'Fehler beim Absenden.');
       }
 
+      // Clear draft on successful submission
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('cv-form-draft');
+      }
+
       setSuccess(true);
       setTimeout(() => router.push('/dashboard'), 2000);
     } catch (err) {
@@ -365,6 +501,14 @@ export default function NewCvPage() {
           >
             Daten aus Account übernehmen
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={clearDraft}
+            className="rounded-full border-red-300 text-red-700 hover:bg-red-50"
+          >
+            Entwurf löschen
+          </Button>
           {!user && (
             <p className="text-sm text-gray-500">Bitte einloggen, um Account-Daten zu nutzen.</p>
           )}
@@ -381,6 +525,7 @@ export default function NewCvPage() {
                 <label className="text-sm font-medium">Vorname *</label>
                 <input
                   type="text"
+                  autoComplete="given-name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -391,6 +536,7 @@ export default function NewCvPage() {
                 <label className="text-sm font-medium">Nachname *</label>
                 <input
                   type="text"
+                  autoComplete="family-name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -404,6 +550,7 @@ export default function NewCvPage() {
                 <label className="text-sm font-medium">Geburtsdatum</label>
                 <input
                   type="date"
+                  autoComplete="bday"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -413,6 +560,7 @@ export default function NewCvPage() {
                 <label className="text-sm font-medium">Telefon *</label>
                 <input
                   type="tel"
+                  autoComplete="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -426,6 +574,7 @@ export default function NewCvPage() {
               <label className="text-sm font-medium">E-Mail *</label>
               <div className="flex items-center gap-2 mb-2">
                 <input
+                  autoComplete="off"
                   type="checkbox"
                   id="useAccountEmail"
                   checked={useAccountEmail}
@@ -438,6 +587,7 @@ export default function NewCvPage() {
               </div>
               <input
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -464,6 +614,7 @@ export default function NewCvPage() {
                 <label className="text-sm font-medium">Straße</label>
                 <input
                   type="text"
+                  autoComplete="address-line1"
                   value={street}
                   onChange={(e) => setStreet(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -473,6 +624,7 @@ export default function NewCvPage() {
                 <label className="text-sm font-medium">Hausnummer</label>
                 <input
                   type="text"
+                  autoComplete="off"
                   value={houseNumber}
                   onChange={(e) => setHouseNumber(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -485,6 +637,7 @@ export default function NewCvPage() {
                   <label className="text-sm font-medium">PLZ</label>
                   <input
                     type="text"
+                  autoComplete="postal-code"
                   value={zipCode}
                   onChange={(e) => setZipCode(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -494,6 +647,7 @@ export default function NewCvPage() {
                 <label className="text-sm font-medium">Ort</label>
                 <input
                   type="text"
+                  autoComplete="address-level2"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -502,6 +656,7 @@ export default function NewCvPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Land</label>
                   <select
+                    autoComplete="country-name"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                     className="w-full border border-input rounded-md px-3 py-2 text-sm bg-white"
@@ -554,6 +709,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Jobtitel</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={exp.jobTitle}
                       onChange={(e) => updateWorkExperience(index, 'jobTitle', e.target.value)}
@@ -563,6 +719,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Arbeitgeber</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={exp.employer}
                       onChange={(e) => updateWorkExperience(index, 'employer', e.target.value)}
@@ -575,6 +732,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Ort</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={exp.location}
                       onChange={(e) => updateWorkExperience(index, 'location', e.target.value)}
@@ -584,6 +742,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Von</label>
                     <input
+                  autoComplete="off"
                       type="month"
                       value={exp.startDate}
                       onChange={(e) => updateWorkExperience(index, 'startDate', e.target.value)}
@@ -593,6 +752,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Bis</label>
                     <input
+                  autoComplete="off"
                       type="month"
                       value={exp.endDate}
                       onChange={(e) => updateWorkExperience(index, 'endDate', e.target.value)}
@@ -605,6 +765,7 @@ export default function NewCvPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Tätigkeitsbeschreibung / Bulletpoints</label>
                   <textarea
+                  autoComplete="off"
                     value={exp.description}
                     onChange={(e) => updateWorkExperience(index, 'description', e.target.value)}
                     className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -650,6 +811,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Abschluss</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={edu.degree}
                       onChange={(e) => updateEducation(index, 'degree', e.target.value)}
@@ -660,6 +822,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Schule / Hochschule</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={edu.institution}
                       onChange={(e) => updateEducation(index, 'institution', e.target.value)}
@@ -672,6 +835,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Ort</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={edu.location}
                       onChange={(e) => updateEducation(index, 'location', e.target.value)}
@@ -681,6 +845,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Von</label>
                     <input
+                  autoComplete="off"
                       type="month"
                       value={edu.startDate}
                       onChange={(e) => updateEducation(index, 'startDate', e.target.value)}
@@ -690,6 +855,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Bis</label>
                     <input
+                  autoComplete="off"
                       type="month"
                       value={edu.endDate}
                       onChange={(e) => updateEducation(index, 'endDate', e.target.value)}
@@ -735,6 +901,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Organisation / Verein</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={vol.organization}
                       onChange={(e) => updateVolunteerWork(index, 'organization', e.target.value)}
@@ -745,6 +912,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Rolle / Position</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={vol.role}
                       onChange={(e) => updateVolunteerWork(index, 'role', e.target.value)}
@@ -758,6 +926,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Ort</label>
                     <input
+                  autoComplete="off"
                       type="text"
                       value={vol.location}
                       onChange={(e) => updateVolunteerWork(index, 'location', e.target.value)}
@@ -767,6 +936,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Von</label>
                     <input
+                  autoComplete="off"
                       type="month"
                       value={vol.startDate}
                       onChange={(e) => updateVolunteerWork(index, 'startDate', e.target.value)}
@@ -776,6 +946,7 @@ export default function NewCvPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Bis</label>
                     <input
+                  autoComplete="off"
                       type="month"
                       value={vol.endDate}
                       onChange={(e) => updateVolunteerWork(index, 'endDate', e.target.value)}
@@ -788,6 +959,7 @@ export default function NewCvPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Tätigkeitsbeschreibung</label>
                   <textarea
+                  autoComplete="off"
                     value={vol.description}
                     onChange={(e) => updateVolunteerWork(index, 'description', e.target.value)}
                     className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -810,6 +982,7 @@ export default function NewCvPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Technische Skills</label>
               <textarea
+                  autoComplete="off"
                 value={technicalSkills}
                 onChange={(e) => setTechnicalSkills(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -821,6 +994,7 @@ export default function NewCvPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Soft Skills</label>
               <textarea
+                  autoComplete="off"
                 value={softSkills}
                 onChange={(e) => setSoftSkills(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -832,6 +1006,7 @@ export default function NewCvPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Sprachen</label>
               <textarea
+                  autoComplete="off"
                 value={languages}
                 onChange={(e) => setLanguages(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -852,6 +1027,7 @@ export default function NewCvPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Zertifikate</label>
               <textarea
+                  autoComplete="off"
                 value={certificates}
                 onChange={(e) => setCertificates(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"
@@ -864,6 +1040,7 @@ export default function NewCvPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Führerschein</label>
                 <input
+                  autoComplete="off"
                   type="text"
                   value={driverLicense}
                   onChange={(e) => setDriverLicense(e.target.value)}
@@ -874,6 +1051,7 @@ export default function NewCvPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Verfügbarkeit / Eintrittsdatum</label>
                 <input
+                  autoComplete="off"
                   type="text"
                   value={availability}
                   onChange={(e) => setAvailability(e.target.value)}
@@ -899,6 +1077,7 @@ export default function NewCvPage() {
                   <span className="text-sm">{photoPath ? 'Anderes Foto wählen' : 'Foto hochladen'}</span>
                 </div>
                 <input
+                  autoComplete="off"
                   type="file"
                   accept="image/jpeg,image/jpg,image/png"
                   onChange={handlePhotoUpload}
@@ -929,6 +1108,7 @@ export default function NewCvPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Stellenbeschreibung</label>
               <textarea
+                  autoComplete="off"
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 className="w-full border border-input rounded-md px-3 py-2 text-sm"

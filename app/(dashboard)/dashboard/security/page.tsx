@@ -94,6 +94,7 @@ export default function SecurityPage() {
                   id="confirm-password"
                   name="confirmPassword"
                   type="password"
+                  autoComplete="new-password"
                   required
                   minLength={8}
                   maxLength={100}
@@ -158,6 +159,7 @@ export default function SecurityPage() {
                   id="delete-password"
                   name="password"
                   type="password"
+                  autoComplete="current-password"
                   required
                   minLength={8}
                   maxLength={100}

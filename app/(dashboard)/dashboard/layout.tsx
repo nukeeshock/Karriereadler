@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ShoppingBag, Settings, Shield, Menu, X, BarChart3, FolderCog, Crown } from 'lucide-react';
 import useSWR from 'swr';
-import { User } from '@/lib/db/schema';
+import { User, UserRole } from '@/lib/db/schema';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -21,8 +21,8 @@ export default function DashboardLayout({
     pathname?.startsWith('/dashboard/kaufen');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data: user } = useSWR<User>('/api/user', fetcher);
-  const isAdmin = user?.role === 'admin' || user?.role === 'owner';
-  const isOwner = user?.role === 'owner';
+  const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.OWNER;
+  const isOwner = user?.role === UserRole.OWNER;
 
   const navItems = [
     { href: '/dashboard', icon: ShoppingBag, label: 'Käufe', description: 'Kaufhistorie & Credits' },
