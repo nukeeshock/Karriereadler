@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "dashboard": "Dashboard",
+    "cv": "CV",
+    "coverLetter": "Cover letter",
+    "buy": "Buy",
+    "contact": "Contact",
+    "analytics": "Analytics",
+    "admin": "Admin",
+    "owner": "Owner"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "label": "Language",
+    "de": "Deutsch",
+    "en": "English"
+  },
+  "cookie": {
+    "title": "Cookies & privacy",
+    "description": "We use essential cookies for the site to work and optional cookies for analytics. See the privacy policy for details.",
+    "acceptAll": "Accept all",
+    "essentialOnly": "Only necessary",
+    "manage": "Cookie settings"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "imprint": "Imprint",
+    "privacy": "Privacy",
+    "contact": "Contact",
+    "about": "About Karriereadler",
+    "services": "Services",
+    "pricing": "Pricing",
+    "home": "Home",
+    "followUs": "Follow us"
+  },
+  "contact": {
+    "title": "Get in touch",
+    "subtitle": "Tell us what you need – we'll reply quickly.",
+    "name": "Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Send message",
+    "success": "Thanks! We received your message.",
+    "error": "Sending failed. Please try again."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Overview of visitors, page views, and behavior.",
+    "totals": "Total",
+    "uniqueVisitors": "Unique visitors",
+    "newVisitors": "New visitors",
+    "returningVisitors": "Returning",
+    "pageViews": "Page views",
+    "avgSession": "Avg. session",
+    "avgPages": "Avg. pages per session",
+    "perPage": "Per-page stats",
+    "page": "Page",
+    "views": "Views",
+    "avgTime": "Avg. time"
+  },
+  "roles": {
+    "role": "Role",
+    "admin": "Admin",
+    "owner": "Owner",
+    "member": "Member",
+    "notAllowed": "Not allowed for this role."
+  },
+  "consent": {
+    "reopen": "Cookie settings"
+  }
+}

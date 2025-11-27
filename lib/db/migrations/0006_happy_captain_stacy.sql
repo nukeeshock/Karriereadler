@@ -1,0 +1,2 @@
+ALTER TABLE "stripe_events" ADD COLUMN "user_id" integer;--> statement-breakpoint
+ALTER TABLE "stripe_events" ADD CONSTRAINT "stripe_events_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;

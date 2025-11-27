@@ -1,0 +1,82 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "pricing": "Preise",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden",
+    "dashboard": "Dashboard",
+    "cv": "Lebenslauf",
+    "coverLetter": "Anschreiben",
+    "buy": "Kaufen",
+    "contact": "Kontakt",
+    "analytics": "Analytics",
+    "admin": "Admin",
+    "owner": "Owner"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "language": {
+    "label": "Sprache",
+    "de": "Deutsch",
+    "en": "English"
+  },
+  "cookie": {
+    "title": "Cookies & Datenschutz",
+    "description": "Wir nutzen notwendige Cookies für die Funktion der Seite und optionale Cookies für Analytics. Details findest du in der Datenschutzerklärung.",
+    "acceptAll": "Alle akzeptieren",
+    "essentialOnly": "Nur notwendige",
+    "manage": "Cookie-Einstellungen"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten.",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "contact": "Kontakt",
+    "about": "Über Karriereadler",
+    "services": "Leistungen",
+    "pricing": "Preise",
+    "home": "Startseite",
+    "followUs": "Folge uns"
+  },
+  "contact": {
+    "title": "Kontakt aufnehmen",
+    "subtitle": "Schreib uns dein Anliegen – wir melden uns schnellstmöglich.",
+    "name": "Name",
+    "email": "E-Mail",
+    "subject": "Betreff",
+    "message": "Nachricht",
+    "submit": "Nachricht senden",
+    "success": "Danke! Wir haben deine Nachricht erhalten.",
+    "error": "Senden fehlgeschlagen. Bitte erneut versuchen."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Überblick über Besucher, Seitenaufrufe und Verhalten.",
+    "totals": "Gesamt",
+    "uniqueVisitors": "Einzigartige Besucher",
+    "newVisitors": "Neue Besucher",
+    "returningVisitors": "Wiederkehrend",
+    "pageViews": "Seitenaufrufe",
+    "avgSession": "Ø Sitzungsdauer",
+    "avgPages": "Ø Seiten pro Sitzung",
+    "perPage": "Seitenstatistiken",
+    "page": "Seite",
+    "views": "Aufrufe",
+    "avgTime": "Ø Zeit"
+  },
+  "roles": {
+    "role": "Rolle",
+    "admin": "Admin",
+    "owner": "Owner",
+    "member": "Mitglied",
+    "notAllowed": "Kein Zugriff für diese Rolle."
+  },
+  "consent": {
+    "reopen": "Cookie-Einstellungen"
+  }
+}

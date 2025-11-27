@@ -1,0 +1,1 @@
+ALTER TABLE "stripe_events" ADD COLUMN "product_type" varchar(50);
