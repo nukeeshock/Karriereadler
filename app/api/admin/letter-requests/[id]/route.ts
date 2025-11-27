@@ -4,18 +4,21 @@ import { db } from '@/lib/db/drizzle';
 import { letterRequests, users, cvRequests } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+function extractId(req: Request) {
+  const url = new URL(req.url);
+  const segments = url.pathname.split('/').filter(Boolean);
+  const id = segments[segments.length - 1];
+  return Number(id);
+}
+
+export async function GET(req: NextRequest) {
   try {
     const user = await getUser();
     if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
       return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 });
     }
 
-    const { id } = params;
-    const requestId = Number(id);
+    const requestId = extractId(req);
     if (Number.isNaN(requestId)) {
       return NextResponse.json({ error: 'Ungültige Anfrage-ID' }, { status: 400 });
     }
@@ -39,8 +42,7 @@ export async function GET(
 }
 
 export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest
 ) {
   try {
     const user = await getUser();
@@ -48,8 +50,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 });
     }
 
-    const { id } = params;
-    const requestId = Number(id);
+    const requestId = extractId(req);
     if (Number.isNaN(requestId)) {
       return NextResponse.json({ error: 'Ungültige Anfrage-ID' }, { status: 400 });
     }
