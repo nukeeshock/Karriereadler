@@ -222,15 +222,20 @@ export default function GeneralPage() {
   );
 
   const birthDateValue = useMemo(() => {
-    const raw = user?.birthDate;
-    if (raw instanceof Date) {
-      return raw.toISOString().split('T')[0];
-    }
-    if (typeof raw === 'string' && raw) {
-      return raw.split('T')[0];
-    }
-    return '';
-  }, [user?.birthDate]);
+    const birthDateValue = useMemo(() => {
+  const raw = user?.birthDate as unknown;
+
+  if (raw instanceof Date) {
+    return raw.toISOString().split('T')[0];
+  }
+
+  if (typeof raw === 'string' && raw) {
+    return raw.split('T')[0];
+  }
+
+  return '';
+}, [user?.birthDate]);
+
 
   return (
     <section className="flex-1 p-8 lg:p-12">
