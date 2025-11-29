@@ -31,13 +31,15 @@ export function DashboardFooter() {
         <div className="space-y-4">
           <div className="flex items-center">
             <Image
-              src="/karriereadler_logo.jpg"
+              src="/favicon.png"
               alt="Karriereadler"
               width={80}
               height={80}
               className="rounded-lg"
             />
-            <p className="font-extrabold text-2xl text-gray-900 tracking-tight leading-none -ml-5 relative z-10 bg-white/90 px-1 rounded">Karriereadler</p>
+            <p className="font-extrabold text-2xl text-gray-900 tracking-tight leading-none ml-2 sm:ml-3 relative z-10 bg-white/90 px-1 rounded">
+              Karriereadler
+            </p>
           </div>
           <p className="text-sm text-gray-600">© {year} {t('footer.rights')}</p>
           <CookieSettingsButton />

@@ -94,14 +94,14 @@ export function DashboardHeader() {
           className="flex items-center hover:opacity-80 transition-opacity min-w-0"
         >
           <Image
-            src="/karriereadler_logo.jpg"
+            src="/favicon.png"
             alt="Karriereadler"
             width={140}
             height={140}
             className="h-24 sm:h-28 w-auto flex-shrink-0"
             priority
           />
-          <span className="text-3xl sm:text-4xl font-black leading-none tracking-tight bg-gradient-to-r from-orange-600 via-amber-500 to-orange-400 bg-clip-text text-transparent drop-shadow-sm truncate -ml-5 relative z-10">
+          <span className="text-3xl sm:text-4xl font-black leading-none tracking-tight bg-gradient-to-r from-orange-600 via-amber-500 to-orange-400 bg-clip-text text-transparent drop-shadow-sm truncate ml-2 sm:ml-3 relative z-10">
             Karriereadler
           </span>
         </Link>

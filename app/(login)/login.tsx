@@ -57,7 +57,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <Image
-            src="/karriereadler_logo.jpg"
+            src="/favicon.png"
             alt="Karriereadler Logo"
             width={220}
             height={220}
