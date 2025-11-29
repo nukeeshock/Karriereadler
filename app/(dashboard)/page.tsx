@@ -6,14 +6,9 @@ import KarriereadlerStory from '@/components/karriereadler-story';
 
 export default async function HomePage() {
   const user = await getUser();
-  const hasCredits = (user?.cvCredits || 0) > 0 || (user?.letterCredits || 0) > 0;
 
-  // Smart CTA routing:
-  // - Logged in with credits → Go directly to CV creation
-  // - Logged in without credits → Go to purchase page
-  // - Not logged in → Guide through value proposition first (Leistungen)
-  const primaryCtaHref = user ? (hasCredits ? '/cv' : '/dashboard/buy') : '/leistungen';
-  const secondaryCtaHref = user ? '/pricing' : '/pricing';
+  const primaryCtaHref = '/kaufen';
+  const secondaryCtaHref = '/pricing';
 
   return (
     <main>
@@ -49,31 +44,33 @@ export default async function HomePage() {
               </p>
               <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="text-lg rounded-full bg-orange-500 hover:bg-orange-600 shadow-lg"
+                  {/* Primary CTA with shimmer + arrow bounce */}
+                  <Link
+                    href={primaryCtaHref}
+                    className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 bg-size-200 bg-pos-0 hover:bg-pos-100 rounded-full shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-105 overflow-hidden"
                   >
-                    <Link href={primaryCtaHref}>
-                      {user ? 'Lebenslauf-Service für 20 €' : 'Mehr erfahren'}
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="text-lg rounded-full bg-white/90 backdrop-blur-sm"
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+                    <span className="relative z-10">
+                      {user ? 'Service buchen ab 20 €' : 'Service buchen ab 20 €'}
+                    </span>
+                    <ArrowRight className="ml-2 h-5 w-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110" />
+                  </Link>
+
+                  {/* Secondary CTA with border glow */}
+                  <Link
+                    href={secondaryCtaHref}
+                    className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-gray-900 bg-white/90 backdrop-blur-sm border-2 border-gray-300 hover:border-orange-500 rounded-full shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 overflow-hidden"
                   >
-                    <Link href={secondaryCtaHref}>
+                    <span className="absolute inset-0 w-0 h-full bg-gradient-to-r from-orange-50 to-orange-100 group-hover:w-full transition-all duration-500 ease-out"></span>
+                    <span className="relative z-10 group-hover:text-orange-700 transition-colors duration-300">
                       {user ? 'Preise ansehen' : 'Preise & Pakete'}
-                    </Link>
-                  </Button>
+                    </span>
+                  </Link>
                 </div>
               </div>
             </div>
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <div className="w-full rounded-2xl border border-gray-200 bg-white/95 backdrop-blur-sm shadow-lg p-6 space-y-4">
+              <div className="w-full rounded-2xl border border-gray-200 bg-white/95 backdrop-blur-sm shadow-lg p-6 space-y-4 hover:shadow-2xl transition-shadow duration-300">
                 <p className="text-sm uppercase tracking-wide text-orange-500 font-semibold">
                   So einfach geht's
                 </p>
@@ -100,20 +97,23 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    asChild
-                    size="sm"
-                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-full"
+                  {/* Small primary button with pulse */}
+                  <Link
+                    href={primaryCtaHref}
+                    className="group relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110 overflow-hidden"
                   >
-                    <Link href={primaryCtaHref}>
-                      {user ? 'Jetzt starten' : 'So funktioniert\'s'}
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm" variant="ghost" className="rounded-full">
-                    <Link href={secondaryCtaHref}>
-                      {user ? 'Preise' : 'Preise ansehen'}
-                    </Link>
-                  </Button>
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                    <span className="relative z-10">Jetzt bestellen</span>
+                  </Link>
+
+                  {/* Ghost button with underline animation */}
+                  <Link
+                    href={secondaryCtaHref}
+                    className="group relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-gray-700 hover:text-orange-600 rounded-full hover:bg-gray-50 transition-all duration-300"
+                  >
+                    <span className="relative z-10">{user ? 'Preise' : 'Preise ansehen'}</span>
+                    <span className="absolute bottom-2 left-6 right-6 h-0.5 bg-gradient-to-r from-orange-500 to-orange-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -125,30 +125,38 @@ export default async function HomePage() {
       <section className="py-12 bg-gradient-to-b from-orange-50/50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
+            <div className="group hover:scale-105 transition-transform duration-300">
               <div className="flex justify-center mb-2">
-                <Users className="h-8 w-8 text-orange-600" />
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
+                  <Users className="h-8 w-8 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
+                </div>
               </div>
               <div className="text-3xl font-bold text-gray-900">200+</div>
               <div className="text-sm text-gray-600">Zufriedene Kunden</div>
             </div>
-            <div>
+            <div className="group hover:scale-105 transition-transform duration-300">
               <div className="flex justify-center mb-2">
-                <Star className="h-8 w-8 text-orange-600" />
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
+                  <Star className="h-8 w-8 text-orange-600 group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" />
+                </div>
               </div>
               <div className="text-3xl font-bold text-gray-900">4.8/5</div>
               <div className="text-sm text-gray-600">Durchschnittliche Bewertung</div>
             </div>
-            <div>
+            <div className="group hover:scale-105 transition-transform duration-300">
               <div className="flex justify-center mb-2">
-                <Award className="h-8 w-8 text-orange-600" />
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
+                  <Award className="h-8 w-8 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
+                </div>
               </div>
               <div className="text-3xl font-bold text-gray-900">10+ Jahre</div>
               <div className="text-sm text-gray-600">HR-Erfahrung</div>
             </div>
-            <div>
+            <div className="group hover:scale-105 transition-transform duration-300">
               <div className="flex justify-center mb-2">
-                <CheckCircle className="h-8 w-8 text-orange-600" />
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
+                  <CheckCircle className="h-8 w-8 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
+                </div>
               </div>
               <div className="text-3xl font-bold text-gray-900">2-3 Tage</div>
               <div className="text-sm text-gray-600">Lieferzeit</div>
@@ -170,7 +178,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md">
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-orange-500 text-orange-500" />
@@ -190,7 +198,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md">
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-orange-500 text-orange-500" />
@@ -210,7 +218,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md">
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-orange-500 text-orange-500" />
@@ -238,8 +246,8 @@ export default async function HomePage() {
       <section id="mehr-erfahren" className="py-16 bg-white w-full scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-            <div>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
+            <div className="group hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white group-hover:bg-orange-600 group-hover:rotate-6 transition-all duration-300">
                 <Sparkles className="h-6 w-6" />
               </div>
               <div className="mt-5">
@@ -254,8 +262,8 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
+            <div className="mt-10 lg:mt-0 group hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white group-hover:bg-orange-600 group-hover:rotate-6 transition-all duration-300">
                 <CreditCard className="h-6 w-6" />
               </div>
               <div className="mt-5">
@@ -269,8 +277,8 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
+            <div className="mt-10 lg:mt-0 group hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white group-hover:bg-orange-600 group-hover:rotate-6 transition-all duration-300">
                 <CreditCard className="h-6 w-6" />
               </div>
               <div className="mt-5">

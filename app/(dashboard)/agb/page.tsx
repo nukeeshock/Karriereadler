@@ -51,8 +51,8 @@ export default function AGBPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
               <li>Erstellung eines professionellen Lebenslaufs ODER</li>
-              <li>Erstellung von zwei individuellen Anschreiben ODER</li>
-              <li>Bundle: Lebenslauf + zwei Anschreiben</li>
+              <li>Erstellung eines individuellen Anschreibens ODER</li>
+              <li>Bundle: Lebenslauf + Anschreiben</li>
               <li>Lieferung in den Formaten Word (.docx) und PDF</li>
               <li>Lieferzeit: 2-3 Werktage nach vollständiger Datenübermittlung</li>
               <li>1 Überarbeitungsrunde innerhalb von 14 Tagen nach Erhalt der Erstversion</li>

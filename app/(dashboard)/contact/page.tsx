@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,17 +24,17 @@ export default function ContactPage() {
     {
       question: 'Wie läuft der Prozess ab, wenn ich meinen Lebenslauf optimieren lassen möchte?',
       answer:
-        'Du schickst mir deinen aktuellen Lebenslauf und die Zielstelle. Ich analysiere deine Unterlagen, stelle bei Bedarf Rückfragen und sende dir eine erste Version. Danach gibt es eine Feedback-Runde, bis die finale Fassung steht.'
+        'Du schickst uns deinen aktuellen Lebenslauf und die Zielstelle. Wir analysieren deine Unterlagen, stellen bei Bedarf Rückfragen und senden dir eine erste Version. Danach gibt es eine Feedback-Runde, bis die finale Fassung steht.'
     },
     {
-      question: 'Welche Unterlagen soll ich dir schicken?',
+      question: 'Welche Unterlagen soll ich euch schicken?',
       answer:
-        'Am hilfreichsten sind dein aktueller Lebenslauf, die Stellenausschreibung, ein vorhandenes Anschreiben und gern dein LinkedIn-Profil. Je mehr Kontext, desto präziser kann ich optimieren.'
+        'Am hilfreichsten sind dein aktueller Lebenslauf, die Stellenausschreibung, ein vorhandenes Anschreiben und gern dein LinkedIn-Profil. Je mehr Kontext, desto präziser können wir optimieren.'
     },
     {
-      question: 'Für welche Branchen optimierst du Bewerbungsunterlagen?',
+      question: 'Für welche Branchen optimiert ihr Bewerbungsunterlagen?',
       answer:
-        'Ich arbeite branchenübergreifend: Technik, Handwerk, IT, Büro/Verwaltung, Ausbildung, Quereinstieg und mehr. Wichtig ist die Zielrolle – darauf richte ich Struktur und Inhalte aus.'
+        'Wir arbeiten branchenübergreifend: Technik, Handwerk, IT, Büro/Verwaltung, Ausbildung, Quereinstieg und mehr. Wichtig ist die Zielrolle – darauf richten wir Struktur und Inhalte aus.'
     },
     {
       question: 'Wie lange dauert es, bis ich die überarbeiteten Unterlagen zurückbekomme?',
@@ -43,17 +44,17 @@ export default function ContactPage() {
     {
       question: 'Können meine Unterlagen ein Bewerbungs-Tracking-System (ATS) bestehen?',
       answer:
-        'Ja. Ich achte auf klare Struktur, saubere Formatierung und relevante Keywords, damit ATS-Systeme Inhalte korrekt auslesen können, ohne an Lesbarkeit für Menschen zu sparen.'
+        'Ja. Wir achten auf klare Struktur, saubere Formatierung und relevante Keywords, damit ATS-Systeme Inhalte korrekt auslesen können, ohne an Lesbarkeit für Menschen zu sparen.'
     },
     {
-      question: 'Wie gehst du mit vertraulichen Daten um?',
+      question: 'Wie geht ihr mit vertraulichen Daten um?',
       answer:
-        'Deine Daten bleiben vertraulich, werden nicht weitergegeben und sorgfältig gespeichert. Auf Wunsch lösche ich Unterlagen nach Abschluss des Auftrags.'
+        'Deine Daten bleiben vertraulich, werden nicht weitergegeben und sorgfältig gespeichert. Auf Wunsch löschen wir Unterlagen nach Abschluss des Auftrags.'
     },
     {
-      question: 'Bietest du auch Hilfe beim Anschreiben oder beim LinkedIn-Profil an?',
+      question: 'Bietet ihr auch Hilfe beim Anschreiben oder beim LinkedIn-Profil an?',
       answer:
-        'Ja. Neben dem Lebenslauf kann ich Anschreiben formulieren und dein LinkedIn-Profil optimieren, damit alles konsistent wirkt.'
+        'Ja. Neben dem Lebenslauf können wir Anschreiben formulieren und dein LinkedIn-Profil optimieren, damit alles konsistent wirkt.'
     }
   ];
 
@@ -82,6 +83,21 @@ export default function ContactPage() {
     <main className="flex-1 bg-white">
       <section className="py-16 sm:py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          {/* Hero Logo */}
+          <div className="flex justify-center mb-8">
+            <div className="group relative hover:scale-105 transition-transform duration-300">
+              <Image
+                src="/logo_adler_notagline.png"
+                alt="Karriereadler - Professionelle Bewerbungsunterlagen"
+                width={600}
+                height={200}
+                className="w-full max-w-2xl h-auto"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+            </div>
+          </div>
+
           <div className="space-y-4 text-center sm:text-left">
             <p className="text-sm uppercase tracking-wide text-orange-500 font-semibold">
               Kontakt
@@ -90,7 +106,7 @@ export default function ContactPage() {
               Lass uns deinen Lebenslauf aufs nächste Level bringen
             </h1>
             <p className="text-lg text-gray-700 max-w-3xl">
-              Fragen zum Ablauf, individuelle Angebote oder Firmenanfragen? Schreib mir, wenn du
+              Fragen zum Ablauf, individuelle Angebote oder Firmenanfragen? Schreib uns, wenn du
               deinen Lebenslauf, dein Anschreiben oder dein LinkedIn-Profil optimieren lassen
               möchtest.
             </p>
@@ -107,7 +123,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card className="lg:col-span-2 shadow-lg border-gray-200">
               <CardHeader className="pb-2">
-                <CardTitle className="text-2xl text-gray-900">Schreib mir</CardTitle>
+                <CardTitle className="text-2xl text-gray-900">Schreib uns</CardTitle>
               </CardHeader>
               <CardContent>
                 <form className="space-y-5" onSubmit={handleSubmit}>
@@ -188,13 +204,13 @@ export default function ContactPage() {
                       {loading ? 'Wird gesendet...' : 'Nachricht senden'}
                     </Button>
                     <p className="text-sm text-gray-600">
-                      Ich melde mich in der Regel innerhalb von 24–48 Stunden zurück.
+                      Wir melden uns in der Regel innerhalb von 24–48 Stunden zurück.
                     </p>
                   </div>
 
                   {status === 'success' && (
                     <p className="text-sm text-green-600">
-                      Danke für deine Nachricht! Ich melde mich schnellstmöglich.
+                      Danke für deine Nachricht! Wir melden uns schnellstmöglich.
                     </p>
                   )}
                   {status === 'error' && (
@@ -208,11 +224,11 @@ export default function ContactPage() {
 
             <Card className="shadow-lg border-gray-200">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xl text-gray-900">So erreichst du mich</CardTitle>
+                <CardTitle className="text-xl text-gray-900">So erreichst du uns</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 text-gray-700">
                 <p>
-                  Am schnellsten erreichst du mich per Formular oder per E-Mail an{' '}
+                  Am schnellsten erreichst du uns per Formular oder per E-Mail an{' '}
                   <span className="font-semibold text-gray-900">info@karriereadler.com</span>.
                 </p>
                 <p>Gemeinsam bringen wir deinen Lebenslauf, dein Anschreiben oder dein LinkedIn-Profil auf Kurs.</p>

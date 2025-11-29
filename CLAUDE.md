@@ -11,8 +11,11 @@ This is a Next.js 15 SaaS application called "Karriereadler" that provides AI-po
 - **Credit-based system**: Users buy credits that are consumed when creating requests
 - **Request/Admin workflow**: Users submit CV/letter requests which admins process manually (not fully automated AI generation)
 - **Email verification required**: Users must verify email before first sign-in
-- **Admin role system**: `user.role === 'admin'` grants access to `/admin` panel
+- **Role hierarchy**: `member` < `admin` < `owner` (owner inherits admin permissions)
 - **Extended user model**: Includes personal details (firstName, lastName, birthDate, address) collected during signup
+- **Contact form**: Persists messages to database with optional email forwarding via Resend
+
+**Note**: Analytics system, language switcher (DE/EN), and night mode features have been removed from the codebase.
 
 ## Development Commands
 
@@ -46,12 +49,12 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 The application uses Next.js App Router with route groups:
 
 - **`app/(login)/`** — Unauthenticated routes: `/sign-in`, `/sign-up`, `/verify-email`
-- **`app/(dashboard)/`** — Authenticated marketing and dashboard pages: landing (`/`), pricing, dashboard, privacy policy, imprint
-- **`app/(dashboard)/dashboard/`** — Nested authenticated dashboard: `/dashboard`, `/dashboard/buy`, `/dashboard/general`, `/dashboard/security`, `/dashboard/activity`
+- **`app/(dashboard)/`** — Public and authenticated marketing pages: landing (`/`), pricing, contact, privacy policy, imprint, terms
+- **`app/(dashboard)/dashboard/`** — Authenticated dashboard: `/dashboard`, `/dashboard/buy`, `/dashboard/general`, `/dashboard/security`, `/dashboard/activity`, `/dashboard/owner` (owner only)
+- **`app/(dashboard)/admin/`** — Admin panel: `/admin`, `/admin/cv-requests/[id]`, `/admin/letter-requests/[id]` (requires `role: 'admin'` or `'owner'`)
 - **`app/cv/`** — CV creation workflow: `/cv` (list), `/cv/new` (form)
 - **`app/cover-letter/`** — Cover letter creation workflow: `/cover-letter` (list), `/cover-letter/new` (form)
-- **`app/admin/`** — Admin panel for managing CV and cover letter requests (requires `role: 'admin'`)
-- **`app/api/`** — API routes for checkout, webhooks, purchases, CV/cover letter requests, admin endpoints
+- **`app/api/`** — API routes for checkout, webhooks, purchases, requests, admin endpoints, analytics, contact
 
 ### Authentication & Authorization
 
@@ -80,7 +83,7 @@ The application uses Next.js App Router with route groups:
 ### Database Schema (`lib/db/schema.ts`)
 
 **Core Tables**:
-- `users` — User accounts with `cvCredits` and `letterCredits` (integer counters), email verification fields, extended personal data (address, birthdate)
+- `users` — User accounts with `cvCredits` and `letterCredits` (integer counters), `role` (member/admin/owner), email verification fields, extended personal data (address, birthdate)
 - `teams` — Team entities (mostly legacy, still used for activity logging)
 - `teamMembers` — User-team relationships with roles (owner/member)
 - `stripeEvents` — Idempotency tracking for webhook events (prevents duplicate credit grants)
@@ -88,6 +91,8 @@ The application uses Next.js App Router with route groups:
 - `invitations` — Team invitation system (pending/accepted status)
 - `cvRequests` — CV optimization requests with personal data, work experience, education, skills (JSON fields), photo path, job description
 - `letterRequests` — Cover letter requests with job details, company info, experiences to highlight, optional reference to cvRequest
+- `contactMessages` — Contact form submissions with name, email, subject, message, handled flag
+- `analyticsEvents` — Analytics table (exists in schema but UI removed; API routes at `/api/analytics/events` and `/api/analytics/summary` still present but unused)
 
 **Key Relations**:
 - Users have many team memberships, cvRequests, and letterRequests
@@ -116,10 +121,10 @@ The application uses Next.js App Router with route groups:
 
 **Webhook Processing** (`app/api/stripe/webhook/route.ts`):
 - **Idempotency**: Records `event.id` in `stripeEvents` table to prevent duplicate processing
-- **`checkout.session.completed`**: Grants credits atomically in transaction:
-  - `cv` → +1 cvCredits
-  - `letter` → +2 letterCredits (matches marketing: "zwei individuelle Anschreiben")
-  - `bundle` → +1 cvCredits, +2 letterCredits
+- **`checkout.session.completed`**: Validates payment and updates order status to PAID
+  - Validates session matches order (session ID, email, user ID)
+  - Updates OrderRequest status from PENDING_PAYMENT to PAID
+  - Sends confirmation email to customer
 - Only processes sessions with `payment_status === 'paid'` and `mode === 'payment'`
 - **Legacy subscription handlers**: Still handles `customer.subscription.updated/deleted` for backward compatibility
 
@@ -146,10 +151,11 @@ The application uses Next.js App Router with route groups:
 5. Admin manages requests via `/admin` panel
 
 **Admin Panel** (`/admin`):
-- Requires `user.role === 'admin'` for access
+- Requires `user.role === 'admin'` or `user.role === 'owner'` for access
 - Lists all CV and letter requests with status badges
 - Provides stats dashboard (total requests, open requests per type)
 - Detail pages at `/admin/cv-requests/[id]` and `/admin/letter-requests/[id]` for viewing full request data and updating status
+- Admin notifications sent via email when new requests are created (if `ADMIN_NOTIFY_EMAIL` or `EMAIL_FROM` configured)
 
 ### Server Actions
 
@@ -165,6 +171,19 @@ The application uses Next.js App Router with route groups:
 - `inviteTeamMember()` — Creates invitation record (email sending not implemented)
 - `removeTeamMember()` — Delete team membership
 - All team actions verify user belongs to team and log activity
+
+### Additional Features
+
+**Contact Form** (`/contact`, `app/api/contact/route.ts`):
+- Persists all submissions to `contactMessages` table with handled flag
+- Optionally forwards to `CONTACT_FORWARD_EMAIL` via Resend (requires `RESEND_API_KEY`)
+- Default sender: `Karriereadler <info@karriereadler.com>` (configurable via `EMAIL_FROM`)
+
+**Owner Role Management** (`/dashboard/owner`):
+- Owner role inherits all admin permissions
+- Owners can promote users to admin or demote admins to member via `/api/owner/admins`
+- New signups become `owner` by default
+- Owner-only dashboard tab for role management
 
 ## Key Patterns
 
@@ -262,16 +281,33 @@ Photo uploads for CV requests:
 - `STRIPE_PRICE_BUNDLE` — Stripe price ID for bundle product
 
 **Optional**:
-- `RESEND_API_KEY` — Resend API key for sending verification emails (logs to console if not set)
-- `EMAIL_FROM` — Email sender address (defaults to `info@karriereadler.com`)
+- `RESEND_API_KEY` — Resend API key for sending emails (logs to console if not set)
+- `EMAIL_FROM` — Email sender address (defaults to `Karriereadler <info@karriereadler.com>`)
+- `ADMIN_NOTIFY_EMAIL` — Email address for admin notifications on new requests (falls back to `EMAIL_FROM`)
+- `CONTACT_FORWARD_EMAIL` — Email address to forward contact form submissions to
+- `STRIPE_WEBHOOK_SECRET_TEST` — Test webhook secret for local development
 
 ## UI & Styling
 
 - **Component Library**: shadcn/ui components in `components/ui/`
-- **Styling**: Tailwind CSS 4.x
+- **Styling**: Tailwind CSS 4.x with custom animations (`tw-animate-css`)
 - **Icons**: `lucide-react`
+- **Animations**: Framer Motion for interactive components
 - **User-Facing Text**: German language ("Lebenslauf", "Anschreiben", "Nutzungen")
 - **Internal Text**: English code comments and variable names
+
+## Performance & Caching
+
+**Cache Headers** (`next.config.ts`):
+- `_next/static/*` — 1 year immutable cache (`max-age=31536000, immutable`)
+- `_next/image/*` — 1 year immutable cache
+- Static assets (`.svg`, `.png`, `.jpg`, etc.) — 1 day cache with 7-day stale-while-revalidate
+- `/api/*` routes — No caching (`no-store`)
+
+**Next.js Configuration**:
+- **PPR (Partial Prerendering)**: Enabled experimentally
+- **Client Segment Cache**: Enabled for faster navigation
+- **Webpack**: Used instead of Turbopack due to Tailwind CSS 4.x compatibility
 
 ## Migration Workflow
 

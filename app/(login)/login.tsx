@@ -56,14 +56,17 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
     <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <Image
-            src="/favicon.png"
-            alt="Karriereadler Logo"
-            width={220}
-            height={220}
-            className="drop-shadow-sm"
-            priority
-          />
+          <div className="group relative hover:scale-105 transition-transform duration-300">
+            <Image
+              src="/logo_adler_notagline.png"
+              alt="Karriereadler Logo"
+              width={400}
+              height={150}
+              className="w-full max-w-md h-auto drop-shadow-sm"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+          </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {mode === 'signin'

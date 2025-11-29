@@ -42,22 +42,42 @@ function CreditsSkeleton() {
   return (
     <Card className="mb-8 h-[140px]">
       <CardHeader>
-        <CardTitle>Nutzungen</CardTitle>
+        <CardTitle>Aufträge</CardTitle>
       </CardHeader>
     </Card>
   );
 }
 
 function UserCredits() {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
+  const { data: ordersData } = useSWR<{
+    orders: {
+      id: number;
+      productType: 'CV' | 'COVER_LETTER' | 'BUNDLE';
+      status: 'PENDING_PAYMENT' | 'PAID' | 'READY_FOR_PROCESSING' | 'CANCELLED';
+      createdAt: string;
+    }[];
+  }>('/api/orders', fetcher);
   const { data: purchases } = useSWR<
     { id: number; productType: string | null; createdAt: string }[]
   >('/api/purchases', fetcher);
 
   const productTypeMap: Record<string, { name: string; icon: string }> = {
+    CV: { name: 'Lebenslauf', icon: '📄' },
+    COVER_LETTER: { name: 'Anschreiben', icon: '✨' },
+    BUNDLE: { name: 'Bundle', icon: '📦' },
     cv: { name: 'Lebenslauf', icon: '📄' },
     letter: { name: 'Anschreiben', icon: '✨' },
     bundle: { name: 'Bundle', icon: '📦' }
+  };
+
+  const orders = ordersData?.orders ?? [];
+  const questionnaireOrder = orders.find((order) => order.status === 'PAID');
+
+  const statusCounts = {
+    total: orders.length,
+    pendingPayment: orders.filter((order) => order.status === 'PENDING_PAYMENT').length,
+    paid: orders.filter((order) => order.status === 'PAID').length,
+    inProgress: orders.filter((order) => order.status === 'READY_FOR_PROCESSING').length
   };
 
   return (
@@ -69,13 +89,11 @@ function UserCredits() {
           size="lg"
           className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white h-auto py-4"
         >
-          <Link href="/cv/new" className="flex items-center justify-center gap-2">
+          <Link href="/kaufen" className="flex items-center justify-center gap-2">
             <FileText className="w-5 h-5" />
             <div className="text-left">
-              <div className="font-semibold">Lebenslauf erstellen</div>
-              <div className="text-xs text-orange-100">
-                {(user?.cvCredits ?? 0) > 0 ? `${user?.cvCredits} Credits verfügbar` : 'Credits kaufen'}
-              </div>
+              <div className="font-semibold">Service buchen</div>
+              <div className="text-xs text-orange-100">Lebenslauf, Anschreiben oder Bundle</div>
             </div>
           </Link>
         </Button>
@@ -85,46 +103,65 @@ function UserCredits() {
           size="lg"
           className="bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white h-auto py-4"
         >
-          <Link href="/cover-letter/new" className="flex items-center justify-center gap-2">
+          <Link
+            href={
+              questionnaireOrder
+                ? `/dashboard/orders/${questionnaireOrder.id}/complete`
+                : '/dashboard/orders'
+            }
+            className="flex items-center justify-center gap-2"
+          >
             <Mail className="w-5 h-5" />
             <div className="text-left">
-              <div className="font-semibold">Anschreiben erstellen</div>
+              <div className="font-semibold">
+                {questionnaireOrder ? 'Fragebogen ausfüllen' : 'Meine Aufträge'}
+              </div>
               <div className="text-xs text-orange-100">
-                {(user?.letterCredits ?? 0) > 0
-                  ? `${user?.letterCredits} Credits verfügbar`
-                  : 'Credits kaufen'}
+                {questionnaireOrder ? 'Bezahlt · Angaben ergänzen' : 'Status & Fragebogen'}
               </div>
             </div>
           </Link>
         </Button>
       </div>
 
-      {/* Credits Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="relative overflow-hidden bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
-          <div className="relative">
-            <p className="text-sm font-medium text-orange-100 mb-1">Verfügbare</p>
-            <p className="text-3xl font-bold mb-2">
-              {user?.cvCredits ?? 0}
-            </p>
-            <p className="text-sm font-medium">Lebenslauf-Credits</p>
+      {/* Order status overview */}
+      <Card className="border-2 shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-xl">Auftragsstatus</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+            <div className="p-4 rounded-xl bg-orange-50 border border-orange-100">
+              <p className="text-sm text-orange-700 mb-1">Gesamt</p>
+              <p className="text-3xl font-bold text-orange-900">{statusCounts.total}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+              <p className="text-sm text-amber-700 mb-1">Zahlung offen</p>
+              <p className="text-3xl font-bold text-amber-900">{statusCounts.pendingPayment}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+              <p className="text-sm text-emerald-700 mb-1">Bezahlt</p>
+              <p className="text-3xl font-bold text-emerald-900">{statusCounts.paid}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+              <p className="text-sm text-blue-700 mb-1">In Bearbeitung</p>
+              <p className="text-3xl font-bold text-blue-900">{statusCounts.inProgress}</p>
+            </div>
           </div>
-        </div>
-
-        <div className="relative overflow-hidden bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl shadow-lg p-6 text-white">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
-          <div className="relative">
-            <p className="text-sm font-medium text-orange-100 mb-1">Verfügbare</p>
-            <p className="text-3xl font-bold mb-2">
-              {user?.letterCredits ?? 0}
-            </p>
-            <p className="text-sm font-medium">Anschreiben</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button asChild variant="outline">
+              <Link href="/dashboard/orders">Alle Aufträge ansehen</Link>
+            </Button>
+            {questionnaireOrder && (
+              <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
+                <Link href={`/dashboard/orders/${questionnaireOrder.id}/complete`}>
+                  Fragebogen fortsetzen
+                </Link>
+              </Button>
+            )}
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Purchase History */}
       <Card className="border-2 shadow-lg">
@@ -189,6 +226,7 @@ function UserCredits() {
     </div>
   );
 }
+
 
 function ManageSubscription() {
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
@@ -440,8 +478,8 @@ export default function SettingsPage() {
   return (
     <section className="flex-1 p-8 lg:p-12">
       <div className="mb-8">
-        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Deine Käufe</h1>
-        <p className="text-gray-600">Übersicht deiner Credits und Kaufhistorie</p>
+        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Deine Aufträge</h1>
+        <p className="text-gray-600">Überblick über Bestellungen, Status und Kaufhistorie</p>
       </div>
       <Suspense fallback={<CreditsSkeleton />}>
         <UserCredits />

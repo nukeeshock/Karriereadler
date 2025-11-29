@@ -8,5 +8,5 @@ export default async function CoverLetterPage() {
     redirect('/sign-in');
   }
 
-  redirect('/cover-letter/new');
+  redirect('/kaufen');
 }

@@ -8,5 +8,5 @@ export default async function CvPage() {
     redirect('/sign-in');
   }
 
-  redirect('/cv/new');
+  redirect('/kaufen');
 }

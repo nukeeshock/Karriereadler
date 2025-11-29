@@ -78,6 +78,13 @@
       "when": 1764422796817,
       "tag": "0010_yielding_rage",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1764435715395,
+      "tag": "0011_cool_thor",
+      "breakpoints": true
     }
   ]
 }

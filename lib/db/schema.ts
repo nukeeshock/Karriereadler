@@ -125,6 +125,47 @@ export const analyticsEvents = pgTable('analytics_events', {
   createdAt: timestamp('created_at').notNull().defaultNow()
 });
 
+// Order Requests - Replaces credit-based system
+export enum ProductType {
+  CV = 'CV',
+  COVER_LETTER = 'COVER_LETTER',
+  BUNDLE = 'BUNDLE'
+}
+
+export enum OrderStatus {
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
+  PAID = 'PAID',
+  READY_FOR_PROCESSING = 'READY_FOR_PROCESSING',
+  CANCELLED = 'CANCELLED'
+}
+
+export const orderRequests = pgTable('order_requests', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .references(() => users.id),
+
+  productType: varchar('product_type', { length: 50 }).notNull(),
+  status: varchar('status', { length: 50 }).notNull().default(OrderStatus.PENDING_PAYMENT),
+
+  // Customer info from pre-order form
+  customerName: varchar('customer_name', { length: 255 }),
+  customerEmail: varchar('customer_email', { length: 255 }).notNull(),
+  customerPhone: varchar('customer_phone', { length: 100 }),
+
+  // Basic info from pre-order (JSON)
+  basicInfo: jsonb('basic_info'),
+
+  // Complete questionnaire data (filled after payment)
+  formData: jsonb('form_data'),
+
+  // Stripe references
+  stripeSessionId: varchar('stripe_session_id', { length: 255 }).unique(),
+  stripePaymentIntentId: varchar('stripe_payment_intent_id', { length: 255 }),
+
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow()
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
@@ -136,6 +177,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   invitationsSent: many(invitations),
   cvRequests: many(cvRequests),
   letterRequests: many(letterRequests),
+  orderRequests: many(orderRequests),
 }));
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
@@ -276,11 +318,20 @@ export const letterRequestsRelations = relations(letterRequests, ({ one }) => ({
   }),
 }));
 
+export const orderRequestsRelations = relations(orderRequests, ({ one }) => ({
+  user: one(users, {
+    fields: [orderRequests.userId],
+    references: [users.id],
+  }),
+}));
+
 // Types
 export type CvRequest = typeof cvRequests.$inferSelect;
 export type NewCvRequest = typeof cvRequests.$inferInsert;
 export type LetterRequest = typeof letterRequests.$inferSelect;
 export type NewLetterRequest = typeof letterRequests.$inferInsert;
+export type OrderRequest = typeof orderRequests.$inferSelect;
+export type NewOrderRequest = typeof orderRequests.$inferInsert;
 
 export enum ActivityType {
   SIGN_UP = 'SIGN_UP',
