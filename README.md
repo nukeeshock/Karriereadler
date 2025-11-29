@@ -131,7 +131,7 @@ While this template is intentionally minimal and to be used as a learning resour
   - `users.role` supports `member`, `admin`, `owner` (owner inherits admin).
   - New sign-ups become `owner`. Owners can add/remove admins via `/dashboard/owner` (API `/api/owner/admins`).
   - Dashboard sidebar shows Analytics/Admin for admin/owner, Owner tab only for owner.
-- **Contact form**: `/contact` posts to `/api/contact`, persists in `contact_messages`. Set `CONTACT_FORWARD_EMAIL` (+ `RESEND_API_KEY`) to forward via Resend; default Absender ist `Karriereadler <noreply@karriereadler.com>`.
+- **Contact form**: `/contact` posts to `/api/contact`, persists in `contact_messages`. Set `CONTACT_FORWARD_EMAIL` (+ `RESEND_API_KEY`) to forward via Resend; default Absender ist `Karriereadler <info@karriereadler.com>`.
 - **Cookie banner & consent**: Banner stores choice in `ka-consent` cookie + `localStorage`; footer has “Cookie-Einstellungen”. Analytics blocked until consent for optional cookies.
 - **Caching**: `next.config.ts` sends long cache headers for `_next/static` and static assets; API routes are `no-store`.
 - **Database**: New tables `contact_messages` and `analytics_events` added; run `pnpm db:generate && pnpm db:migrate` after pulling.

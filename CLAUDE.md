@@ -263,7 +263,7 @@ Photo uploads for CV requests:
 
 **Optional**:
 - `RESEND_API_KEY` — Resend API key for sending verification emails (logs to console if not set)
-- `EMAIL_FROM` — Email sender address (defaults to `noreply@karriereadler.com`)
+- `EMAIL_FROM` — Email sender address (defaults to `info@karriereadler.com`)
 
 ## UI & Styling
 

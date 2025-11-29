@@ -3,9 +3,10 @@ import { handleSubscriptionChange, stripe } from '@/lib/payments/stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/drizzle';
 import { stripeEvents, users } from '@/lib/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { eq, or, sql } from 'drizzle-orm';
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const webhookSecretTest = process.env.STRIPE_WEBHOOK_SECRET_TEST;
 
 export async function POST(request: NextRequest) {
   const payload = await request.text();
@@ -13,14 +14,43 @@ export async function POST(request: NextRequest) {
 
   let event: Stripe.Event;
 
-  try {
-    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-  } catch (err) {
-    console.error('Webhook signature verification failed.', err);
+  if (!webhookSecret && !webhookSecretTest) {
+    console.error('Missing Stripe webhook secret(s)');
     return NextResponse.json(
-      { error: 'Webhook signature verification failed.' },
-      { status: 400 }
+      { error: 'Webhook secret not configured.' },
+      { status: 500 }
     );
+  }
+
+  try {
+    // Accept both live and test webhook secrets so test-mode payments on production domains work.
+    event = stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      webhookSecret || webhookSecretTest!
+    );
+  } catch (err) {
+    if (!webhookSecretTest) {
+      console.error('Webhook signature verification failed.', err);
+      return NextResponse.json(
+        { error: 'Webhook signature verification failed.' },
+        { status: 400 }
+      );
+    }
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        webhookSecretTest
+      );
+    } catch (testErr) {
+      console.error('Webhook signature verification failed (test secret).', testErr);
+      return NextResponse.json(
+        { error: 'Webhook signature verification failed.' },
+        { status: 400 }
+      );
+    }
   }
 
   // Wrap entire webhook processing in try-catch for critical error alerting
@@ -34,17 +64,24 @@ export async function POST(request: NextRequest) {
       break;
     }
     case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const sessionId = session.id;
+
       const alreadyHandled = await db
         .select({ id: stripeEvents.id })
         .from(stripeEvents)
-        .where(eq(stripeEvents.eventId, event.id))
+        .where(
+          or(
+            eq(stripeEvents.eventId, event.id),
+            eq(stripeEvents.checkoutSessionId, sessionId)
+          )
+        )
         .limit(1);
 
       if (alreadyHandled.length > 0) {
         return NextResponse.json({ received: true, idempotent: true });
       }
 
-      const session = event.data.object as Stripe.Checkout.Session;
       if (
         session.payment_status !== 'paid' ||
         (session.mode && session.mode !== 'payment')
@@ -96,6 +133,7 @@ export async function POST(request: NextRequest) {
       await db.transaction(async (tx) => {
         await tx.insert(stripeEvents).values({
           eventId: event.id,
+          checkoutSessionId: sessionId,
           type: event.type,
           productType,
           userId: userIdNum

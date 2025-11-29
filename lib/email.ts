@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto';
 
 const FROM_ADDRESS =
-  process.env.EMAIL_FROM || 'Karriereadler <noreply@karriereadler.com>';
+  process.env.EMAIL_FROM || 'Karriereadler <info@karriereadler.com>';
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
 // Validate that RESEND_API_KEY is set in production

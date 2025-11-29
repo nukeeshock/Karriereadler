@@ -46,6 +46,7 @@ export const users = pgTable('users', {
 export const stripeEvents = pgTable('stripe_events', {
   id: serial('id').primaryKey(),
   eventId: varchar('event_id', { length: 255 }).notNull().unique(),
+  checkoutSessionId: varchar('checkout_session_id', { length: 255 }).unique(),
   type: varchar('type', { length: 100 }).notNull(),
   productType: varchar('product_type', { length: 50 }),
   userId: integer('user_id').references(() => users.id),

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
           quantity: 1
         }
       ],
-      success_url: `${process.env.BASE_URL}/dashboard?checkout=success`,
+      success_url: `${process.env.BASE_URL}/dashboard/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL}/dashboard/buy?checkout=cancelled`,
       customer_email: user.email,
       metadata: {

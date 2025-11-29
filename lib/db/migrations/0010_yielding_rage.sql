@@ -1,0 +1,2 @@
+ALTER TABLE "stripe_events" ADD COLUMN "checkout_session_id" varchar(255);--> statement-breakpoint
+ALTER TABLE "stripe_events" ADD CONSTRAINT "stripe_events_checkout_session_id_unique" UNIQUE("checkout_session_id");

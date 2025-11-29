@@ -1,6 +1,6 @@
 # Email-Domain einrichten (Resend)
 
-## Option 1: Eigene Domain verwenden (noreply@karriereadler.com)
+## Option 1: Eigene Domain verwenden (info@karriereadler.com)
 
 ### Voraussetzungen
 - Du musst Zugriff auf die DNS-Einstellungen deiner Domain haben
@@ -72,7 +72,7 @@ Value: v=DMARC1; p=none; ...
 Wenn die Domain verifiziert ist, aktualisiere deine `.env`:
 
 ```bash
-EMAIL_FROM=noreply@karriereadler.com  # Oder support@, hello@, etc.
+EMAIL_FROM=info@karriereadler.com  # Oder support@, hello@, etc.
 ```
 
 ## Option 2: Resend Subdomain verwenden (Einfacher, aber weniger professionell)
@@ -95,7 +95,7 @@ Wenn du die Haupt-Domain nicht für Emails nutzen willst:
 2. Gleiche DNS Records, aber für die Subdomain
 3. In `.env`:
    ```bash
-   EMAIL_FROM=noreply@mail.karriereadler.com
+   EMAIL_FROM=info@mail.karriereadler.com
    ```
 
 ## Testen
