@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Instagram, Linkedin, Music2 } from 'lucide-react';
 
-import { CookieSettingsButton } from '@/components/cookie-banner';
 import { useI18n } from '@/components/providers/i18n-provider';
 
 export function DashboardFooter() {
@@ -41,8 +40,7 @@ export function DashboardFooter() {
               Karriereadler
             </p>
           </div>
-          <p className="text-sm text-gray-600">© {year} {t('footer.rights')}</p>
-          <CookieSettingsButton />
+          <p className="text-sm text-gray-600" suppressHydrationWarning>© {year} {t('footer.rights')}</p>
         </div>
 
         <div>

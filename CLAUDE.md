@@ -54,7 +54,7 @@ The application uses Next.js App Router with route groups:
 - **`app/(dashboard)/admin/`** — Admin panel: `/admin`, `/admin/cv-requests/[id]`, `/admin/letter-requests/[id]` (requires `role: 'admin'` or `'owner'`)
 - **`app/cv/`** — CV creation workflow: `/cv` (list), `/cv/new` (form)
 - **`app/cover-letter/`** — Cover letter creation workflow: `/cover-letter` (list), `/cover-letter/new` (form)
-- **`app/api/`** — API routes for checkout, webhooks, purchases, requests, admin endpoints, analytics, contact
+- **`app/api/`** — API routes for checkout, webhooks, orders, admin endpoints, contact
 
 ### Authentication & Authorization
 
@@ -83,27 +83,27 @@ The application uses Next.js App Router with route groups:
 ### Database Schema (`lib/db/schema.ts`)
 
 **Core Tables**:
-- `users` — User accounts with `cvCredits` and `letterCredits` (integer counters), `role` (member/admin/owner), email verification fields, extended personal data (address, birthdate)
+- `users` — User accounts with `role` (member/admin/owner), email verification fields, extended personal data (address, birthdate)
 - `teams` — Team entities (mostly legacy, still used for activity logging)
 - `teamMembers` — User-team relationships with roles (owner/member)
-- `stripeEvents` — Idempotency tracking for webhook events (prevents duplicate credit grants)
+- `orderRequests` — Order requests for CV/Cover Letter/Bundle with customer data, product type, status, Stripe session tracking
+- `stripeEvents` — Idempotency tracking for webhook events (prevents duplicate order processing)
 - `activityLogs` — User activity tracking (sign in, sign up, password changes, etc.)
 - `invitations` — Team invitation system (pending/accepted status)
-- `cvRequests` — CV optimization requests with personal data, work experience, education, skills (JSON fields), photo path, job description
-- `letterRequests` — Cover letter requests with job details, company info, experiences to highlight, optional reference to cvRequest
 - `contactMessages` — Contact form submissions with name, email, subject, message, handled flag
-- `analyticsEvents` — Analytics table (exists in schema but UI removed; API routes at `/api/analytics/events` and `/api/analytics/summary` still present but unused)
 
 **Key Relations**:
-- Users have many team memberships, cvRequests, and letterRequests
+- Users have many team memberships and orderRequests
 - Teams have many members and activity logs
 - Activity logs reference both user and team
-- LetterRequests can optionally reference a cvRequest
+- OrderRequests belong to users and track Stripe payment sessions
 
-**Request Status Enum** (`RequestStatus`):
-- `offen` — New request, not yet processed
-- `in_bearbeitung` — Request currently being worked on
-- `fertig` — Request completed
+**Order Status Enum** (`OrderStatus`):
+- `PENDING_PAYMENT` — Order created, awaiting payment
+- `PAID` — Payment confirmed, ready for processing
+- `IN_PROGRESS` — Admin is processing the order
+- `COMPLETED` — Order finished and delivered to customer
+- `CANCELLED` — Order was cancelled
 
 **Database Queries** (`lib/db/queries.ts`):
 - `getUser()` — Get current authenticated user from session cookie
@@ -128,34 +128,29 @@ The application uses Next.js App Router with route groups:
 - Only processes sessions with `payment_status === 'paid'` and `mode === 'payment'`
 - **Legacy subscription handlers**: Still handles `customer.subscription.updated/deleted` for backward compatibility
 
-**Credit System**:
-- Credits stored as integers on `users` table: `cvCredits`, `letterCredits`
-- Atomic decrement on use: `UPDATE users SET cvCredits = cvCredits - 1 WHERE id = ? AND cvCredits >= 1 RETURNING *`
-- If update returns no rows, user had insufficient credits (prevents race conditions)
+### Order Processing Workflow
 
-### Request Processing Workflow
+**Purchase Flow**:
+1. User visits `/kaufen` (requires authentication)
+2. Selects product (CV, Cover Letter, or Bundle) and fills in basic customer data
+3. Clicks "Zur sicheren Zahlung" → POST to `/api/orders/create`
+4. Backend creates `orderRequest` with status `PENDING_PAYMENT` and Stripe checkout session
+5. User completes payment on Stripe Checkout
+6. Stripe webhook (`checkout.session.completed`) validates payment and updates order to `PAID`
+7. Confirmation email sent to customer with dashboard link
 
-**CV Request Flow**:
-1. User fills out form at `/cv/new` with personal data, work experience, education, skills, optional job description
-2. User can upload photo via `/api/upload/photo` (stored in `public/uploads/`)
-3. Form submission POSTs to `/api/cv-request`
-4. Backend atomically decrements cvCredits and creates cvRequest record with status `offen`
-5. Admin views request at `/admin` and can update status to `in_bearbeitung` or `fertig` via `/api/admin/cv-requests/[id]`
-6. Request data stored with JSON fields for complex structures (workExperience, education, skills, other)
+**Order Status Flow**:
+- `PENDING_PAYMENT` — Order created, awaiting payment
+- `PAID` — Payment received, ready for processing
+- `IN_PROGRESS` — Admin started working on order
+- `COMPLETED` — Order finished and delivered
+- `CANCELLED` — Order cancelled
 
-**Cover Letter Request Flow**:
-1. User fills out form at `/cover-letter/new` with job details, company info, experiences to highlight
-2. Can optionally link to existing CV request via `cvRequestId`
-3. Form submission POSTs to `/api/letter-request`
-4. Backend atomically decrements letterCredits and creates letterRequest record with status `offen`
-5. Admin manages requests via `/admin` panel
-
-**Admin Panel** (`/admin`):
+**Admin Panel** (`/admin/orders`):
 - Requires `user.role === 'admin'` or `user.role === 'owner'` for access
-- Lists all CV and letter requests with status badges
-- Provides stats dashboard (total requests, open requests per type)
-- Detail pages at `/admin/cv-requests/[id]` and `/admin/letter-requests/[id]` for viewing full request data and updating status
-- Admin notifications sent via email when new requests are created (if `ADMIN_NOTIFY_EMAIL` or `EMAIL_FROM` configured)
+- Lists all orders with status badges and customer information
+- Detail pages at `/admin/orders/[id]` for viewing full order data and customer questionnaire
+- Admin can view basicInfo (collected at purchase) and formData (from questionnaire)
 
 ### Server Actions
 
@@ -187,48 +182,6 @@ The application uses Next.js App Router with route groups:
 
 ## Key Patterns
 
-### Working with JSON Fields
-
-CV and letter requests use JSON fields for complex nested data. When creating or updating requests:
-
-```typescript
-// workExperience is stored as stringified JSON in the database
-const cvRequest = await db.insert(cvRequests).values({
-  userId: user.id,
-  workExperience: JSON.stringify([
-    { company: 'Acme Inc', position: 'Developer', startDate: '2020-01', endDate: '2023-06' }
-  ]),
-  education: JSON.stringify([...]),
-  skills: JSON.stringify({ technical: ['React', 'Node.js'], languages: ['German', 'English'] }),
-  other: JSON.stringify({ certificates: ['AWS'], driverLicense: 'B' })
-});
-
-// When reading, parse the JSON strings
-const parsedRequest = {
-  ...request,
-  workExperience: JSON.parse(request.workExperience || '[]'),
-  education: JSON.parse(request.education || '[]')
-};
-```
-
-### Atomic Credit Operations
-
-Always use this pattern for credit consumption to prevent race conditions:
-
-```typescript
-const [updated] = await db
-  .update(users)
-  .set({ cvCredits: sql`${users.cvCredits} - 1` })
-  .where(and(eq(users.id, userId), sql`${users.cvCredits} >= 1`))
-  .returning();
-
-if (!updated) {
-  return { error: 'Insufficient credits' };
-}
-
-// Only proceed with AI call after successful credit reservation
-```
-
 ### Activity Logging
 
 Log user actions for audit trail:
@@ -253,20 +206,6 @@ export const myAction = validatedActionWithUser(schema, async (data, formData, u
   // user is guaranteed to be authenticated
 });
 ```
-
-### File Uploads
-
-Photo uploads for CV requests:
-
-```typescript
-// Upload endpoint: POST /api/upload/photo
-// Accepts multipart/form-data with 'photo' field
-// Returns: { path: '/uploads/filename.jpg' }
-// Files stored in: public/uploads/
-// Access in DB: cvRequests.photoPath
-```
-
-**Important**: The `public/uploads/` directory should be added to `.gitignore` to avoid committing uploaded files.
 
 ## Environment Variables
 

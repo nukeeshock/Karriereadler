@@ -118,20 +118,26 @@ While this template is intentionally minimal and to be used as a learning resour
 - https://zerotoshipped.com
 - https://turbostarter.dev
 
-## Karriereadler specifics
+## Karriereadler Specifics
 
-- **Run**: `pnpm dev` (dev), `pnpm build && pnpm start` (prod).
-- **Language**: Header DE/EN switcher with browser-language fallback. Stored in `localStorage` (`ka-lang`).
-- **Analytics**:
-  - Pseudonymous visitor/session IDs in `localStorage` only after consent.
-  - Events POST to `/api/analytics/events`; summaries at `/api/analytics/summary` (admin/owner only).
-  - Dashboard tab `/dashboard/analytics` shows visitors, new vs returning, session time, pages per session, and per-page stats.
-  - Honors cookie consent; analytics stays disabled until optional cookies accepted.
+- **Run**: `pnpm dev` (development), `pnpm build && pnpm start` (production)
+- **Language**: German language only (all user-facing text in German)
 - **Roles**:
-  - `users.role` supports `member`, `admin`, `owner` (owner inherits admin).
-  - New sign-ups become `owner`. Owners can add/remove admins via `/dashboard/owner` (API `/api/owner/admins`).
-  - Dashboard sidebar shows Analytics/Admin for admin/owner, Owner tab only for owner.
-- **Contact form**: `/contact` posts to `/api/contact`, persists in `contact_messages`. Set `CONTACT_FORWARD_EMAIL` (+ `RESEND_API_KEY`) to forward via Resend; default Absender ist `Karriereadler <info@karriereadler.com>`.
-- **Cookie banner & consent**: Banner stores choice in `ka-consent` cookie + `localStorage`; footer has “Cookie-Einstellungen”. Analytics blocked until consent for optional cookies.
-- **Caching**: `next.config.ts` sends long cache headers for `_next/static` and static assets; API routes are `no-store`.
-- **Database**: New tables `contact_messages` and `analytics_events` added; run `pnpm db:generate && pnpm db:migrate` after pulling.
+  - `users.role` supports `member`, `admin`, `owner` (owner inherits admin permissions)
+  - New sign-ups become `owner` by default
+  - Owners can add/remove admins via `/dashboard/owner` (API: `/api/owner/admins`)
+- **Contact form**:
+  - `/contact` posts to `/api/contact`, persists in `contactMessages` table
+  - Set `CONTACT_FORWARD_EMAIL` + `RESEND_API_KEY` to forward emails via Resend
+  - Default sender: `Karriereadler <info@karriereadler.com>`
+- **Order System**:
+  - One-time payments via Stripe (no subscriptions)
+  - Products: CV (€20), Cover Letter (€20), Bundle (€30)
+  - Order workflow: Payment → Order created (PENDING_PAYMENT) → Stripe webhook → PAID → Admin processes
+  - Admin panel at `/admin/orders` for order management
+- **Caching**:
+  - `next.config.ts` sends long cache headers for `_next/static` and static assets
+  - API routes use `no-store`
+- **Database**:
+  - Main tables: `users`, `orderRequests`, `stripeEvents`, `contactMessages`
+  - Run `pnpm db:generate && pnpm db:migrate` after schema changes

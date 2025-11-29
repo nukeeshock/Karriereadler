@@ -67,16 +67,10 @@ function UserMenu() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 z-[100] bg-white/95 backdrop-blur-sm border-orange-200">
-        <DropdownMenuItem className="cursor-pointer focus:bg-orange-50">
-          <Link href="/dashboard" className="flex w-full items-center">
-            <Home className="mr-2 h-4 w-4 text-orange-600" />
-            <span className="font-medium">{t('nav.dashboard')}</span>
-          </Link>
-        </DropdownMenuItem>
         {user.role && (
           <DropdownMenuItem className="cursor-default opacity-80 bg-orange-50" disabled>
             <span className="text-sm">
-              {t('roles.role')}: <span className="font-semibold">{t(`roles.${user.role as 'admin' | 'owner' | 'member'}`)}</span>
+              Status: <span className="font-semibold">{t(`roles.${user.role as 'admin' | 'owner' | 'member'}`)}</span>
             </span>
           </DropdownMenuItem>
         )}
@@ -111,7 +105,8 @@ export function DashboardHeader() {
   // Navigation Items
   const navItems = user
     ? [
-        { href: '/kaufen', label: t('nav.buy') },
+        { href: '/dashboard', label: 'Dashboard' },
+        { href: '/leistungen', label: 'Leistungen' },
         { href: '/contact', label: t('nav.contact') }
       ]
     : [
