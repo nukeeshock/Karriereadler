@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { Button } from '@/components/ui/button';
 import { User } from '@/lib/db/schema';
 import { Check, Sparkles, FileText, Package } from 'lucide-react';
+import { WiderrufsCheckbox } from '@/components/checkout/widerrufs-checkbox';
 
 type ProductKey = 'cv' | 'letter' | 'bundle';
 
@@ -72,6 +73,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function BuyPage() {
   const [loadingProduct, setLoadingProduct] = useState<ProductKey | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [widerrufsAccepted, setWiderrufsAccepted] = useState(false);
   const { data: user } = useSWR<User>('/api/user', fetcher);
 
   async function startCheckout(productType: ProductKey) {
@@ -136,6 +138,14 @@ export default function BuyPage() {
             <p className="text-red-600 text-center">{error}</p>
           </div>
         )}
+
+        {/* Widerrufsrecht Notice */}
+        <div className="max-w-4xl mx-auto mb-12">
+          <WiderrufsCheckbox
+            checked={widerrufsAccepted}
+            onChange={setWiderrufsAccepted}
+          />
+        </div>
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
@@ -206,11 +216,11 @@ export default function BuyPage() {
                   {/* CTA Button */}
                   <Button
                     onClick={() => startCheckout(product.key)}
-                    disabled={loadingProduct !== null}
+                    disabled={!widerrufsAccepted || loadingProduct !== null}
                     className={`w-full py-6 text-base font-semibold rounded-xl transition-all ${
                       product.highlight
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl'
-                        : 'bg-orange-500 hover:bg-orange-600 text-white'
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
+                        : 'bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50 disabled:cursor-not-allowed'
                     }`}
                   >
                     {loadingProduct === product.key ? (
@@ -247,15 +257,37 @@ export default function BuyPage() {
           })}
         </div>
 
+        {/* Nachbesserungs-Garantie */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-8 shadow-lg">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Check className="h-6 w-6 text-green-600" />
+              Zufriedenheitsgarantie durch Nachbesserung
+            </h3>
+            <div className="space-y-3 text-gray-700">
+              <p>
+                Du erhältst keine 08/15-Vorlage, sondern <strong>individuell überarbeitete Unterlagen</strong>.
+              </p>
+              <p>
+                Bist du mit Struktur, Layout oder Formulierungen nicht zufrieden, kannst du{' '}
+                <strong>innerhalb von 14 Tagen nach Erhalt</strong> eine Überarbeitung anfordern –
+                bis zu <strong>1 Überarbeitungsrunde ist inklusive</strong>.
+              </p>
+              <p className="text-sm text-gray-600 bg-white/60 rounded-lg p-3 border border-green-200">
+                <strong>Hinweis:</strong> Ein Anspruch auf Rückerstattung besteht nicht, sofern wir die vereinbarte Leistung erbracht und Nachbesserungen angeboten haben. Dies entspricht der gesetzlichen Regelung für vollständig erbrachte digitale Dienstleistungen.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Bottom Info */}
-        <div className="mt-16 text-center">
+        <div className="mt-8 text-center">
           <div className="inline-block bg-white rounded-xl shadow-sm border border-gray-200 px-8 py-6 max-w-2xl">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Sichere Zahlung über Stripe
             </h3>
             <p className="text-sm text-gray-600">
-              Nach dem Kauf erhältst du sofort Zugriff auf deine Credits. Nutze sie flexibel,
-              wann immer du sie brauchst – kein Ablaufdatum, keine Abos.
+              Nach dem Kauf erhältst du Credits, die du flexibel einsetzen kannst – kein Ablaufdatum, keine Abos.
             </p>
           </div>
         </div>

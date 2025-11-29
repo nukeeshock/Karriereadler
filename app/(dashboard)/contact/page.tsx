@@ -220,7 +220,7 @@ export default function ContactPage() {
             </Card>
           </div>
 
-          <div className="space-y-4" id="faq">
+          <div className="space-y-4 scroll-mt-32" id="faq">
             <h2 className="text-3xl font-bold text-gray-900">Häufige Fragen (FAQ)</h2>
             <div className="divide-y divide-gray-200 rounded-2xl border border-gray-200 bg-white shadow-sm">
               {faqs.map((item, idx) => {

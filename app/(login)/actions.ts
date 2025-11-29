@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 import { and, eq, inArray, sql } from 'drizzle-orm';
+import fs from 'fs/promises';
+import path from 'path';
 import { db } from '@/lib/db/drizzle';
 import {
   User,
@@ -14,11 +16,17 @@ import {
   type NewTeamMember,
   type NewActivityLog,
   ActivityType,
-  invitations
+  invitations,
+  cvRequests,
+  letterRequests
 } from '@/lib/db/schema';
-import { comparePasswords, hashPassword, setSession } from '@/lib/auth/session';
+import {
+  comparePasswords,
+  deleteSession,
+  hashPassword,
+  setSession
+} from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import { getUser, getUserWithTeam } from '@/lib/db/queries';
 import {
   validatedAction,
@@ -47,6 +55,13 @@ async function logActivity(
   };
   await db.insert(activityLogs).values(newActivity);
 }
+
+const passwordRulesSchema = z
+  .string()
+  .min(8, 'Passwort muss mindestens 8 Zeichen lang sein.')
+  .max(100)
+  .regex(/[a-z]/, 'Passwort muss mindestens einen Kleinbuchstaben enthalten.')
+  .regex(/[A-Z]/, 'Passwort muss mindestens einen Großbuchstaben enthalten.');
 
 const signInSchema = z.object({
   email: z.string().email().min(3).max(255),
@@ -118,7 +133,7 @@ const signUpSchema = z.object({
   city: z.string().max(100).optional(),
   country: z.string().max(100).optional(),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: passwordRulesSchema,
   inviteId: z.string().optional()
 });
 
@@ -327,16 +342,27 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 });
 
 export async function signOut() {
-  const user = (await getUser()) as User;
-  const userWithTeam = await getUserWithTeam(user.id);
-  await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
-  (await cookies()).delete('session');
+  'use server';
+
+  const user = await getUser();
+
+  await Promise.all([
+    deleteSession(),
+    (async () => {
+      if (user) {
+        const userWithTeam = await getUserWithTeam(user.id);
+        await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
+      }
+    })()
+  ]);
+
+  redirect('/');
 }
 
 const updatePasswordSchema = z.object({
   currentPassword: z.string().min(8).max(100),
-  newPassword: z.string().min(8).max(100),
-  confirmPassword: z.string().min(8).max(100)
+  newPassword: passwordRulesSchema,
+  confirmPassword: passwordRulesSchema
 });
 
 export const updatePassword = validatedActionWithUser(
@@ -393,12 +419,12 @@ export const updatePassword = validatedActionWithUser(
   }
 );
 
-const deleteAccountSchema = z.object({
+const softDeleteAccountSchema = z.object({
   password: z.string().min(8).max(100)
 });
 
-export const deleteAccount = validatedActionWithUser(
-  deleteAccountSchema,
+export const softDeleteAccount = validatedActionWithUser(
+  softDeleteAccountSchema,
   async (data, _, user) => {
     const { password } = data;
 
@@ -438,8 +464,77 @@ export const deleteAccount = validatedActionWithUser(
         );
     }
 
-    (await cookies()).delete('session');
+    await deleteSession();
     redirect('/sign-in');
+  }
+);
+
+const hardDeleteAccountSchema = z.object({
+  password: z.string().min(8).max(100),
+  confirmDeletion: z.preprocess(
+    (val) => val === 'true' || val === 'on' || val === true,
+    z.literal(true)
+  )
+});
+
+export const hardDeleteAccount = validatedActionWithUser(
+  hardDeleteAccountSchema,
+  async (data, _, user) => {
+    const { password } = data;
+
+    const isPasswordValid = await comparePasswords(password, user.passwordHash);
+    if (!isPasswordValid) {
+      return {
+        password,
+        error: 'Passwort ist falsch.'
+      };
+    }
+
+    try {
+      await db.transaction(async (tx) => {
+        const photos = await tx
+          .select({ photoPath: cvRequests.photoPath })
+          .from(cvRequests)
+          .where(eq(cvRequests.userId, user.id));
+
+        await Promise.all(
+          photos.map(async ({ photoPath }) => {
+            if (!photoPath) return;
+
+            const normalizedPath = photoPath.startsWith('/')
+              ? photoPath.slice(1)
+              : photoPath;
+            const absolutePath = path.join(
+              process.cwd(),
+              'public',
+              normalizedPath
+            );
+
+            await fs.unlink(absolutePath).catch(() => {});
+          })
+        );
+
+        await tx.delete(cvRequests).where(eq(cvRequests.userId, user.id));
+        await tx
+          .delete(letterRequests)
+          .where(eq(letterRequests.userId, user.id));
+        await tx
+          .delete(activityLogs)
+          .where(eq(activityLogs.userId, user.id));
+        await tx
+          .delete(teamMembers)
+          .where(eq(teamMembers.userId, user.id));
+        await tx.delete(users).where(eq(users.id, user.id));
+      });
+    } catch (error) {
+      console.error('Hard delete failed:', error);
+      return {
+        error: 'Konnte Account nicht löschen. Bitte versuche es erneut.'
+      };
+    }
+
+    await deleteSession();
+    redirect('/account-deleted-confirmation');
   }
 );
 

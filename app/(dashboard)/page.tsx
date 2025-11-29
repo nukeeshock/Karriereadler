@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, CreditCard } from 'lucide-react';
+import { ArrowRight, Sparkles, CreditCard, Star, Users, Award, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { getUser } from '@/lib/db/queries';
 import KarriereadlerStory from '@/components/karriereadler-story';
@@ -7,7 +7,13 @@ import KarriereadlerStory from '@/components/karriereadler-story';
 export default async function HomePage() {
   const user = await getUser();
   const hasCredits = (user?.cvCredits || 0) > 0 || (user?.letterCredits || 0) > 0;
-  const ctaHref = user ? (hasCredits ? '/cv' : '/dashboard/buy') : '/sign-in';
+
+  // Smart CTA routing:
+  // - Logged in with credits → Go directly to CV creation
+  // - Logged in without credits → Go to purchase page
+  // - Not logged in → Guide through value proposition first (Leistungen)
+  const primaryCtaHref = user ? (hasCredits ? '/cv' : '/dashboard/buy') : '/leistungen';
+  const secondaryCtaHref = user ? '/pricing' : '/pricing';
 
   return (
     <main>
@@ -46,10 +52,10 @@ export default async function HomePage() {
                   <Button
                     asChild
                     size="lg"
-                    className="text-lg rounded-full bg-orange-500 hover:bg-orange-600 animate-pulse shadow-lg"
+                    className="text-lg rounded-full bg-orange-500 hover:bg-orange-600 shadow-lg"
                   >
-                    <Link href={ctaHref}>
-                      Lebenslauf-Service für 20 €
+                    <Link href={primaryCtaHref}>
+                      {user ? 'Lebenslauf-Service für 20 €' : 'Mehr erfahren'}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
@@ -59,7 +65,9 @@ export default async function HomePage() {
                     variant="outline"
                     className="text-lg rounded-full bg-white/90 backdrop-blur-sm"
                   >
-                    <Link href="#mehr-erfahren">Mehr erfahren</Link>
+                    <Link href={secondaryCtaHref}>
+                      {user ? 'Preise ansehen' : 'Preise & Pakete'}
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -67,7 +75,7 @@ export default async function HomePage() {
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
               <div className="w-full rounded-2xl border border-gray-200 bg-white/95 backdrop-blur-sm shadow-lg p-6 space-y-4">
                 <p className="text-sm uppercase tracking-wide text-orange-500 font-semibold">
-                  So einfach geht’s
+                  So einfach geht's
                 </p>
                 <div className="text-sm text-gray-800 bg-orange-50 border border-orange-100 rounded-xl px-4 py-3">
                   <div className="font-semibold text-orange-600">
@@ -97,11 +105,127 @@ export default async function HomePage() {
                     size="sm"
                     className="bg-orange-500 hover:bg-orange-600 text-white rounded-full"
                   >
-                    <Link href={ctaHref}>Jetzt starten</Link>
+                    <Link href={primaryCtaHref}>
+                      {user ? 'Jetzt starten' : 'So funktioniert\'s'}
+                    </Link>
                   </Button>
                   <Button asChild size="sm" variant="ghost" className="rounded-full">
-                    <Link href="#mehr-erfahren">Mehr erfahren</Link>
+                    <Link href={secondaryCtaHref}>
+                      {user ? 'Preise' : 'Preise ansehen'}
+                    </Link>
                   </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Signals & Stats */}
+      <section className="py-12 bg-gradient-to-b from-orange-50/50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="flex justify-center mb-2">
+                <Users className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900">200+</div>
+              <div className="text-sm text-gray-600">Zufriedene Kunden</div>
+            </div>
+            <div>
+              <div className="flex justify-center mb-2">
+                <Star className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900">4.8/5</div>
+              <div className="text-sm text-gray-600">Durchschnittliche Bewertung</div>
+            </div>
+            <div>
+              <div className="flex justify-center mb-2">
+                <Award className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900">10+ Jahre</div>
+              <div className="text-sm text-gray-600">HR-Erfahrung</div>
+            </div>
+            <div>
+              <div className="flex justify-center mb-2">
+                <CheckCircle className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="text-3xl font-bold text-gray-900">2-3 Tage</div>
+              <div className="text-sm text-gray-600">Lieferzeit</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              Das sagen unsere Kunden
+            </h2>
+            <p className="text-gray-600">
+              Echte Erfahrungen von Menschen, die mit Karriereadler ihre Traumjobs gefunden haben
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-orange-500 text-orange-500" />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                &quot;Der Lebenslauf war perfekt auf die Stelle zugeschnitten. Nach nur zwei Wochen hatte ich drei Vorstellungsgespräche!&quot;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center">
+                  <span className="text-orange-700 font-semibold">SK</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Sarah K.</div>
+                  <div className="text-sm text-gray-600">Marketing Manager</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-orange-500 text-orange-500" />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                &quot;Endlich kein stundenlanger Kampf mit Formatierungen! Das Anschreiben klang professionell und persönlich – genau richtig.&quot;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center">
+                  <span className="text-orange-700 font-semibold">MH</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Michael H.</div>
+                  <div className="text-sm text-gray-600">Software-Entwickler</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-xl p-6 border border-orange-100 shadow-md">
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-orange-500 text-orange-500" />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4 italic">
+                &quot;Als Quereinsteiger war ich unsicher, wie ich meine Erfahrungen darstellen soll. Das Team hat das perfekt gelöst!&quot;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center">
+                  <span className="text-orange-700 font-semibold">LM</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Laura M.</div>
+                  <div className="text-sm text-gray-600">Projektmanagerin</div>
                 </div>
               </div>
             </div>

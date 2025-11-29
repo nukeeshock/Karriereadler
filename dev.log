@@ -91,3 +91,25 @@
  GET /api/purchases 200 in 228ms
  GET / 200 in 389ms
  GET /api/user 200 in 129ms
+ GET /api/user 200 in 116ms
+ ○ Compiling /dashboard/buy ...
+ ✓ Compiled /dashboard/buy in 560ms (2033 modules)
+ GET /dashboard/buy 200 in 701ms
+ GET /dashboard/buy 200 in 752ms
+ GET /api/user 200 in 124ms
+ GET /api/user 200 in 122ms
+ GET / 200 in 818ms
+ GET /api/user 200 in 119ms
+ GET / 200 in 311ms
+ GET /api/user 200 in 120ms
+ GET / 200 in 296ms
+ GET /api/user 200 in 118ms
+ GET / 200 in 301ms
+ GET /api/user 200 in 119ms
+ GET /api/user 200 in 130ms
+ GET / 200 in 303ms
+ GET /api/user 200 in 110ms
+ GET /api/user 200 in 119ms
+ GET / 200 in 307ms
+ GET /api/user 200 in 110ms
+[?25h

@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2 } from 'lucide-react';
 import { signIn, signUp } from './actions';
 import { ActionState } from '@/lib/auth/middleware';
@@ -89,7 +90,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                       name="firstName"
                       type="text"
                       autoComplete="given-name"
-                      defaultValue={state.firstName}
+                      defaultValue={state?.firstName || ''}
                       required
                       maxLength={100}
                       className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
@@ -107,7 +108,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                       name="lastName"
                       type="text"
                       autoComplete="family-name"
-                      defaultValue={state.lastName}
+                      defaultValue={state?.lastName || ''}
                       required
                       maxLength={100}
                       className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
@@ -127,7 +128,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                     name="birthDate"
                     type="date"
                     autoComplete="bday"
-                    defaultValue={state.birthDate}
+                    defaultValue={state?.birthDate || ''}
                     required
                     className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                   />
@@ -145,7 +146,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                       name="street"
                       type="text"
                       autoComplete="address-line1"
-                      defaultValue={state.street}
+                      defaultValue={state?.street || ''}
                       maxLength={255}
                       className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                       placeholder="Musterstraße"
@@ -155,7 +156,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                       name="houseNumber"
                       type="text"
                       autoComplete="off"
-                      defaultValue={state.houseNumber}
+                      defaultValue={state?.houseNumber || ''}
                       maxLength={20}
                       className="appearance-none rounded-full relative block w-28 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                       placeholder="1a"
@@ -173,7 +174,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                         name="zipCode"
                         type="text"
                         autoComplete="postal-code"
-                        defaultValue={state.zipCode}
+                        defaultValue={state?.zipCode || ''}
                         maxLength={20}
                         className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                         placeholder="10115"
@@ -190,7 +191,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                         name="city"
                         type="text"
                         autoComplete="address-level2"
-                        defaultValue={state.city}
+                        defaultValue={state?.city || ''}
                         maxLength={100}
                         className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                         placeholder="Berlin"
@@ -209,7 +210,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                     id="country"
                     name="country"
                     autoComplete="country-name"
-                    defaultValue={state.country || ''}
+                    defaultValue={state?.country || ''}
                     className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 text-sm text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 bg-white"
                   >
                     <option value="">Land auswählen (optional)</option>
@@ -237,7 +238,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 name="email"
                 type="email"
                 autoComplete="email"
-                defaultValue={state.email}
+                defaultValue={state?.email || ''}
                 required
                 maxLength={50}
                 className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
@@ -261,14 +262,19 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 autoComplete={
                   mode === 'signin' ? 'current-password' : 'new-password'
                 }
-                defaultValue={state.password}
+                defaultValue={state?.password || ''}
                 required
                 minLength={8}
                 maxLength={100}
                 className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                placeholder="Mindestens 8 Zeichen"
+                placeholder="Mindestens 8 Zeichen, Groß- und Kleinschreibung"
               />
             </div>
+            {mode === 'signup' && (
+              <p className="mt-1 text-xs text-gray-500">
+                Mindestens 8 Zeichen mit mindestens einem Groß- und Kleinbuchstaben verwenden.
+              </p>
+            )}
           </div>
 
           {state?.success && (
@@ -284,6 +290,49 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           {state?.error && (
             <div className="text-red-500 text-sm" role="alert">
               {state.error}
+            </div>
+          )}
+
+          {mode === 'signup' && (
+            <div className="space-y-3">
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="consentBirthDate"
+                  name="consentBirthDate"
+                  required
+                  className="mt-1"
+                />
+                <Label
+                  htmlFor="consentBirthDate"
+                  className="text-sm text-gray-700 leading-relaxed"
+                >
+                  Ich willige ein, dass mein Geburtsdatum (besondere Kategorie personenbezogener Daten gem. Art. 9 DSGVO)
+                  zur Kontoerstellung und zur Bearbeitung meiner Anfragen gespeichert wird. Diese Einwilligung kann ich
+                  jederzeit widerrufen.{' '}
+                  <Link href="/datenschutz" className="text-orange-600 underline">
+                    Datenschutzerklärung
+                  </Link>
+                </Label>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="consentDataProcessing"
+                  name="consentDataProcessing"
+                  required
+                  className="mt-1"
+                />
+                <Label
+                  htmlFor="consentDataProcessing"
+                  className="text-sm text-gray-700 leading-relaxed"
+                >
+                  Ich willige in die Verarbeitung meiner personenbezogenen Daten (Name, E-Mail, Adresse) zur
+                  Kontoerstellung und Leistungserbringung ein.{' '}
+                  <Link href="/datenschutz" className="text-orange-600 underline">
+                    Datenschutzerklärung
+                  </Link>
+                </Label>
+              </div>
             </div>
           )}
 
@@ -305,6 +354,14 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               )}
             </Button>
           </div>
+
+          {mode === 'signin' && (
+            <div className="text-center text-sm">
+              <Link href="/forgot-password" className="text-[color:#3f7cc7] underline">
+                Passwort vergessen?
+              </Link>
+            </div>
+          )}
         </form>
 
         <div className="mt-6">

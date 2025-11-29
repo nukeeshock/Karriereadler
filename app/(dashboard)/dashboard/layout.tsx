@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, Settings, Shield, Menu, X, BarChart3, FolderCog, Crown } from 'lucide-react';
+import { ShoppingBag, Settings, Shield, Menu, X, BarChart3, FolderCog, Crown, Trash2 } from 'lucide-react';
 import useSWR from 'swr';
 import { User, UserRole } from '@/lib/db/schema';
 
@@ -27,7 +27,8 @@ export default function DashboardLayout({
   const navItems = [
     { href: '/dashboard', icon: ShoppingBag, label: 'Käufe', description: 'Kaufhistorie & Credits' },
     { href: '/dashboard/general', icon: Settings, label: 'Allgemein', description: 'Account-Einstellungen' },
-    { href: '/dashboard/security', icon: Shield, label: 'Sicherheit', description: 'Passwort & Account-Sicherheit' }
+    { href: '/dashboard/security', icon: Shield, label: 'Sicherheit', description: 'Passwort & Account-Sicherheit' },
+    { href: '/dashboard/delete-account', icon: Trash2, label: 'Account löschen', description: 'Daten unwiderruflich löschen' }
   ];
 
   if (isAdmin) {

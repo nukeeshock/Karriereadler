@@ -64,6 +64,13 @@
       "when": 1764261218109,
       "tag": "0008_fixed_romulus",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1764408500914,
+      "tag": "0009_red_hammerhead",
+      "breakpoints": true
     }
   ]
 }

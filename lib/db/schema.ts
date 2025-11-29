@@ -36,6 +36,8 @@ export const users = pgTable('users', {
   emailVerified: boolean('email_verified').notNull().default(false),
   verificationToken: text('verification_token'),
   verificationTokenExpiry: timestamp('verification_token_expiry'),
+  passwordResetToken: text('password_reset_token'),
+  passwordResetTokenExpiry: timestamp('password_reset_token_expiry'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),

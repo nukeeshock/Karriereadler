@@ -1,13 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import useSWR from 'swr';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { FileText, Mail, User } from 'lucide-react';
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { FileText, Mail } from 'lucide-react';
 
 type CvRequestSummary = {
   id: number;
@@ -16,7 +13,7 @@ type CvRequestSummary = {
   firstName: string;
   lastName: string;
   email: string;
-  createdAt: string;
+  createdAt: Date;
   userName: string | null;
   userEmail: string;
 };
@@ -27,18 +24,18 @@ type LetterRequestSummary = {
   status: string;
   jobTitle: string;
   companyName: string;
-  createdAt: string;
+  createdAt: Date;
   userName: string | null;
   userEmail: string;
 };
 
-export default function AdminPage() {
+type AdminDashboardProps = {
+  cvRequests: CvRequestSummary[];
+  letterRequests: LetterRequestSummary[];
+};
+
+export default function AdminDashboard({ cvRequests, letterRequests }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<'cv' | 'letter'>('cv');
-  const { data: cvRequests, error: cvError } = useSWR<CvRequestSummary[]>('/api/admin/cv-requests', fetcher);
-  const { data: letterRequests, error: letterError } = useSWR<LetterRequestSummary[]>(
-    '/api/admin/letter-requests',
-    fetcher
-  );
 
   const getStatusBadge = (status: string) => {
     const colors = {
@@ -58,19 +55,6 @@ export default function AdminPage() {
     );
   };
 
-  if (cvError || letterError) {
-    return (
-      <section className="flex-1 p-4 lg:p-8">
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="py-8 text-center text-red-800">
-            <p className="font-semibold">Zugriff verweigert oder Fehler beim Laden</p>
-            <p className="text-sm mt-2">Du benötigst Admin-Rechte (role: owner), um diese Seite zu sehen.</p>
-          </CardContent>
-        </Card>
-      </section>
-    );
-  }
-
   return (
     <section className="flex-1 p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
@@ -86,7 +70,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">CV-Anfragen</p>
-                  <p className="text-2xl font-bold text-gray-900">{cvRequests?.length || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">{cvRequests.length}</p>
                 </div>
                 <FileText className="w-8 h-8 text-orange-500" />
               </div>
@@ -98,7 +82,7 @@ export default function AdminPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Anschreiben-Anfragen</p>
-                  <p className="text-2xl font-bold text-gray-900">{letterRequests?.length || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">{letterRequests.length}</p>
                 </div>
                 <Mail className="w-8 h-8 text-orange-500" />
               </div>
@@ -111,7 +95,7 @@ export default function AdminPage() {
                 <div>
                   <p className="text-sm text-gray-600">Offen (CV)</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {cvRequests?.filter((r) => r.status === 'offen').length || 0}
+                    {cvRequests.filter((r) => r.status === 'offen').length}
                   </p>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -127,7 +111,7 @@ export default function AdminPage() {
                 <div>
                   <p className="text-sm text-gray-600">Offen (Anschreiben)</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {letterRequests?.filter((r) => r.status === 'offen').length || 0}
+                    {letterRequests.filter((r) => r.status === 'offen').length}
                   </p>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -164,9 +148,7 @@ export default function AdminPage() {
           <CardContent>
             {activeTab === 'cv' && (
               <div className="space-y-4">
-                {!cvRequests ? (
-                  <p className="text-center text-gray-500 py-8">Lädt...</p>
-                ) : cvRequests.length === 0 ? (
+                {cvRequests.length === 0 ? (
                   <p className="text-center text-gray-500 py-8">Keine Lebenslauf-Anfragen vorhanden.</p>
                 ) : (
                   <div className="overflow-x-auto">
@@ -215,9 +197,7 @@ export default function AdminPage() {
 
             {activeTab === 'letter' && (
               <div className="space-y-4">
-                {!letterRequests ? (
-                  <p className="text-center text-gray-500 py-8">Lädt...</p>
-                ) : letterRequests.length === 0 ? (
+                {letterRequests.length === 0 ? (
                   <p className="text-center text-gray-500 py-8">Keine Anschreiben-Anfragen vorhanden.</p>
                 ) : (
                   <div className="overflow-x-auto">

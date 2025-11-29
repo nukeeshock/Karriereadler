@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useTransition } from 'react';
 import { Home, LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import useSWR, { mutate } from 'swr';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,14 +24,9 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: user } = useSWR<User>('/api/user', fetcher);
-  const router = useRouter();
   const { t } = useI18n();
-
-  async function handleSignOut() {
-    await signOut();
-    mutate('/api/user');
-    router.push('/');
-  }
+  const router = useRouter();
+  const [signingOut, startTransition] = useTransition();
 
   if (!user) {
     return (
@@ -40,6 +35,15 @@ function UserMenu() {
       </Button>
     );
   }
+
+  const handleSignOut = () => {
+    startTransition(async () => {
+      // Optimistically clear cached user for instant UI change
+      await mutate('/api/user', null, false);
+      // signOut() now handles redirect to /sign-in
+      await signOut();
+    });
+  };
 
   return (
     <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -66,14 +70,12 @@ function UserMenu() {
             {t('roles.role')}: {t(`roles.${user.role as 'admin' | 'owner' | 'member'}`)}
           </DropdownMenuItem>
         )}
-        <form action={handleSignOut} className="w-full">
-          <button type="submit" className="flex w-full">
-            <DropdownMenuItem className="w-full flex-1 cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>{t('nav.signOut')}</span>
-            </DropdownMenuItem>
-          </button>
-        </form>
+        <button type="button" onClick={handleSignOut} className="flex w-full">
+          <DropdownMenuItem className="w-full flex-1 cursor-pointer">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>{signingOut ? t('nav.signOut') + '…' : t('nav.signOut')}</span>
+          </DropdownMenuItem>
+        </button>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -89,7 +91,7 @@ export function DashboardHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         <Link
           href="/"
-          className="flex items-center hover:opacity-80 transition-opacity gap-3 min-w-0"
+          className="flex items-center hover:opacity-80 transition-opacity min-w-0"
         >
           <Image
             src="/karriereadler_logo.jpg"
@@ -99,7 +101,7 @@ export function DashboardHeader() {
             className="h-24 sm:h-28 w-auto flex-shrink-0"
             priority
           />
-          <span className="text-3xl sm:text-4xl font-black leading-none tracking-tight bg-gradient-to-r from-orange-600 via-amber-500 to-orange-400 bg-clip-text text-transparent drop-shadow-sm truncate">
+          <span className="text-3xl sm:text-4xl font-black leading-none tracking-tight bg-gradient-to-r from-orange-600 via-amber-500 to-orange-400 bg-clip-text text-transparent drop-shadow-sm truncate -ml-5 relative z-10">
             Karriereadler
           </span>
         </Link>
@@ -134,6 +136,12 @@ export function DashboardHeader() {
             </>
           ) : (
             <>
+              <Link
+                href="/leistungen"
+                className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
+              >
+                Leistungen
+              </Link>
               <Link
                 href="/pricing"
                 className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
@@ -223,11 +231,11 @@ export function DashboardHeader() {
             ) : (
               <>
                 <Link
-                  href="/sign-in"
+                  href="/leistungen"
                   className="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-orange-50 hover:text-orange-600"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  {t('nav.signIn')}
+                  Leistungen
                 </Link>
                 <Link
                   href="/pricing"
@@ -235,6 +243,13 @@ export function DashboardHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {t('nav.pricing')}
+                </Link>
+                <Link
+                  href="/sign-in"
+                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {t('nav.signIn')}
                 </Link>
                 <Link
                   href="/contact"
