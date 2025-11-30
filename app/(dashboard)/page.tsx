@@ -211,45 +211,36 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Trust Signals & Stats */}
+      {/* Value props */}
       <section className="py-12 bg-gradient-to-b from-orange-50/50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="group hover:scale-105 transition-transform duration-300">
-              <div className="flex justify-center mb-2">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
-                  <Users className="h-8 w-8 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
-                </div>
-              </div>
-              <div className="text-3xl font-bold text-gray-900">200+</div>
-              <div className="text-sm text-gray-600">Zufriedene Kunden</div>
+          <div className="text-center mb-10">
+            <p className="text-sm uppercase tracking-wide text-orange-500 font-semibold">Was du von Karriereadler bekommst</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            <div className="group p-6 bg-white border border-orange-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Struktur statt Chaos</h3>
+              <p className="text-sm text-gray-700">
+                Deine Stationen werden so sortiert, dass sie einen roten Faden ergeben.
+              </p>
             </div>
-            <div className="group hover:scale-105 transition-transform duration-300">
-              <div className="flex justify-center mb-2">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
-                  <Star className="h-8 w-8 text-orange-600 group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" />
-                </div>
-              </div>
-              <div className="text-3xl font-bold text-gray-900">4.8/5</div>
-              <div className="text-sm text-gray-600">Durchschnittliche Bewertung</div>
+            <div className="group p-6 bg-white border border-orange-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Ehrliche Texte</h3>
+              <p className="text-sm text-gray-700">
+                Kein „Rockstar-Ninja-Experte“ – sondern Formulierungen, die zu dir passen.
+              </p>
             </div>
-            <div className="group hover:scale-105 transition-transform duration-300">
-              <div className="flex justify-center mb-2">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
-                  <Award className="h-8 w-8 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
-                </div>
-              </div>
-              <div className="text-3xl font-bold text-gray-900">10+ Jahre</div>
-              <div className="text-sm text-gray-600">HR-Erfahrung</div>
+            <div className="group p-6 bg-white border border-orange-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Bewerbungs-ready Dateien</h3>
+              <p className="text-sm text-gray-700">
+                Du bekommst Word- und PDF-Version, sofort einsatzbereit für Online-Portale.
+              </p>
             </div>
-            <div className="group hover:scale-105 transition-transform duration-300">
-              <div className="flex justify-center mb-2">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors duration-300">
-                  <CheckCircle className="h-8 w-8 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
-                </div>
-              </div>
-              <div className="text-3xl font-bold text-gray-900">2-3 Tage</div>
-              <div className="text-sm text-gray-600">Lieferzeit</div>
+            <div className="group p-6 bg-white border border-orange-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Support bei Anpassungen</h3>
+              <p className="text-sm text-gray-700">
+                Kleine Änderungen nach der ersten Version sind mit drin.
+              </p>
             </div>
           </div>
         </div>
