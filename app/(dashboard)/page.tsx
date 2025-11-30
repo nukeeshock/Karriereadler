@@ -141,22 +141,6 @@ export default async function HomePage() {
                     </span>
                   </Link>
                 </div>
-                <div className="flex flex-wrap gap-3 mt-4 text-sm text-gray-700">
-                  <Link
-                    href="/lebenslauf-schreiben-lassen"
-                    className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold"
-                  >
-                    Lebenslauf-Service im Detail
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    href="/anschreiben-schreiben-lassen"
-                    className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold"
-                  >
-                    Anschreiben-Service im Detail
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
               </div>
             </div>
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
@@ -186,25 +170,25 @@ export default async function HomePage() {
                     <p>Zurücklehnen – wir erstellen deine Unterlagen individuell von Hand und senden dir den fertigen Lebenslauf per E-Mail zu.</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  {/* Small primary button with pulse */}
+                <div className="flex flex-wrap gap-3">
                   <Link
-                    href={primaryCtaHref}
-                    className="group relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110 overflow-hidden"
+                    href="/lebenslauf-schreiben-lassen"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                   >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-                    <span className="relative z-10">Jetzt bestellen</span>
+                    <Sparkles className="w-4 h-4" />
+                    Lebenslauf-Service im Detail
                   </Link>
-
-                  {/* Ghost button with underline animation */}
                   <Link
-                    href={secondaryCtaHref}
-                    className="group relative inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-gray-700 hover:text-orange-600 rounded-full hover:bg-gray-50 transition-all duration-300"
+                    href="/anschreiben-schreiben-lassen"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 border border-orange-100 rounded-full transition-all duration-300"
                   >
-                    <span className="relative z-10">{user ? 'Preise' : 'Preise ansehen'}</span>
-                    <span className="absolute bottom-2 left-6 right-6 h-0.5 bg-gradient-to-r from-orange-500 to-orange-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                    <CreditCard className="w-4 h-4" />
+                    Anschreiben-Service im Detail
                   </Link>
                 </div>
+                <p className="text-xs text-gray-600">
+                  Vergleiche Leistungen, Beispiele und Lieferzeiten – danach kannst du auf der Startseite direkt buchen.
+                </p>
               </div>
             </div>
           </div>
