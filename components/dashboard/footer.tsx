@@ -14,7 +14,9 @@ export function DashboardFooter() {
     { href: '/', label: t('footer.home') },
     { href: '/pricing', label: t('footer.pricing') },
     { href: '/leistungen', label: t('footer.services') },
-    { href: '/contact', label: t('footer.contact') }
+    { href: '/contact', label: t('footer.contact') },
+    { href: '/lebenslauf-schreiben-lassen', label: 'Lebenslauf schreiben lassen' },
+    { href: '/anschreiben-schreiben-lassen', label: 'Anschreiben schreiben lassen' }
   ];
 
   const legalLinks = [

@@ -354,45 +354,23 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           )}
 
           {mode === 'signup' && (
-            <div className="space-y-3">
-              <div className="flex items-start gap-2">
-                <Checkbox
-                  id="consentBirthDate"
-                  name="consentBirthDate"
-                  required
-                  className="mt-1"
-                />
-                <Label
-                  htmlFor="consentBirthDate"
-                  className="text-sm text-gray-700 leading-relaxed"
-                >
-                  Ich willige ein, dass mein Geburtsdatum (besondere Kategorie personenbezogener Daten gem. Art. 9 DSGVO)
-                  zur Kontoerstellung und zur Bearbeitung meiner Anfragen gespeichert wird. Diese Einwilligung kann ich
-                  jederzeit widerrufen.{' '}
-                  <Link href="/datenschutz" className="text-orange-600 underline">
-                    Datenschutzerklärung
-                  </Link>
-                </Label>
-              </div>
-
-              <div className="flex items-start gap-2">
-                <Checkbox
-                  id="consentDataProcessing"
-                  name="consentDataProcessing"
-                  required
-                  className="mt-1"
-                />
-                <Label
-                  htmlFor="consentDataProcessing"
-                  className="text-sm text-gray-700 leading-relaxed"
-                >
-                  Ich willige in die Verarbeitung meiner personenbezogenen Daten (Name, E-Mail, Adresse) zur
-                  Kontoerstellung und Leistungserbringung ein.{' '}
-                  <Link href="/datenschutz" className="text-orange-600 underline">
-                    Datenschutzerklärung
-                  </Link>
-                </Label>
-              </div>
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="consentPrivacy"
+                name="consentPrivacy"
+                required
+                className="mt-1"
+              />
+              <label
+                htmlFor="consentPrivacy"
+                className="text-sm text-gray-700 leading-relaxed block"
+              >
+                Ich habe die{' '}
+                <Link href="/datenschutz" className="text-orange-600 underline">
+                  Datenschutzerklärung
+                </Link>{' '}
+                gelesen und willige in die Verarbeitung meiner Angaben zur Kontoerstellung und Bearbeitung meiner Anfragen ein. Ich kann diese Einwilligung jederzeit widerrufen.
+              </label>
             </div>
           )}
 

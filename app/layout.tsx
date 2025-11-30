@@ -7,6 +7,7 @@ import Script from 'next/script';
 import AppProviders from './providers';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.BASE_URL ?? 'https://karriereadler.com'),
   title: 'Karriereadler – Manuelle Lebensläufe & Anschreiben vom Profi',
   description:
     'Karriereadler erstellt deinen Lebenslauf und dein Anschreiben manuell: individuelle Beratung, klare Texte, professionelles Ergebnis.',

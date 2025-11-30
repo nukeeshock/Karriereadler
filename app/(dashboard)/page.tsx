@@ -1,8 +1,25 @@
+import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, CreditCard, Star, Users, Award, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import { getUser } from '@/lib/db/queries';
 import KarriereadlerStory from '@/components/karriereadler-story';
+
+const baseUrl = process.env.BASE_URL ?? 'https://karriereadler.com';
+const aggregateRating = {
+  ratingValue: '4.8',
+  reviewCount: '200'
+};
+
+export const metadata: Metadata = {
+  title: 'Lebenslauf schreiben lassen ab 20 € – Professionelle Erstellung | Karriereadler',
+  description:
+    'Lass deinen Lebenslauf professionell schreiben – ab 20 €, manuell von HR-Experten. ATS-optimiert, 2–3 Werktage Lieferzeit, inkl. Korrekturschleife.',
+  alternates: {
+    canonical: '/'
+  }
+};
 
 export default async function HomePage() {
   const user = await getUser();
@@ -12,6 +29,63 @@ export default async function HomePage() {
 
   return (
     <main>
+      <Script id="service-jsonld" type="application/ld+json">
+        {JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': [
+            {
+              '@type': 'Service',
+              name: 'Lebenslauf schreiben lassen',
+              description:
+                'Professionell erstellter Lebenslauf durch HR-Experten, ATS-optimiert, Lieferung in 2–3 Werktagen.',
+              provider: {
+                '@type': 'Organization',
+                name: 'Karriereadler',
+                url: baseUrl,
+                logo: `${baseUrl}/logo_adler_notagline.png`
+              },
+              areaServed: 'DE',
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: 'EUR',
+                price: '20.00',
+                url: `${baseUrl}/kaufen?product=cv`,
+                availability: 'https://schema.org/InStock'
+              },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: aggregateRating.ratingValue,
+                reviewCount: aggregateRating.reviewCount
+              }
+            },
+            {
+              '@type': 'Service',
+              name: 'Anschreiben schreiben lassen',
+              description:
+                'Individuell formuliertes Anschreiben für deine Zielposition, manuell erstellt von Karriereadler.',
+              provider: {
+                '@type': 'Organization',
+                name: 'Karriereadler',
+                url: baseUrl,
+                logo: `${baseUrl}/logo_adler_notagline.png`
+              },
+              areaServed: 'DE',
+              offers: {
+                '@type': 'Offer',
+                priceCurrency: 'EUR',
+                price: '20.00',
+                url: `${baseUrl}/kaufen?product=cover`,
+                availability: 'https://schema.org/InStock'
+              },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: aggregateRating.ratingValue,
+                reviewCount: aggregateRating.reviewCount
+              }
+            }
+          ]
+        })}
+      </Script>
       <section className="relative py-20 overflow-hidden">
         {/* Background Image with Overlay */}
         <div
@@ -51,7 +125,7 @@ export default async function HomePage() {
                   >
                     <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
                     <span className="relative z-10">
-                      {user ? 'Service buchen ab 20 €' : 'Service buchen ab 20 €'}
+                      {user ? 'Lebenslauf-Service jetzt buchen' : 'Lebenslauf-Service jetzt buchen'}
                     </span>
                     <ArrowRight className="ml-2 h-5 w-5 relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110" />
                   </Link>
@@ -63,8 +137,24 @@ export default async function HomePage() {
                   >
                     <span className="absolute inset-0 w-0 h-full bg-gradient-to-r from-orange-50 to-orange-100 group-hover:w-full transition-all duration-500 ease-out"></span>
                     <span className="relative z-10 group-hover:text-orange-700 transition-colors duration-300">
-                      {user ? 'Preise ansehen' : 'Preise & Pakete'}
+                      {user ? 'Preise für Lebenslauf & Anschreiben' : 'Preise für Lebenslauf & Anschreiben'}
                     </span>
+                  </Link>
+                </div>
+                <div className="flex flex-wrap gap-3 mt-4 text-sm text-gray-700">
+                  <Link
+                    href="/lebenslauf-schreiben-lassen"
+                    className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold"
+                  >
+                    Lebenslauf-Service im Detail
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href="/anschreiben-schreiben-lassen"
+                    className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-semibold"
+                  >
+                    Anschreiben-Service im Detail
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>

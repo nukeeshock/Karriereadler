@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default function DashboardInnerLayout({
+export default function VerifyEmailLayout({
   children
 }: {
   children: React.ReactNode;

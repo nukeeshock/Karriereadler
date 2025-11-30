@@ -1,6 +1,17 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Check, Star, Clock, RefreshCw, FileText, Globe, Sparkles } from 'lucide-react';
+import Script from 'next/script';
+import { Check, Star, Clock, RefreshCw, FileText, Globe, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+export const metadata: Metadata = {
+  title: 'Lebenslauf & Anschreiben Preise – Professionelle Erstellung ab 20 €',
+  description:
+    'Preise für Lebenslauf, Anschreiben und Bundle: ab 20 €, manuell erstellt, 2–3 Werktage Lieferzeit, Korrekturschleife inklusive.',
+  alternates: {
+    canonical: '/pricing'
+  }
+};
 
 const products = [
   {
@@ -29,9 +40,42 @@ const products = [
   }
 ] as const;
 
+const baseUrl = process.env.BASE_URL ?? 'https://karriereadler.com';
+const aggregateRating = {
+  ratingValue: '4.8',
+  reviewCount: '200'
+};
+
 export default function PricingPage() {
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <Script id="pricing-product-jsonld" type="application/ld+json">
+        {JSON.stringify({
+          '@context': 'https://schema.org',
+          '@graph': products.map((product) => ({
+            '@type': 'Product',
+            name: product.name,
+            description: product.description,
+            image: `${baseUrl}/logo_adler_notagline.png`,
+            brand: {
+              '@type': 'Brand',
+              name: 'Karriereadler'
+            },
+            offers: {
+              '@type': 'Offer',
+              priceCurrency: 'EUR',
+              price: product.priceEuro.toFixed(2),
+              availability: 'https://schema.org/InStock',
+              url: `${baseUrl}/kaufen?product=${product.productType}`
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: aggregateRating.ratingValue,
+              reviewCount: aggregateRating.reviewCount
+            }
+          }))
+        })}
+      </Script>
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold text-gray-900">Preise ohne Abo</h1>
         <p className="text-gray-600 mt-2">Zahle nur einmal – professionelle Bewerbungsunterlagen, individuell für dich erstellt.</p>
@@ -113,6 +157,18 @@ function PricingCard({
   product: (typeof products)[number];
 }) {
   const isRecommended = product.recommended;
+  const detailLink =
+    product.productType === 'cv'
+      ? '/lebenslauf-schreiben-lassen'
+      : product.productType === 'cover'
+        ? '/anschreiben-schreiben-lassen'
+        : '/pricing';
+  const detailLabel =
+    product.productType === 'cv'
+      ? 'Details zum Lebenslauf-Service'
+      : product.productType === 'cover'
+        ? 'Details zum Anschreiben-Service'
+        : 'Bundle-Leistungen ansehen';
 
   return (
     <div className={`group pt-6 border-2 rounded-2xl shadow-lg px-6 pb-6 bg-white relative transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
@@ -142,6 +198,13 @@ function PricingCard({
           </li>
         ))}
       </ul>
+      <Link
+        href={detailLink}
+        className="inline-flex items-center gap-2 text-orange-600 font-semibold mb-6 hover:text-orange-700 transition-colors"
+      >
+        {detailLabel}
+        <ArrowRight className="w-4 h-4" />
+      </Link>
       <Link
         href={`/kaufen?product=${product.productType}`}
         className={`group/btn relative w-full inline-flex items-center justify-center px-6 py-3 font-semibold text-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden ${

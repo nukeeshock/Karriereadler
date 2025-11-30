@@ -1,10 +1,14 @@
 import Link from 'next/link';
-import { CheckCircle, FileText, Mail, Clock, RefreshCw, Globe, Award } from 'lucide-react';
+import { CheckCircle, FileText, Mail, Clock, RefreshCw, Globe, Award, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: 'Unsere Leistungen | Karriereadler',
-  description: 'Professionelle Lebenslauf- und Anschreiben-Erstellung von Experten. Individuell, ATS-optimiert, in 2-3 Werktagen.'
+  title: 'Bewerbungsunterlagen erstellen lassen – So funktioniert Karriereadler',
+  description:
+    'Professionelle Lebenslauf- und Anschreiben-Erstellung von Experten. Individuell, ATS-optimiert, in 2-3 Werktagen, inklusive Korrekturschleife.',
+  alternates: {
+    canonical: '/leistungen'
+  }
 };
 
 export default function LeistungenPage() {
@@ -26,6 +30,38 @@ export default function LeistungenPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Landingpage Teaser */}
+        <section className="mb-14 grid md:grid-cols-2 gap-6">
+          {[
+            {
+              href: '/lebenslauf-schreiben-lassen',
+              title: 'Lebenslauf schreiben lassen',
+              desc: 'Individuell erstellt ab 20 €, ATS-optimiert, 2–3 Werktage Lieferzeit.',
+              cta: 'Zum Lebenslauf-Service'
+            },
+            {
+              href: '/anschreiben-schreiben-lassen',
+              title: 'Anschreiben schreiben lassen',
+              desc: 'Story und Tonalität passend zur Zielstelle, inkl. Korrekturschleife.',
+              cta: 'Zum Anschreiben-Service'
+            }
+          ].map((card) => (
+            <Link
+              key={card.href}
+              href={card.href}
+              className="group block p-6 bg-white border border-orange-100 rounded-xl shadow-sm hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-semibold text-gray-900">{card.title}</h2>
+                  <p className="text-gray-700 mt-2">{card.desc}</p>
+                </div>
+                <ArrowRight className="w-6 h-6 text-orange-600 transition-transform group-hover:translate-x-1" />
+              </div>
+              <p className="mt-3 text-orange-600 font-semibold">{card.cta}</p>
+            </Link>
+          ))}
+        </section>
 
         {/* What We Offer */}
         <section className="mb-20">
