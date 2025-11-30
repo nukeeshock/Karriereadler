@@ -154,10 +154,10 @@ export function DashboardHeader() {
           {/* Logo + Branding */}
           <Link href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0">
             <Image
-              src="/logo_hero.png"
+              src="/KARRIEREADLER_logo_Kunterserstrich.png"
               alt="Karriereadler Logo"
-              width={scrolled ? 140 : 160}
-              height={scrolled ? 40 : 48}
+              width={scrolled ? 150 : 180}
+              height={scrolled ? 30 : 35}
               className="transition-all duration-300"
               priority
             />
@@ -245,7 +245,12 @@ export function DashboardHeader() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center py-2 -ml-2 pl-2 pr-4 hover:opacity-80 transition-opacity active:scale-95"
               >
-                <Image src="/logo_hero.png" alt="Karriereadler Logo" width={140} height={40} />
+                <Image
+                  src="/KARRIEREADLER_logo_Kunterserstrich.png"
+                  alt="Karriereadler Logo"
+                  width={160}
+                  height={32}
+                />
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
