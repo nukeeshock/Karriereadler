@@ -201,76 +201,74 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      // Send confirmation email to customer
-      try {
-        const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders`;
-        await sendEmail({
-          to: order.customerEmail,
-          subject: 'Zahlung bestätigt - Fragebogen ausfüllen | Karriereadler',
-          html: `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="utf-8">
-                <style>
-                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
-                  .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                  .header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; color: white; }
-                  .header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
-                  .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
-                  .content { padding: 40px 30px; }
-                  .button { display: inline-block; background: #F76B6B; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 24px 0; }
-                  .info-box { background: #FFE4E8; border-left: 4px solid #FFB6C1; padding: 16px; margin: 24px 0; border-radius: 4px; }
-                  .info-box p { color: #D84949; margin: 8px 0; }
-                  .footer { background: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
-                </style>
-              </head>
-              <body>
-                <div class="container">
-                  <div class="header">
-                    <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
-                    <h1>Zahlung bestätigt</h1>
-                  </div>
-                  <div class="content">
-                    <p>Hallo ${order.customerName || 'liebe/r Kunde/in'},</p>
-                    <p>vielen Dank für deinen Kauf bei Karriereadler. Deine Zahlung wurde erfolgreich verarbeitet.</p>
+      console.log('OrderRequest updated to PAID:', orderIdNum);
 
-                    <div class="info-box">
-                      <p><strong>Wichtig: Bitte fülle jetzt den Fragebogen aus.</strong></p>
-                      <p>Damit wir mit der Erstellung deiner Bewerbungsunterlagen beginnen können, benötigen wir noch einige Informationen von dir.</p>
-                    </div>
-
-                    <p><strong>Nächste Schritte:</strong></p>
-                    <ol>
-                      <li>Gehe zu deinem Dashboard</li>
-                      <li>Öffne den Bereich "Aufträge abschließen"</li>
-                      <li>Fülle den Fragebogen vollständig aus</li>
-                    </ol>
-
-                    <div style="text-align: center;">
-                      <a href="${dashboardUrl}" class="button">Zum Dashboard - Fragebogen ausfüllen</a>
-                    </div>
-
-                    <p style="margin-top: 30px;">Sobald wir deinen ausgefüllten Fragebogen erhalten haben, beginnen wir sofort mit der professionellen Erstellung deiner Unterlagen.</p>
-
-                    <p>Bei Fragen stehen wir dir jederzeit gerne zur Verfügung.</p>
-
-                    <p>Viele Grüße,<br>Dein Karriereadler-Team</p>
-                  </div>
-                  <div class="footer">
-                    <p>© ${new Date().getFullYear()} Karriereadler. Alle Rechte vorbehalten.</p>
-                  </div>
+      // Send confirmation email asynchronously (don't block webhook response)
+      const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders`;
+      sendEmail({
+        to: order.customerEmail,
+        subject: 'Zahlung bestätigt - Fragebogen ausfüllen | Karriereadler',
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
+                .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+                .header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; color: white; }
+                .header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
+                .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
+                .content { padding: 40px 30px; }
+                .button { display: inline-block; background: #F76B6B; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 24px 0; }
+                .info-box { background: #FFE4E8; border-left: 4px solid #FFB6C1; padding: 16px; margin: 24px 0; border-radius: 4px; }
+                .info-box p { color: #D84949; margin: 8px 0; }
+                .footer { background: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
+                  <h1>Zahlung bestätigt</h1>
                 </div>
-              </body>
-            </html>
-          `
-        });
-      } catch (emailError) {
+                <div class="content">
+                  <p>Hallo ${order.customerName || 'liebe/r Kunde/in'},</p>
+                  <p>vielen Dank für deinen Kauf bei Karriereadler. Deine Zahlung wurde erfolgreich verarbeitet.</p>
+
+                  <div class="info-box">
+                    <p><strong>Wichtig: Bitte fülle jetzt den Fragebogen aus.</strong></p>
+                    <p>Damit wir mit der Erstellung deiner Bewerbungsunterlagen beginnen können, benötigen wir noch einige Informationen von dir.</p>
+                  </div>
+
+                  <p><strong>Nächste Schritte:</strong></p>
+                  <ol>
+                    <li>Gehe zu deinem Dashboard</li>
+                    <li>Öffne den Bereich "Aufträge abschließen"</li>
+                    <li>Fülle den Fragebogen vollständig aus</li>
+                  </ol>
+
+                  <div style="text-align: center;">
+                    <a href="${dashboardUrl}" class="button">Zum Dashboard - Fragebogen ausfüllen</a>
+                  </div>
+
+                  <p style="margin-top: 30px;">Sobald wir deinen ausgefüllten Fragebogen erhalten haben, beginnen wir sofort mit der professionellen Erstellung deiner Unterlagen.</p>
+
+                  <p>Bei Fragen stehen wir dir jederzeit gerne zur Verfügung.</p>
+
+                  <p>Viele Grüße,<br>Dein Karriereadler-Team</p>
+                </div>
+                <div class="footer">
+                  <p>© ${new Date().getFullYear()} Karriereadler. Alle Rechte vorbehalten.</p>
+                </div>
+              </div>
+            </body>
+          </html>
+        `
+      }).catch(emailError => {
         console.error('Failed to send customer confirmation email:', emailError);
         // Don't break the webhook - email is not critical
-      }
-
-      console.log('OrderRequest updated to PAID:', orderIdNum);
+      });
       break;
     }
     default:
