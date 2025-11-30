@@ -35,10 +35,10 @@ export const metadata: Metadata = {
     siteName: 'Karriereadler',
     images: [
       {
-        url: '/logo_adler_notagline.png',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Karriereadler Logo'
+        alt: 'Karriereadler - Lebensläufe, die Türen öffnen'
       }
     ],
     locale: 'de_DE',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Karriereadler – Manuelle Lebensläufe & Anschreiben vom Profi',
     description: 'Karriereadler erstellt deinen Lebenslauf und dein Anschreiben manuell: individuelle Beratung, klare Texte, professionelles Ergebnis.',
-    images: ['/logo_adler_notagline.png']
+    images: ['/og-image.png']
   },
   appleWebApp: {
     capable: true,
