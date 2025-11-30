@@ -3,7 +3,17 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense, useState, useTransition, useEffect } from 'react';
-import { Home, LogOut, Menu, User as UserIcon, LogIn, X } from 'lucide-react';
+import {
+  LogOut,
+  Menu,
+  User as UserIcon,
+  LogIn,
+  X,
+  Settings,
+  Shield,
+  Activity,
+  FileText
+} from 'lucide-react';
 import useSWR, { mutate } from 'swr';
 import { usePathname } from 'next/navigation';
 
@@ -19,6 +29,12 @@ import { signOut } from '@/app/(login)/actions';
 import { User } from '@/lib/db/schema';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const accountLinks = [
+  { href: '/dashboard/orders', label: 'Meine Aufträge', icon: FileText },
+  { href: '/dashboard/general', label: 'Account-Informationen', icon: Settings },
+  { href: '/dashboard/security', label: 'Sicherheit', icon: Shield },
+  { href: '/dashboard/activity', label: 'Aktivitäten', icon: Activity }
+];
 
 // NavLink mit Gradient-Underline
 function NavLink({ href, children, active = false }: { href: string; children: React.ReactNode; active?: boolean }) {
@@ -74,6 +90,18 @@ function UserMenu() {
             </span>
           </DropdownMenuItem>
         )}
+        <DropdownMenuSeparator />
+        {accountLinks.map((item) => {
+          const Icon = item.icon;
+          return (
+            <DropdownMenuItem key={item.href} asChild>
+              <Link href={item.href} className="flex items-center gap-2 cursor-pointer">
+                <Icon className="h-4 w-4 text-orange-600" />
+                <span className="font-medium">{item.label}</span>
+              </Link>
+            </DropdownMenuItem>
+          );
+        })}
         <DropdownMenuSeparator />
         <button type="button" onClick={handleSignOut} className="flex w-full">
           <DropdownMenuItem className="w-full flex-1 cursor-pointer focus:bg-red-50">
@@ -268,6 +296,32 @@ export function DashboardHeader() {
                   {item.label}
                 </Link>
               ))}
+              {user && (
+                <div className="pt-6 mt-4 border-t border-gray-200 space-y-2">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1">
+                    Mein Konto
+                  </p>
+                  {accountLinks.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname?.startsWith(item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 ${
+                          isActive
+                            ? 'bg-orange-50 text-orange-700 border-orange-100'
+                            : 'text-gray-700 border-transparent hover:bg-gray-50'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span className="font-medium">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </nav>
 
             {/* Mobile CTA */}

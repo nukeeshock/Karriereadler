@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Allow LAN access in dev (mobile devices) to avoid cross-origin warnings
+  allowedDevOrigins: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://192.168.0.92:3000'
+  ],
   webpack: (config) => {
     return config;
   },
