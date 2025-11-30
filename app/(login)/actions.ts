@@ -18,8 +18,11 @@ import {
   ActivityType,
   invitations,
   cvRequests,
-  letterRequests
+  letterRequests,
+  orderRequests,
+  stripeEvents
 } from '@/lib/db/schema';
+import { del } from '@vercel/blob';
 import {
   comparePasswords,
   deleteSession,
@@ -110,6 +113,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
   if (!foundUser.emailVerified) {
     return {
       error: 'Bitte verifiziere zuerst deine Email-Adresse. Überprüfe dein Postfach.',
+      notVerified: true,
       email,
       password
     };
@@ -122,6 +126,64 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
   redirect('/dashboard');
 });
+
+const resendVerificationSchema = z.object({
+  email: z.string().email()
+});
+
+export const resendVerificationEmail = validatedAction(
+  resendVerificationSchema,
+  async (data) => {
+    const { email: rawEmail } = data;
+    const email = rawEmail.trim().toLowerCase();
+
+    // Find user
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    if (!user) {
+      return {
+        error: 'Kein Account mit dieser Email-Adresse gefunden.'
+      };
+    }
+
+    if (user.emailVerified) {
+      return {
+        error: 'Diese Email-Adresse wurde bereits verifiziert. Du kannst dich jetzt einloggen.'
+      };
+    }
+
+    // Generate new verification token
+    const verificationToken = generateVerificationToken();
+    const verificationTokenExpiry = getVerificationTokenExpiry();
+
+    // Update user with new token
+    await db
+      .update(users)
+      .set({
+        verificationToken,
+        verificationTokenExpiry
+      })
+      .where(eq(users.id, user.id));
+
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, verificationToken);
+      return {
+        success: true,
+        message: 'Verifizierungs-Email wurde erneut gesendet. Bitte überprüfe dein Postfach.'
+      };
+    } catch (error) {
+      console.error('Failed to resend verification email:', error);
+      return {
+        error: 'Fehler beim Senden der Email. Bitte versuche es später erneut.'
+      };
+    }
+  }
+);
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, 'Vorname ist erforderlich').max(100),
@@ -492,6 +554,24 @@ export const hardDeleteAccount = validatedActionWithUser(
 
     try {
       await db.transaction(async (tx) => {
+        // Delete Vercel Blob files from orderRequests
+        const orders = await tx
+          .select({ finishedFileUrl: orderRequests.finishedFileUrl })
+          .from(orderRequests)
+          .where(eq(orderRequests.userId, user.id));
+
+        await Promise.all(
+          orders.map(async ({ finishedFileUrl }) => {
+            if (!finishedFileUrl) return;
+            try {
+              await del(finishedFileUrl);
+            } catch (error) {
+              console.error('Failed to delete blob:', finishedFileUrl, error);
+            }
+          })
+        );
+
+        // Delete old photos from cvRequests (legacy)
         const photos = await tx
           .select({ photoPath: cvRequests.photoPath })
           .from(cvRequests)
@@ -514,6 +594,9 @@ export const hardDeleteAccount = validatedActionWithUser(
           })
         );
 
+        // Delete database records (in order to respect foreign key constraints)
+        await tx.delete(stripeEvents).where(eq(stripeEvents.userId, user.id));
+        await tx.delete(orderRequests).where(eq(orderRequests.userId, user.id));
         await tx.delete(cvRequests).where(eq(cvRequests.userId, user.id));
         await tx
           .delete(letterRequests)
@@ -543,6 +626,7 @@ const updateAccountSchema = z.object({
   firstName: z.string().min(1, 'Vorname ist erforderlich').max(100),
   lastName: z.string().min(1, 'Nachname ist erforderlich').max(100),
   birthDate: z.string().min(1, 'Geburtsdatum ist erforderlich'),
+  phoneNumber: z.string().max(50).optional(),
   street: z.string().max(255).optional(),
   houseNumber: z.string().max(20).optional(),
   zipCode: z.string().max(20).optional(),
@@ -558,6 +642,7 @@ export const updateAccount = validatedActionWithUser(
       firstName,
       lastName,
       birthDate,
+      phoneNumber,
       street,
       houseNumber,
       zipCode,
@@ -576,6 +661,7 @@ export const updateAccount = validatedActionWithUser(
           firstName,
           lastName,
           birthDate: birthDateValue || null,
+          phoneNumber: phoneNumber || null,
           street: street || null,
           houseNumber: houseNumber || null,
           zipCode: zipCode || null,
@@ -590,6 +676,7 @@ export const updateAccount = validatedActionWithUser(
       firstName,
       lastName,
       birthDate,
+      phoneNumber,
       street,
       houseNumber,
       zipCode,

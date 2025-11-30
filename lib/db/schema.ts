@@ -28,6 +28,7 @@ export const users = pgTable('users', {
   zipCode: varchar('zip_code', { length: 20 }),
   city: varchar('city', { length: 100 }),
   country: varchar('country', { length: 100 }),
+  phoneNumber: varchar('phone_number', { length: 50 }),
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   role: varchar('role', { length: 20 }).notNull().default(UserRole.MEMBER),

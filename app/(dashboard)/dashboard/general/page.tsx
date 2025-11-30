@@ -47,6 +47,7 @@ type ActionState = {
   firstName?: string;
   lastName?: string;
   birthDate?: string;
+  phoneNumber?: string;
   street?: string;
   houseNumber?: string;
   zipCode?: string;
@@ -63,6 +64,7 @@ type AccountFormProps = {
   firstNameValue?: string;
   lastNameValue?: string;
   birthDateValue?: string;
+  phoneNumberValue?: string;
   streetValue?: string;
   houseNumberValue?: string;
   zipCodeValue?: string;
@@ -76,6 +78,7 @@ function AccountForm({
   firstNameValue = '',
   lastNameValue = '',
   birthDateValue = '',
+  phoneNumberValue = '',
   streetValue = '',
   houseNumberValue = '',
   zipCodeValue = '',
@@ -87,7 +90,7 @@ function AccountForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="firstName" className="mb-2">
-            Vorname
+            Vorname *
           </Label>
           <Input
             id="firstName"
@@ -100,7 +103,7 @@ function AccountForm({
         </div>
         <div>
           <Label htmlFor="lastName" className="mb-2">
-            Nachname
+            Nachname *
           </Label>
           <Input
             id="lastName"
@@ -115,7 +118,7 @@ function AccountForm({
 
       <div>
         <Label htmlFor="birthDate" className="mb-2">
-          Geburtsdatum
+          Geburtsdatum *
         </Label>
         <Input
           id="birthDate"
@@ -129,7 +132,7 @@ function AccountForm({
 
       <div>
         <Label htmlFor="email" className="mb-2">
-          Email
+          Email *
         </Label>
         <Input
           id="email"
@@ -142,10 +145,24 @@ function AccountForm({
         />
       </div>
 
+      <div>
+        <Label htmlFor="phoneNumber" className="mb-2">
+          Telefonnummer
+        </Label>
+        <Input
+          id="phoneNumber"
+          name="phoneNumber"
+          type="tel"
+          autoComplete="tel"
+          placeholder="+49 123 456789"
+          defaultValue={state.phoneNumber || phoneNumberValue}
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="street" className="mb-2">
-            Straße (optional)
+            Straße
           </Label>
           <Input
             id="street"
@@ -158,7 +175,7 @@ function AccountForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label htmlFor="houseNumber" className="mb-2">
-              Hausnr. (optional)
+              Hausnr.
             </Label>
             <Input
               id="houseNumber"
@@ -170,7 +187,7 @@ function AccountForm({
           </div>
           <div>
             <Label htmlFor="zipCode" className="mb-2">
-              PLZ (optional)
+              PLZ
             </Label>
             <Input
               id="zipCode"
@@ -186,7 +203,7 @@ function AccountForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="city" className="mb-2">
-            Ort (optional)
+            Ort
           </Label>
           <Input
             id="city"
@@ -198,7 +215,7 @@ function AccountForm({
         </div>
         <div>
           <Label htmlFor="country" className="mb-2">
-            Land (optional)
+            Land
           </Label>
           <select
             id="country"
@@ -207,7 +224,7 @@ function AccountForm({
             defaultValue={state.country || countryValue}
             className="w-full rounded-full border border-input bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           >
-            <option value="">Land auswählen (optional)</option>
+            <option value="">Land auswählen</option>
             {EU_COUNTRIES.map((c) => (
               <option key={c.code} value={c.label}>
                 {c.flag} {c.label}
@@ -279,6 +296,7 @@ export default function GeneralPage() {
               firstNameValue={user?.firstName ?? ''}
               lastNameValue={user?.lastName ?? ''}
               birthDateValue={birthDateValue}
+              phoneNumberValue={user?.phoneNumber ?? ''}
               streetValue={user?.street ?? ''}
               houseNumberValue={user?.houseNumber ?? ''}
               zipCodeValue={user?.zipCode ?? ''}

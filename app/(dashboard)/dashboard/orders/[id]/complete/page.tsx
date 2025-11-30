@@ -657,7 +657,7 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
 
                         <div>
                           <Label htmlFor={`description-${index}`}>
-                            Beschreibung (optional)
+                            Beschreibung
                           </Label>
                           <Textarea
                             id={`description-${index}`}
@@ -686,7 +686,7 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
                 <div className="space-y-6">
                   <div>
                     <Label className="text-base font-semibold">
-                      Engagements & Ehrenämter (optional)
+                      Engagements & Ehrenämter
                     </Label>
                     <p className="text-xs text-gray-500 mt-1 mb-4">
                       Falls vorhanden, gib hier deine ehrenamtlichen Tätigkeiten, Vereinsmitgliedschaften oder soziales Engagement an.
@@ -844,7 +844,7 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
 
                 <div>
                   <Label htmlFor="linkedinUrl">
-                    LinkedIn-Profil (optional)
+                    LinkedIn-Profil
                   </Label>
                   <Input
                     id="linkedinUrl"
@@ -860,7 +860,7 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
 
                 <div>
                   <Label htmlFor="resumeUpload">
-                    Aktueller Lebenslauf hochladen (optional)
+                    Aktueller Lebenslauf hochladen
                   </Label>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                     <Input
@@ -894,7 +894,7 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
 
                 <div>
                   <Label htmlFor="additionalCvInfo">
-                    Zusätzliche Informationen (optional)
+                    Zusätzliche Informationen
                   </Label>
                   <Textarea
                     id="additionalCvInfo"
@@ -943,7 +943,7 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
 
                 <div>
                   <Label htmlFor="jobPostingUrl">
-                    Link zur Stellenanzeige (optional)
+                    Link zur Stellenanzeige
                   </Label>
                   <Input
                     id="jobPostingUrl"
@@ -998,7 +998,7 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
 
                 <div>
                   <Label htmlFor="additionalLetterInfo">
-                    Zusätzliche Hinweise (optional)
+                    Zusätzliche Hinweise
                   </Label>
                   <Textarea
                     id="additionalLetterInfo"

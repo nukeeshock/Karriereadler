@@ -98,6 +98,7 @@ export default function KaufenPage() {
       if (user.firstName) setFirstName(user.firstName);
       if (user.lastName) setLastName(user.lastName);
       if (user.email) setEmail(user.email);
+      if (user.phoneNumber) setPhone(user.phoneNumber);
       if (user.street) setStreet(user.street);
       if (user.zipCode) setPostalCode(user.zipCode);
       if (user.city) setCity(user.city);
@@ -407,7 +408,7 @@ export default function KaufenPage() {
 
             <div>
               <Label htmlFor="additionalInfo">
-                Zusätzliche Informationen (optional)
+                Zusätzliche Informationen
               </Label>
               <Textarea
                 id="additionalInfo"

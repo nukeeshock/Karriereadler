@@ -130,7 +130,7 @@ export default function ContactPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-gray-900">
-                        Name
+                        Name *
                       </Label>
                       <Input
                         id="name"
@@ -142,7 +142,7 @@ export default function ContactPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email" className="text-gray-900">
-                        E-Mail
+                        E-Mail *
                       </Label>
                       <Input
                         id="email"
@@ -157,7 +157,7 @@ export default function ContactPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="phone" className="text-gray-900">
-                      Telefon (optional)
+                      Telefon
                     </Label>
                     <Input
                       id="phone"
@@ -170,7 +170,7 @@ export default function ContactPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="subject" className="text-gray-900">
-                      Betreff
+                      Betreff *
                     </Label>
                     <Input
                       id="subject"
@@ -183,7 +183,7 @@ export default function ContactPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="message" className="text-gray-900">
-                      Nachricht
+                      Nachricht *
                     </Label>
                     <Textarea
                       id="message"

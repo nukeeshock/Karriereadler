@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,6 +52,34 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
     { error: '', success: '' }
   );
 
+  const [resendState, setResendState] = useState<{ loading: boolean; message?: string; error?: string }>({
+    loading: false
+  });
+
+  const handleResendVerification = async () => {
+    if (!state?.email) return;
+
+    setResendState({ loading: true });
+
+    try {
+      const response = await fetch('/api/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: state.email })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setResendState({ loading: false, message: result.message });
+      } else {
+        setResendState({ loading: false, error: result.error || 'Fehler beim Senden' });
+      }
+    } catch (error) {
+      setResendState({ loading: false, error: 'Netzwerkfehler. Bitte versuche es erneut.' });
+    }
+  };
+
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -85,7 +113,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName" className="block text-sm font-medium text-gray-900">
-                    Vorname
+                    Vorname *
                   </Label>
                   <div className="mt-1">
                     <Input
@@ -103,7 +131,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 </div>
                 <div>
                   <Label htmlFor="lastName" className="block text-sm font-medium text-gray-900">
-                    Nachname
+                    Nachname *
                   </Label>
                   <div className="mt-1">
                     <Input
@@ -123,7 +151,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
 
               <div>
                 <Label htmlFor="birthDate" className="block text-sm font-medium text-gray-900">
-                  Geburtsdatum
+                  Geburtsdatum *
                 </Label>
                 <div className="mt-1">
                   <Input
@@ -141,7 +169,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="street" className="block text-sm font-medium text-gray-900">
-                    Straße & Hausnummer (optional)
+                    Straße & Hausnummer
                   </Label>
                   <div className="mt-1 flex gap-2">
                     <Input
@@ -169,7 +197,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
                     <Label htmlFor="zipCode" className="block text-sm font-medium text-gray-900">
-                      PLZ (optional)
+                      PLZ
                     </Label>
                     <div className="mt-1">
                       <Input
@@ -186,7 +214,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                   </div>
                   <div>
                     <Label htmlFor="city" className="block text-sm font-medium text-gray-900">
-                      Ort (optional)
+                      Ort
                     </Label>
                     <div className="mt-1">
                       <Input
@@ -206,7 +234,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
 
               <div>
                 <Label htmlFor="country" className="block text-sm font-medium text-gray-900">
-                  Land (optional)
+                  Land
                 </Label>
                 <div className="mt-1">
                   <select
@@ -216,7 +244,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
                     defaultValue={state?.country || ''}
                     className="appearance-none rounded-full relative block w-full px-3 py-2 border border-gray-300 text-sm text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 bg-white"
                   >
-                    <option value="">Land auswählen (optional)</option>
+                    <option value="">Land auswählen</option>
                     {EU_COUNTRIES.map((c) => (
                       <option key={c.code} value={c.label}>
                         {c.flag} {c.label}
@@ -233,7 +261,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               htmlFor="email"
               className="block text-sm font-medium text-gray-900"
             >
-              E-Mail
+              E-Mail *
             </Label>
             <div className="mt-1">
               <Input
@@ -255,7 +283,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               htmlFor="password"
               className="block text-sm font-medium text-gray-900"
             >
-              Passwort
+              Passwort *
             </Label>
             <div className="mt-1">
               <Input
@@ -291,8 +319,37 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           )}
 
           {state?.error && (
-            <div className="text-red-500 text-sm" role="alert">
-              {state.error}
+            <div className="space-y-2">
+              <div className="text-red-500 text-sm" role="alert">
+                {state.error}
+              </div>
+              {state?.notVerified && (
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResendVerification}
+                    disabled={resendState.loading}
+                    className="w-full"
+                  >
+                    {resendState.loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sende...
+                      </>
+                    ) : (
+                      'Verifizierungs-Email erneut senden'
+                    )}
+                  </Button>
+                  {resendState.message && (
+                    <div className="text-green-600 text-sm">{resendState.message}</div>
+                  )}
+                  {resendState.error && (
+                    <div className="text-red-500 text-sm">{resendState.error}</div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
