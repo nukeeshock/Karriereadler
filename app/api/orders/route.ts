@@ -11,6 +11,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log('[Orders API] Fetching orders for user:', { userId: user.id, email: user.email });
+
     const orders = await db
       .select({
         id: orderRequests.id,
@@ -18,12 +20,15 @@ export async function GET() {
         status: orderRequests.status,
         customerName: orderRequests.customerName,
         customerEmail: orderRequests.customerEmail,
+        finishedFileUrl: orderRequests.finishedFileUrl,
         createdAt: orderRequests.createdAt,
         updatedAt: orderRequests.updatedAt
       })
       .from(orderRequests)
       .where(eq(orderRequests.userId, user.id))
       .orderBy(desc(orderRequests.createdAt));
+
+    console.log('[Orders API] Found orders:', { count: orders.length, userEmail: user.email });
 
     return NextResponse.json({ orders });
   } catch (error) {

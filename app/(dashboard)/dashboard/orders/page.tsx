@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  Download
 } from 'lucide-react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -22,9 +23,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 type Order = {
   id: number;
   productType: 'CV' | 'COVER_LETTER' | 'BUNDLE';
-  status: 'PENDING_PAYMENT' | 'PAID' | 'READY_FOR_PROCESSING' | 'CANCELLED';
+  status: 'PENDING_PAYMENT' | 'PAID' | 'READY_FOR_PROCESSING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
   customerName: string | null;
   customerEmail: string;
+  finishedFileUrl: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -53,9 +55,19 @@ const statusConfig: Record<string, { label: string; variant: 'default' | 'second
     icon: AlertCircle
   },
   READY_FOR_PROCESSING: {
+    label: 'Fragebogen eingereicht',
+    variant: 'secondary',
+    icon: Clock
+  },
+  IN_PROGRESS: {
     label: 'In Bearbeitung',
     variant: 'secondary',
     icon: Clock
+  },
+  COMPLETED: {
+    label: 'Abgeschlossen – Download verfügbar',
+    variant: 'default',
+    icon: CheckCircle2
   },
   CANCELLED: {
     label: 'Abgebrochen',
@@ -175,10 +187,25 @@ export default function OrdersPage() {
                             </Link>
                           </Button>
                         )}
+                        {order.status === 'COMPLETED' && order.finishedFileUrl && (
+                          <a
+                            href={`/api/orders/${order.id}/download`}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all"
+                          >
+                            <Download className="w-4 h-4" />
+                            <span>PDF herunterladen</span>
+                          </a>
+                        )}
                         {order.status === 'READY_FOR_PROCESSING' && (
                           <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-4 py-2 rounded-lg">
                             <CheckCircle2 className="w-4 h-4" />
                             <span className="font-medium">Fragebogen eingereicht</span>
+                          </div>
+                        )}
+                        {order.status === 'IN_PROGRESS' && (
+                          <div className="flex items-center gap-2 text-sm text-blue-700 bg-blue-50 px-4 py-2 rounded-lg">
+                            <Clock className="w-4 h-4" />
+                            <span className="font-medium">In Bearbeitung</span>
                           </div>
                         )}
                         {order.status === 'PENDING_PAYMENT' && (

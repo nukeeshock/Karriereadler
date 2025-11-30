@@ -49,3 +49,4 @@ postgres_data/
 # uploads (user-generated)
 /public/uploads/
 /uploads/
+/private/

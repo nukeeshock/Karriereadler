@@ -24,7 +24,13 @@ type Order = {
   id: number;
   userId: number | null;
   productType: 'CV' | 'COVER_LETTER' | 'BUNDLE';
-  status: 'PENDING_PAYMENT' | 'PAID' | 'READY_FOR_PROCESSING' | 'CANCELLED';
+  status:
+    | 'PENDING_PAYMENT'
+    | 'PAID'
+    | 'READY_FOR_PROCESSING'
+    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'CANCELLED';
   customerName: string | null;
   customerEmail: string;
   customerPhone: string | null;
@@ -44,7 +50,10 @@ const productLabels: Record<string, string> = {
   BUNDLE: 'Bundle'
 };
 
-const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const statusConfig: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   PENDING_PAYMENT: {
     label: 'Zahlung offen',
     variant: 'outline'
@@ -56,6 +65,14 @@ const statusConfig: Record<string, { label: string; variant: 'default' | 'second
   READY_FOR_PROCESSING: {
     label: 'Bereit zur Bearbeitung',
     variant: 'secondary'
+  },
+  IN_PROGRESS: {
+    label: 'In Bearbeitung',
+    variant: 'secondary'
+  },
+  COMPLETED: {
+    label: 'Abgeschlossen',
+    variant: 'default'
   },
   CANCELLED: {
     label: 'Abgebrochen',
@@ -134,7 +151,9 @@ export default function AdminOrdersPage() {
     total: orders.length,
     pending: orders.filter((o) => o.status === 'PENDING_PAYMENT').length,
     paid: orders.filter((o) => o.status === 'PAID').length,
-    ready: orders.filter((o) => o.status === 'READY_FOR_PROCESSING').length
+    ready: orders.filter((o) => o.status === 'READY_FOR_PROCESSING').length,
+    inProgress: orders.filter((o) => o.status === 'IN_PROGRESS').length,
+    completed: orders.filter((o) => o.status === 'COMPLETED').length
   };
 
   return (
@@ -146,7 +165,7 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-gray-600">Gesamt</p>
@@ -169,6 +188,18 @@ export default function AdminOrdersPage() {
             <CardContent className="p-4">
               <p className="text-sm text-gray-600">Bereit</p>
               <p className="text-2xl font-bold text-green-600">{stats.ready}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-gray-600">In Bearbeitung</p>
+              <p className="text-2xl font-bold text-purple-600">{stats.inProgress}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-gray-600">Abgeschlossen</p>
+              <p className="text-2xl font-bold text-emerald-600">{stats.completed}</p>
             </CardContent>
           </Card>
         </div>
@@ -203,13 +234,32 @@ export default function AdminOrdersPage() {
           >
             Bereit zur Bearbeitung
           </Button>
+          <Button
+            variant={filter === 'IN_PROGRESS' ? 'default' : 'outline'}
+            onClick={() => setFilter('IN_PROGRESS')}
+            size="sm"
+          >
+            In Bearbeitung
+          </Button>
+          <Button
+            variant={filter === 'COMPLETED' ? 'default' : 'outline'}
+            onClick={() => setFilter('COMPLETED')}
+            size="sm"
+          >
+            Abgeschlossen
+          </Button>
         </div>
 
         {/* Orders List */}
         <div className="space-y-3">
           {filteredOrders.map((order) => {
             const Icon = productIcons[order.productType];
-            const statusInfo = statusConfig[order.status];
+            const statusInfo =
+              statusConfig[order.status] ||
+              ({
+                label: order.status,
+                variant: 'outline'
+              } as const);
 
             return (
               <Card key={order.id} className="hover:shadow-md transition-shadow">

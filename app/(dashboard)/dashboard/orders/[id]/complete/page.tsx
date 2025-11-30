@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle, Plus, X } from 'lucide-react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -21,6 +21,37 @@ type Order = {
   basicInfo: any;
 };
 
+type WorkExperience = {
+  company: string;
+  position: string;
+  startMonth: string;
+  startYear: string;
+  endMonth: string;
+  endYear: string;
+  isCurrent: boolean;
+  responsibilities: string;
+};
+
+type Education = {
+  institution: string;
+  degree: string;
+  field: string;
+  startYear: string;
+  endYear: string;
+  description: string;
+};
+
+type VoluntaryWork = {
+  organization: string;
+  role: string;
+  startMonth: string;
+  startYear: string;
+  endMonth: string;
+  endYear: string;
+  isCurrent: boolean;
+  description: string;
+};
+
 export default function CompleteOrderPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
@@ -31,8 +62,34 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
 
   // CV Fields
   const [jobDescription, setJobDescription] = useState('');
-  const [workExperience, setWorkExperience] = useState('');
-  const [education, setEducation] = useState('');
+  const [workExperiences, setWorkExperiences] = useState<WorkExperience[]>([{
+    company: '',
+    position: '',
+    startMonth: '',
+    startYear: '',
+    endMonth: '',
+    endYear: '',
+    isCurrent: false,
+    responsibilities: ''
+  }]);
+  const [educationEntries, setEducationEntries] = useState<Education[]>([{
+    institution: '',
+    degree: '',
+    field: '',
+    startYear: '',
+    endYear: '',
+    description: ''
+  }]);
+  const [voluntaryWork, setVoluntaryWork] = useState<VoluntaryWork[]>([{
+    organization: '',
+    role: '',
+    startMonth: '',
+    startYear: '',
+    endMonth: '',
+    endYear: '',
+    isCurrent: false,
+    description: ''
+  }]);
   const [skills, setSkills] = useState('');
   const [additionalCvInfo, setAdditionalCvInfo] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
@@ -130,8 +187,9 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
       if (order.productType === 'CV' || order.productType === 'BUNDLE') {
         formData.cv = {
           jobDescription,
-          workExperience,
-          education,
+          workExperience: JSON.stringify(workExperiences),
+          education: JSON.stringify(educationEntries),
+          voluntaryWork: JSON.stringify(voluntaryWork),
           skills,
           linkedinUrl: linkedinUrl || null,
           resumePath: resumePath || null,
@@ -180,6 +238,82 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
     BUNDLE: 'Komplett-Bundle (Lebenslauf + Anschreiben)'
   };
 
+  // Work Experience Handlers
+  const addWorkExperience = () => {
+    setWorkExperiences([...workExperiences, {
+      company: '',
+      position: '',
+      startMonth: '',
+      startYear: '',
+      endMonth: '',
+      endYear: '',
+      isCurrent: false,
+      responsibilities: ''
+    }]);
+  };
+
+  const removeWorkExperience = (index: number) => {
+    if (workExperiences.length > 1) {
+      setWorkExperiences(workExperiences.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateWorkExperience = (index: number, field: keyof WorkExperience, value: string | boolean) => {
+    const updated = [...workExperiences];
+    updated[index] = { ...updated[index], [field]: value };
+    setWorkExperiences(updated);
+  };
+
+  // Education Handlers
+  const addEducation = () => {
+    setEducationEntries([...educationEntries, {
+      institution: '',
+      degree: '',
+      field: '',
+      startYear: '',
+      endYear: '',
+      description: ''
+    }]);
+  };
+
+  const removeEducation = (index: number) => {
+    if (educationEntries.length > 1) {
+      setEducationEntries(educationEntries.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateEducation = (index: number, field: keyof Education, value: string) => {
+    const updated = [...educationEntries];
+    updated[index] = { ...updated[index], [field]: value };
+    setEducationEntries(updated);
+  };
+
+  // Voluntary Work Handlers
+  const addVoluntaryWork = () => {
+    setVoluntaryWork([...voluntaryWork, {
+      organization: '',
+      role: '',
+      startMonth: '',
+      startYear: '',
+      endMonth: '',
+      endYear: '',
+      isCurrent: false,
+      description: ''
+    }]);
+  };
+
+  const removeVoluntaryWork = (index: number) => {
+    if (voluntaryWork.length > 1) {
+      setVoluntaryWork(voluntaryWork.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateVoluntaryWork = (index: number, field: keyof VoluntaryWork, value: string | boolean) => {
+    const updated = [...voluntaryWork];
+    updated[index] = { ...updated[index], [field]: value };
+    setVoluntaryWork(updated);
+  };
+
   const handleResumeUpload = async (file: File | null) => {
     if (!file) return;
     setResumeError(null);
@@ -217,6 +351,22 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
       setResumeUploading(false);
     }
   };
+
+  // Month options
+  const months = [
+    { value: '01', label: 'Januar' },
+    { value: '02', label: 'Februar' },
+    { value: '03', label: 'März' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'Mai' },
+    { value: '06', label: 'Juni' },
+    { value: '07', label: 'Juli' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'Oktober' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'Dezember' }
+  ];
 
   return (
     <div className="flex-1 min-h-screen p-4 sm:p-8 bg-gray-50">
@@ -257,35 +407,425 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="workExperience">
-                    Berufserfahrung *
-                  </Label>
-                  <Textarea
-                    id="workExperience"
-                    value={workExperience}
-                    onChange={(e) => setWorkExperience(e.target.value)}
-                    placeholder="Liste deine bisherigen beruflichen Stationen auf (Firma, Position, Zeitraum, Aufgaben)..."
-                    rows={6}
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Beispiel: 2020-2023: Softwareentwickler bei Firma XYZ - Entwicklung von Webanwendungen mit React...
-                  </p>
+                {/* Work Experience - Dynamic Fields */}
+                <div className="space-y-6">
+                  <div>
+                    <Label className="text-base font-semibold">
+                      Berufserfahrung *
+                    </Label>
+                    <p className="text-xs text-gray-500 mt-1 mb-4">
+                      Füge alle relevanten beruflichen Stationen hinzu
+                    </p>
+                  </div>
+
+                  {workExperiences.map((exp, index) => (
+                    <Card key={index} className="border-orange-200 bg-orange-50/30">
+                      <CardContent className="p-4 space-y-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-semibold text-gray-900">
+                            Position {index + 1}
+                          </h4>
+                          {workExperiences.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeWorkExperience(index)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Entfernen
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`company-${index}`}>Firmenname *</Label>
+                            <Input
+                              id={`company-${index}`}
+                              value={exp.company}
+                              onChange={(e) => updateWorkExperience(index, 'company', e.target.value)}
+                              placeholder="z.B. Acme GmbH"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`position-${index}`}>Position / Rolle *</Label>
+                            <Input
+                              id={`position-${index}`}
+                              value={exp.position}
+                              onChange={(e) => updateWorkExperience(index, 'position', e.target.value)}
+                              placeholder="z.B. Senior Developer"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Von *</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <select
+                                value={exp.startMonth}
+                                onChange={(e) => updateWorkExperience(index, 'startMonth', e.target.value)}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                required
+                              >
+                                <option value="">Monat</option>
+                                {months.map(m => (
+                                  <option key={m.value} value={m.value}>{m.label}</option>
+                                ))}
+                              </select>
+                              <Input
+                                type="number"
+                                value={exp.startYear}
+                                onChange={(e) => updateWorkExperience(index, 'startYear', e.target.value)}
+                                placeholder="Jahr"
+                                min="1950"
+                                max="2100"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label>Bis *</Label>
+                            <div className="space-y-2">
+                              <div className="grid grid-cols-2 gap-2">
+                                <select
+                                  value={exp.endMonth}
+                                  onChange={(e) => updateWorkExperience(index, 'endMonth', e.target.value)}
+                                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                  required={!exp.isCurrent}
+                                  disabled={exp.isCurrent}
+                                >
+                                  <option value="">Monat</option>
+                                  {months.map(m => (
+                                    <option key={m.value} value={m.value}>{m.label}</option>
+                                  ))}
+                                </select>
+                                <Input
+                                  type="number"
+                                  value={exp.endYear}
+                                  onChange={(e) => updateWorkExperience(index, 'endYear', e.target.value)}
+                                  placeholder="Jahr"
+                                  min="1950"
+                                  max="2100"
+                                  required={!exp.isCurrent}
+                                  disabled={exp.isCurrent}
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  id={`current-${index}`}
+                                  checked={exp.isCurrent}
+                                  onChange={(e) => updateWorkExperience(index, 'isCurrent', e.target.checked)}
+                                  className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                />
+                                <label htmlFor={`current-${index}`} className="text-sm text-gray-700">
+                                  Aktuell
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`responsibilities-${index}`}>
+                            Tätigkeiten & Erfolge *
+                          </Label>
+                          <Textarea
+                            id={`responsibilities-${index}`}
+                            value={exp.responsibilities}
+                            onChange={(e) => updateWorkExperience(index, 'responsibilities', e.target.value)}
+                            placeholder="Beschreibe deine Hauptaufgaben, Verantwortlichkeiten und Erfolge..."
+                            rows={4}
+                            required
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addWorkExperience}
+                    className="w-full border-orange-300 text-orange-700 hover:bg-orange-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Weitere Position hinzufügen
+                  </Button>
                 </div>
 
-                <div>
-                  <Label htmlFor="education">
-                    Ausbildung / Studium *
-                  </Label>
-                  <Textarea
-                    id="education"
-                    value={education}
-                    onChange={(e) => setEducation(e.target.value)}
-                    placeholder="Deine schulische und berufliche Ausbildung (Abschluss, Institution, Zeitraum)..."
-                    rows={4}
-                    required
-                  />
+                {/* Education - Dynamic Fields */}
+                <div className="space-y-6">
+                  <div>
+                    <Label className="text-base font-semibold">
+                      Ausbildung / Studium *
+                    </Label>
+                    <p className="text-xs text-gray-500 mt-1 mb-4">
+                      Füge alle relevanten Bildungsabschlüsse hinzu
+                    </p>
+                  </div>
+
+                  {educationEntries.map((edu, index) => (
+                    <Card key={index} className="border-orange-200 bg-orange-50/30">
+                      <CardContent className="p-4 space-y-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-semibold text-gray-900">
+                            Abschluss {index + 1}
+                          </h4>
+                          {educationEntries.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeEducation(index)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Entfernen
+                            </Button>
+                          )}
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`institution-${index}`}>Bildungseinrichtung *</Label>
+                          <Input
+                            id={`institution-${index}`}
+                            value={edu.institution}
+                            onChange={(e) => updateEducation(index, 'institution', e.target.value)}
+                            placeholder="z.B. Universität München"
+                            required
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`degree-${index}`}>Abschluss *</Label>
+                            <Input
+                              id={`degree-${index}`}
+                              value={edu.degree}
+                              onChange={(e) => updateEducation(index, 'degree', e.target.value)}
+                              placeholder="z.B. Bachelor of Science"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`field-${index}`}>Fachrichtung *</Label>
+                            <Input
+                              id={`field-${index}`}
+                              value={edu.field}
+                              onChange={(e) => updateEducation(index, 'field', e.target.value)}
+                              placeholder="z.B. Informatik"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`startYear-${index}`}>Von Jahr *</Label>
+                            <Input
+                              id={`startYear-${index}`}
+                              type="number"
+                              value={edu.startYear}
+                              onChange={(e) => updateEducation(index, 'startYear', e.target.value)}
+                              placeholder="2018"
+                              min="1950"
+                              max="2100"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`endYear-${index}`}>Bis Jahr *</Label>
+                            <Input
+                              id={`endYear-${index}`}
+                              type="number"
+                              value={edu.endYear}
+                              onChange={(e) => updateEducation(index, 'endYear', e.target.value)}
+                              placeholder="2022"
+                              min="1950"
+                              max="2100"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`description-${index}`}>
+                            Beschreibung (optional)
+                          </Label>
+                          <Textarea
+                            id={`description-${index}`}
+                            value={edu.description}
+                            onChange={(e) => updateEducation(index, 'description', e.target.value)}
+                            placeholder="Schwerpunkte, besondere Leistungen, Abschlussnote..."
+                            rows={3}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addEducation}
+                    className="w-full border-orange-300 text-orange-700 hover:bg-orange-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Weiteren Abschluss hinzufügen
+                  </Button>
+                </div>
+
+                {/* Voluntary Work - Dynamic Fields */}
+                <div className="space-y-6">
+                  <div>
+                    <Label className="text-base font-semibold">
+                      Engagements & Ehrenämter (optional)
+                    </Label>
+                    <p className="text-xs text-gray-500 mt-1 mb-4">
+                      Falls vorhanden, gib hier deine ehrenamtlichen Tätigkeiten, Vereinsmitgliedschaften oder soziales Engagement an.
+                    </p>
+                  </div>
+
+                  {voluntaryWork.map((vol, index) => (
+                    <Card key={index} className="border-orange-200 bg-orange-50/30">
+                      <CardContent className="p-4 space-y-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-semibold text-gray-900">
+                            Engagement {index + 1}
+                          </h4>
+                          {voluntaryWork.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeVoluntaryWork(index)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Entfernen
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`organization-${index}`}>Organisation</Label>
+                            <Input
+                              id={`organization-${index}`}
+                              value={vol.organization}
+                              onChange={(e) => updateVoluntaryWork(index, 'organization', e.target.value)}
+                              placeholder="z.B. Rotes Kreuz"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`role-${index}`}>Rolle / Position</Label>
+                            <Input
+                              id={`role-${index}`}
+                              value={vol.role}
+                              onChange={(e) => updateVoluntaryWork(index, 'role', e.target.value)}
+                              placeholder="z.B. Teamleiter"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label>Von</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <select
+                                value={vol.startMonth}
+                                onChange={(e) => updateVoluntaryWork(index, 'startMonth', e.target.value)}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              >
+                                <option value="">Monat</option>
+                                {months.map(m => (
+                                  <option key={m.value} value={m.value}>{m.label}</option>
+                                ))}
+                              </select>
+                              <Input
+                                type="number"
+                                value={vol.startYear}
+                                onChange={(e) => updateVoluntaryWork(index, 'startYear', e.target.value)}
+                                placeholder="Jahr"
+                                min="1950"
+                                max="2100"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <Label>Bis</Label>
+                            <div className="space-y-2">
+                              <div className="grid grid-cols-2 gap-2">
+                                <select
+                                  value={vol.endMonth}
+                                  onChange={(e) => updateVoluntaryWork(index, 'endMonth', e.target.value)}
+                                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                  disabled={vol.isCurrent}
+                                >
+                                  <option value="">Monat</option>
+                                  {months.map(m => (
+                                    <option key={m.value} value={m.value}>{m.label}</option>
+                                  ))}
+                                </select>
+                                <Input
+                                  type="number"
+                                  value={vol.endYear}
+                                  onChange={(e) => updateVoluntaryWork(index, 'endYear', e.target.value)}
+                                  placeholder="Jahr"
+                                  min="1950"
+                                  max="2100"
+                                  disabled={vol.isCurrent}
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  id={`voluntary-current-${index}`}
+                                  checked={vol.isCurrent}
+                                  onChange={(e) => updateVoluntaryWork(index, 'isCurrent', e.target.checked)}
+                                  className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                />
+                                <label htmlFor={`voluntary-current-${index}`} className="text-sm text-gray-700">
+                                  Aktuell
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor={`voluntary-description-${index}`}>
+                            Beschreibung der Tätigkeiten
+                          </Label>
+                          <Textarea
+                            id={`voluntary-description-${index}`}
+                            value={vol.description}
+                            onChange={(e) => updateVoluntaryWork(index, 'description', e.target.value)}
+                            placeholder="Beschreibe deine Aufgaben und Aktivitäten..."
+                            rows={4}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addVoluntaryWork}
+                    className="w-full border-orange-300 text-orange-700 hover:bg-orange-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Weiteres Engagement hinzufügen
+                  </Button>
                 </div>
 
                 <div>
@@ -308,10 +848,10 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
                   </Label>
                   <Input
                     id="linkedinUrl"
-                    type="url"
+                    type="text"
                     value={linkedinUrl}
                     onChange={(e) => setLinkedinUrl(e.target.value)}
-                    placeholder="https://www.linkedin.com/in/deinprofil"
+                    placeholder="linkedin.com/in/deinprofil oder https://www.linkedin.com/in/deinprofil"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Hilft uns, deine Laufbahn und Referenzen direkt abzugleichen.

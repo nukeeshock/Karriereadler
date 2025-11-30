@@ -136,12 +136,15 @@ export enum OrderStatus {
   PENDING_PAYMENT = 'PENDING_PAYMENT',
   PAID = 'PAID',
   READY_FOR_PROCESSING = 'READY_FOR_PROCESSING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
   CANCELLED = 'CANCELLED'
 }
 
 export const orderRequests = pgTable('order_requests', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
+    .notNull()
     .references(() => users.id),
 
   productType: varchar('product_type', { length: 50 }).notNull(),
@@ -161,6 +164,9 @@ export const orderRequests = pgTable('order_requests', {
   // Stripe references
   stripeSessionId: varchar('stripe_session_id', { length: 255 }).unique(),
   stripePaymentIntentId: varchar('stripe_payment_intent_id', { length: 255 }),
+
+  // Finished file (uploaded by admin when order is completed)
+  finishedFileUrl: text('finished_file_url'),
 
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()

@@ -16,11 +16,15 @@ const createOrderSchema = z.object({
   productType: z.enum([ProductType.CV, ProductType.COVER_LETTER, ProductType.BUNDLE]),
   customerName: z.string().min(1),
   customerEmail: z.string().email(),
-  customerPhone: z.string().nullable().optional(),
+  customerPhone: z.string().min(1),
   basicInfo: z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    phone: z.string().optional(),
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+    phone: z.string().min(1),
+    street: z.string().min(1),
+    postalCode: z.string().regex(/^\d{5}$/, 'Postleitzahl muss 5-stellig sein'),
+    city: z.string().min(1),
+    birthDate: z.string().min(1),
     additionalInfo: z.string().optional()
   })
 });
@@ -54,6 +58,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create OrderRequest with PENDING_PAYMENT status
+    console.log('[Order Create] Creating order for user:', { userId: user.id, email: user.email, productType });
+
     const [order] = await db
       .insert(orderRequests)
       .values({
@@ -66,6 +72,8 @@ export async function POST(request: NextRequest) {
         basicInfo
       })
       .returning();
+
+    console.log('[Order Create] Order created successfully:', { orderId: order.id, userId: order.userId });
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({

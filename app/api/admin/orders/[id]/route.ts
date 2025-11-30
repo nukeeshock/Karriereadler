@@ -16,16 +16,17 @@ export async function GET(
 
     // Check if user is admin or owner
     if (user.role !== 'admin' && user.role !== 'owner') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 });
     }
 
     const { id } = await params;
-    const orderId = Number(id);
+    const orderId = parseInt(id, 10);
 
-    if (Number.isNaN(orderId)) {
-      return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
+    if (isNaN(orderId)) {
+      return NextResponse.json({ error: 'Ungültige Auftrags-ID' }, { status: 400 });
     }
 
+    // Get order
     const [order] = await db
       .select()
       .from(orderRequests)
@@ -33,12 +34,12 @@ export async function GET(
       .limit(1);
 
     if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Auftrag nicht gefunden' }, { status: 404 });
     }
 
     return NextResponse.json({ order });
   } catch (error) {
-    console.error('Error fetching admin order:', error);
-    return NextResponse.json({ error: 'Failed to fetch order' }, { status: 500 });
+    console.error('[Admin Order Detail] Error:', error);
+    return NextResponse.json({ error: 'Fehler beim Laden des Auftrags' }, { status: 500 });
   }
 }

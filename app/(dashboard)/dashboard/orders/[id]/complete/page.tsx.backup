@@ -1,0 +1,513 @@
+'use client';
+
+import { use, useState, useEffect } from 'react';
+import useSWR from 'swr';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+type Order = {
+  id: number;
+  productType: 'CV' | 'COVER_LETTER' | 'BUNDLE';
+  status: string;
+  customerName: string | null;
+  customerEmail: string;
+  basicInfo: any;
+};
+
+export default function CompleteOrderPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const router = useRouter();
+  const { data, error, isLoading } = useSWR<{ order: Order }>(
+    `/api/orders/${resolvedParams.id}`,
+    fetcher
+  );
+
+  // CV Fields
+  const [jobDescription, setJobDescription] = useState('');
+  const [workExperience, setWorkExperience] = useState('');
+  const [education, setEducation] = useState('');
+  const [skills, setSkills] = useState('');
+  const [additionalCvInfo, setAdditionalCvInfo] = useState('');
+  const [linkedinUrl, setLinkedinUrl] = useState('');
+  const [resumePath, setResumePath] = useState<string | null>(null);
+  const [resumeFileName, setResumeFileName] = useState<string | null>(null);
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+
+  // Cover Letter Fields
+  const [jobTitle, setJobTitle] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [jobPostingUrl, setJobPostingUrl] = useState('');
+  const [jobDescriptionText, setJobDescriptionText] = useState('');
+  const [experiencesToHighlight, setExperiencesToHighlight] = useState('');
+  const [strengths, setStrengths] = useState('');
+  const [additionalLetterInfo, setAdditionalLetterInfo] = useState('');
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const order = data?.order;
+
+  useEffect(() => {
+    if (order && order.status !== 'PAID') {
+      router.push('/dashboard/orders');
+    }
+  }, [order, router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 min-h-screen p-4 sm:p-8 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-orange-600" />
+          <p className="text-gray-600">Lade Auftrag...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <div className="flex-1 min-h-screen p-4 sm:p-8">
+        <div className="max-w-2xl mx-auto">
+          <Card className="border-red-200">
+            <CardContent className="p-8 text-center">
+              <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Auftrag nicht gefunden</h2>
+              <p className="text-gray-600 mb-6">
+                Der Auftrag konnte nicht geladen werden oder du hast keine Berechtigung.
+              </p>
+              <Button onClick={() => router.push('/dashboard/orders')}>
+                Zurück zur Übersicht
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="flex-1 min-h-screen p-4 sm:p-8 bg-gray-50">
+        <div className="max-w-2xl mx-auto">
+          <Card className="border-green-200">
+            <CardContent className="p-8 text-center">
+              <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Fragebogen erfolgreich eingereicht!
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Vielen Dank! Wir haben alle Informationen erhalten und beginnen nun mit der Erstellung
+                deiner Bewerbungsunterlagen. Du erhältst die fertigen Dokumente in 2-3 Werktagen per E-Mail.
+              </p>
+              <Button onClick={() => router.push('/dashboard/orders')}>
+                Zurück zur Übersicht
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const formData: any = {};
+
+      // Add fields based on productType
+      if (order.productType === 'CV' || order.productType === 'BUNDLE') {
+        formData.cv = {
+          jobDescription,
+          workExperience,
+          education,
+          skills,
+          linkedinUrl: linkedinUrl || null,
+          resumePath: resumePath || null,
+          additionalInfo: additionalCvInfo
+        };
+      }
+
+      if (order.productType === 'COVER_LETTER' || order.productType === 'BUNDLE') {
+        formData.coverLetter = {
+          jobTitle,
+          companyName,
+          jobPostingUrl,
+          jobDescriptionText,
+          experiencesToHighlight,
+          strengths,
+          additionalInfo: additionalLetterInfo
+        };
+      }
+
+      const res = await fetch(`/api/orders/${order.id}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formData })
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'Fehler beim Einreichen des Fragebogens');
+      }
+
+      setSuccess(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const showCvForm = order.productType === 'CV' || order.productType === 'BUNDLE';
+  const showLetterForm = order.productType === 'COVER_LETTER' || order.productType === 'BUNDLE';
+
+  const productLabels: Record<string, string> = {
+    CV: 'Lebenslauf',
+    COVER_LETTER: 'Anschreiben',
+    BUNDLE: 'Komplett-Bundle (Lebenslauf + Anschreiben)'
+  };
+
+  const handleResumeUpload = async (file: File | null) => {
+    if (!file) return;
+    setResumeError(null);
+    setResumeUploading(true);
+
+    try {
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        setResumeError('Datei ist zu groß. Bitte max. 10MB hochladen.');
+        setResumeUploading(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('resume', file);
+
+      const res = await fetch('/api/upload/resume', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Upload fehlgeschlagen');
+      }
+
+      setResumePath(data.path);
+      setResumeFileName(file.name);
+    } catch (err) {
+      setResumeError(err instanceof Error ? err.message : 'Upload fehlgeschlagen');
+      setResumePath(null);
+      setResumeFileName(null);
+    } finally {
+      setResumeUploading(false);
+    }
+  };
+
+  return (
+    <div className="flex-1 min-h-screen p-4 sm:p-8 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Fragebogen ausfüllen</h1>
+          <p className="text-gray-600">
+            Produkt: <strong>{productLabels[order.productType]}</strong>
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            Bitte fülle alle Felder sorgfältig aus. Diese Informationen helfen uns, deine
+            Bewerbungsunterlagen optimal zu erstellen.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* CV Form */}
+          {showCvForm && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Lebenslauf-Informationen</CardTitle>
+                <CardDescription>
+                  Angaben für die Erstellung deines professionellen Lebenslaufs
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="jobDescription">
+                    Zielposition / Jobbeschreibung *
+                  </Label>
+                  <Textarea
+                    id="jobDescription"
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder="Beschreibe die Position, auf die du dich bewirbst, oder füge die Stellenausschreibung ein..."
+                    rows={4}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="workExperience">
+                    Berufserfahrung *
+                  </Label>
+                  <Textarea
+                    id="workExperience"
+                    value={workExperience}
+                    onChange={(e) => setWorkExperience(e.target.value)}
+                    placeholder="Liste deine bisherigen beruflichen Stationen auf (Firma, Position, Zeitraum, Aufgaben)..."
+                    rows={6}
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Beispiel: 2020-2023: Softwareentwickler bei Firma XYZ - Entwicklung von Webanwendungen mit React...
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="education">
+                    Ausbildung / Studium *
+                  </Label>
+                  <Textarea
+                    id="education"
+                    value={education}
+                    onChange={(e) => setEducation(e.target.value)}
+                    placeholder="Deine schulische und berufliche Ausbildung (Abschluss, Institution, Zeitraum)..."
+                    rows={4}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="skills">
+                    Fähigkeiten & Kenntnisse *
+                  </Label>
+                  <Textarea
+                    id="skills"
+                    value={skills}
+                    onChange={(e) => setSkills(e.target.value)}
+                    placeholder="Fachliche Kenntnisse, Softwarekenntnisse, Sprachen, Zertifikate..."
+                    rows={4}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="linkedinUrl">
+                    LinkedIn-Profil (optional)
+                  </Label>
+                  <Input
+                    id="linkedinUrl"
+                    type="text"
+                    value={linkedinUrl}
+                    onChange={(e) => setLinkedinUrl(e.target.value)}
+                    placeholder="linkedin.com/in/deinprofil oder https://www.linkedin.com/in/deinprofil"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Hilft uns, deine Laufbahn und Referenzen direkt abzugleichen.
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="resumeUpload">
+                    Aktueller Lebenslauf hochladen (optional)
+                  </Label>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <Input
+                      id="resumeUpload"
+                      type="file"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      onChange={(e) => handleResumeUpload(e.target.files?.[0] || null)}
+                      disabled={resumeUploading}
+                    />
+                    {resumeUploading && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Upload läuft...
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    PDF oder DOCX, max. 10MB. Wir orientieren uns daran, was bereits gut funktioniert.
+                  </p>
+                  {resumeFileName && resumePath && (
+                    <p className="text-sm text-green-700 mt-1">
+                      Datei gespeichert: {resumeFileName}
+                    </p>
+                  )}
+                  {resumeError && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {resumeError}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="additionalCvInfo">
+                    Zusätzliche Informationen (optional)
+                  </Label>
+                  <Textarea
+                    id="additionalCvInfo"
+                    value={additionalCvInfo}
+                    onChange={(e) => setAdditionalCvInfo(e.target.value)}
+                    placeholder="Ehrenamtliche Tätigkeiten, Hobbys, Führerschein, besondere Auszeichnungen..."
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Cover Letter Form */}
+          {showLetterForm && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Anschreiben-Informationen</CardTitle>
+                <CardDescription>
+                  Angaben für die Erstellung deines individuellen Anschreibens
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="jobTitle">Ziel-Position *</Label>
+                    <Input
+                      id="jobTitle"
+                      value={jobTitle}
+                      onChange={(e) => setJobTitle(e.target.value)}
+                      placeholder="z.B. Marketing Manager"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="companyName">Firma *</Label>
+                    <Input
+                      id="companyName"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="z.B. Acme GmbH"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="jobPostingUrl">
+                    Link zur Stellenanzeige (optional)
+                  </Label>
+                  <Input
+                    id="jobPostingUrl"
+                    type="text"
+                    value={jobPostingUrl}
+                    onChange={(e) => setJobPostingUrl(e.target.value)}
+                    placeholder="z.B. https://jobs.example.com/position oder linkedin.com/jobs/..."
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="jobDescriptionText">
+                    Stellenbeschreibung / Anforderungen *
+                  </Label>
+                  <Textarea
+                    id="jobDescriptionText"
+                    value={jobDescriptionText}
+                    onChange={(e) => setJobDescriptionText(e.target.value)}
+                    placeholder="Füge die Stellenbeschreibung oder wichtige Anforderungen ein..."
+                    rows={5}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="experiencesToHighlight">
+                    Welche Erfahrungen möchtest du hervorheben? *
+                  </Label>
+                  <Textarea
+                    id="experiencesToHighlight"
+                    value={experiencesToHighlight}
+                    onChange={(e) => setExperiencesToHighlight(e.target.value)}
+                    placeholder="Beschreibe relevante Erfahrungen, Projekte oder Erfolge, die du im Anschreiben betonen möchtest..."
+                    rows={4}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="strengths">
+                    Deine Stärken *
+                  </Label>
+                  <Textarea
+                    id="strengths"
+                    value={strengths}
+                    onChange={(e) => setStrengths(e.target.value)}
+                    placeholder="Was sind deine persönlichen und fachlichen Stärken?"
+                    rows={3}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="additionalLetterInfo">
+                    Zusätzliche Hinweise (optional)
+                  </Label>
+                  <Textarea
+                    id="additionalLetterInfo"
+                    value={additionalLetterInfo}
+                    onChange={(e) => setAdditionalLetterInfo(e.target.value)}
+                    placeholder="Besondere Wünsche, Ton des Anschreibens, sonstige Hinweise..."
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <p className="text-red-600">{submitError}</p>
+            </div>
+          )}
+
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/orders')}
+              disabled={submitting}
+            >
+              Abbrechen
+            </Button>
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="flex-1 bg-orange-600 hover:bg-orange-700"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Wird eingereicht...
+                </>
+              ) : (
+                'Fragebogen absenden'
+              )}
+            </Button>
+          </div>
+
+          <p className="text-xs text-center text-gray-500">
+            Nach dem Absenden beginnen wir sofort mit der Erstellung deiner Unterlagen.
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}

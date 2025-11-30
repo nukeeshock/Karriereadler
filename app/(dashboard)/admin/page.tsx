@@ -41,6 +41,11 @@ export default async function AdminPage() {
     redirect('/sign-in');
   }
 
+  // Redirect to new orders-based admin panel
+  if (user.role === UserRole.ADMIN || user.role === UserRole.OWNER) {
+    redirect('/admin/orders');
+  }
+
   // Wenn keine Admin-Berechtigung, Zugriff verweigert anzeigen
   if (user.role !== UserRole.ADMIN && user.role !== UserRole.OWNER) {
     return (

@@ -86,6 +86,10 @@ export default function KaufenPage() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [street, setStreet] = useState('');
+  const [postalCode, setPostalCode] = useState('');
+  const [city, setCity] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [additionalInfo, setAdditionalInfo] = useState('');
 
   // Pre-fill from user data
@@ -94,6 +98,10 @@ export default function KaufenPage() {
       if (user.firstName) setFirstName(user.firstName);
       if (user.lastName) setLastName(user.lastName);
       if (user.email) setEmail(user.email);
+      if (user.street) setStreet(user.street);
+      if (user.zipCode) setPostalCode(user.zipCode);
+      if (user.city) setCity(user.city);
+      if (user.birthDate) setBirthDate(user.birthDate);
     }
   }, [user]);
 
@@ -164,6 +172,26 @@ export default function KaufenPage() {
       setError('Bitte gib eine gültige E-Mail-Adresse an.');
       return;
     }
+    if (!phone.trim()) {
+      setError('Bitte gib eine Telefonnummer an.');
+      return;
+    }
+    if (!street.trim()) {
+      setError('Bitte gib deine Straße und Hausnummer an.');
+      return;
+    }
+    if (!postalCode.trim() || !/^\d{5}$/.test(postalCode)) {
+      setError('Bitte gib eine gültige 5-stellige Postleitzahl an.');
+      return;
+    }
+    if (!city.trim()) {
+      setError('Bitte gib deinen Ort an.');
+      return;
+    }
+    if (!birthDate.trim()) {
+      setError('Bitte gib dein Geburtsdatum an.');
+      return;
+    }
 
     setLoading(true);
 
@@ -175,11 +203,15 @@ export default function KaufenPage() {
           productType: selectedProduct,
           customerName: `${firstName} ${lastName}`.trim(),
           customerEmail: email,
-          customerPhone: phone || null,
+          customerPhone: phone,
           basicInfo: {
             firstName,
             lastName,
             phone,
+            street,
+            postalCode,
+            city,
+            birthDate,
             additionalInfo
           }
         })
@@ -312,13 +344,64 @@ export default function KaufenPage() {
             </div>
 
             <div>
-              <Label htmlFor="phone">Telefon (optional)</Label>
+              <Label htmlFor="phone">Telefonnummer *</Label>
               <Input
                 id="phone"
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+49 123 456789"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="street">Straße & Hausnummer *</Label>
+              <Input
+                id="street"
+                type="text"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="Musterstraße 123"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="postalCode">Postleitzahl *</Label>
+                <Input
+                  id="postalCode"
+                  type="text"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  placeholder="12345"
+                  pattern="\d{5}"
+                  maxLength={5}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="city">Ort *</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Berlin"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="birthDate">Geburtsdatum *</Label>
+              <Input
+                id="birthDate"
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                required
               />
             </div>
 

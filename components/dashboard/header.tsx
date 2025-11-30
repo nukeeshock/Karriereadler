@@ -212,17 +212,45 @@ export function DashboardHeader() {
           <div className="flex flex-col h-full">
             {/* Mobile Header */}
             <div className="flex items-center justify-between px-4 h-17 border-b border-gray-200">
-              <div className="flex items-center">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center py-2 -ml-2 pl-2 pr-4 hover:opacity-80 transition-opacity active:scale-95"
+              >
                 <Image src="/logo_hero.png" alt="Karriereadler Logo" width={140} height={40} />
-              </div>
+              </Link>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-12 h-12 -mr-2 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors active:scale-95"
                 aria-label="Menü schließen"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
+
+            {/* User Info (if logged in) */}
+            {user && (
+              <div className="px-4 py-4 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-amber-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white shadow-md">
+                    <span className="text-lg font-semibold">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">
+                      {user.name || user.email}
+                    </p>
+                    <p className="text-xs text-gray-600 truncate">{user.email}</p>
+                    {user.role && (
+                      <p className="text-xs text-orange-600 font-medium mt-0.5">
+                        {t(`roles.${user.role as 'admin' | 'owner' | 'member'}`)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Mobile Nav Links */}
             <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -243,7 +271,7 @@ export function DashboardHeader() {
             </nav>
 
             {/* Mobile CTA */}
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t border-gray-200 space-y-2">
               {!user ? (
                 <div className="flex gap-2">
                   <Link
@@ -266,17 +294,21 @@ export function DashboardHeader() {
                   <Link
                     href="/kaufen"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full px-6 py-4 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center font-semibold shadow-lg mb-3"
+                    className="block w-full px-6 py-4 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center font-semibold shadow-lg"
                   >
                     Jetzt Lebenslauf verbessern
                   </Link>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full px-6 py-4 rounded-xl bg-gray-100 text-gray-900 text-center font-semibold"
+                  <button
+                    onClick={async () => {
+                      setMobileMenuOpen(false);
+                      await mutate('/api/user', null, false);
+                      await signOut();
+                    }}
+                    className="flex items-center justify-center gap-2 w-full px-6 py-4 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-semibold transition-colors"
                   >
-                    Zum Dashboard
-                  </Link>
+                    <LogOut className="w-4 h-4" />
+                    <span>Abmelden</span>
+                  </button>
                 </>
               )}
             </div>

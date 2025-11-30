@@ -1,0 +1,1 @@
+ALTER TABLE "order_requests" ADD COLUMN "finished_file_url" text;

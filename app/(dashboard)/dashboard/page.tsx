@@ -53,7 +53,8 @@ function UserCredits() {
     orders: {
       id: number;
       productType: 'CV' | 'COVER_LETTER' | 'BUNDLE';
-      status: 'PENDING_PAYMENT' | 'PAID' | 'READY_FOR_PROCESSING' | 'CANCELLED';
+      status: 'PENDING_PAYMENT' | 'PAID' | 'READY_FOR_PROCESSING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+      finishedFileUrl: string | null;
       createdAt: string;
     }[];
   }>('/api/orders', fetcher);
@@ -72,12 +73,14 @@ function UserCredits() {
 
   const orders = ordersData?.orders ?? [];
   const questionnaireOrder = orders.find((order) => order.status === 'PAID');
+  const completedOrders = orders.filter((order) => order.status === 'COMPLETED' && order.finishedFileUrl);
 
   const statusCounts = {
     total: orders.length,
     pendingPayment: orders.filter((order) => order.status === 'PENDING_PAYMENT').length,
     paid: orders.filter((order) => order.status === 'PAID').length,
-    inProgress: orders.filter((order) => order.status === 'READY_FOR_PROCESSING').length
+    inProgress: orders.filter((order) => order.status === 'IN_PROGRESS' || order.status === 'READY_FOR_PROCESSING').length,
+    completed: orders.filter((order) => order.status === 'COMPLETED').length
   };
 
   return (
@@ -130,7 +133,7 @@ function UserCredits() {
           <CardTitle className="text-xl">Auftragsstatus</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
             <div className="p-4 rounded-xl bg-orange-50 border border-orange-100">
               <p className="text-sm text-orange-700 mb-1">Gesamt</p>
               <p className="text-3xl font-bold text-orange-900">{statusCounts.total}</p>
@@ -139,15 +142,25 @@ function UserCredits() {
               <p className="text-sm text-amber-700 mb-1">Zahlung offen</p>
               <p className="text-3xl font-bold text-amber-900">{statusCounts.pendingPayment}</p>
             </div>
-            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-              <p className="text-sm text-emerald-700 mb-1">Bezahlt</p>
-              <p className="text-3xl font-bold text-emerald-900">{statusCounts.paid}</p>
-            </div>
             <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
               <p className="text-sm text-blue-700 mb-1">In Bearbeitung</p>
               <p className="text-3xl font-bold text-blue-900">{statusCounts.inProgress}</p>
             </div>
+            <div className="p-4 rounded-xl bg-green-50 border border-green-100">
+              <p className="text-sm text-green-700 mb-1">Abgeschlossen</p>
+              <p className="text-3xl font-bold text-green-900">{statusCounts.completed}</p>
+            </div>
           </div>
+          {completedOrders.length > 0 && (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+              <p className="text-green-800 font-semibold mb-1">
+                ✅ {completedOrders.length} {completedOrders.length === 1 ? 'Dokument' : 'Dokumente'} zum Download bereit!
+              </p>
+              <p className="text-sm text-green-700">
+                Deine fertigen Bewerbungsunterlagen kannst du unter "Alle Aufträge ansehen" herunterladen.
+              </p>
+            </div>
+          )}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button asChild variant="outline">
               <Link href="/dashboard/orders">Alle Aufträge ansehen</Link>
