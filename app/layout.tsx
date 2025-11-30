@@ -28,6 +28,28 @@ export const metadata: Metadata = {
       { rel: 'apple-touch-icon-precomposed', url: '/favicon.png?v=2' }
     ]
   },
+  openGraph: {
+    title: 'Karriereadler – Manuelle Lebensläufe & Anschreiben vom Profi',
+    description: 'Karriereadler erstellt deinen Lebenslauf und dein Anschreiben manuell: individuelle Beratung, klare Texte, professionelles Ergebnis.',
+    url: 'https://karriereadler.com',
+    siteName: 'Karriereadler',
+    images: [
+      {
+        url: '/logo_adler_notagline.png',
+        width: 1200,
+        height: 630,
+        alt: 'Karriereadler Logo'
+      }
+    ],
+    locale: 'de_DE',
+    type: 'website'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Karriereadler – Manuelle Lebensläufe & Anschreiben vom Profi',
+    description: 'Karriereadler erstellt deinen Lebenslauf und dein Anschreiben manuell: individuelle Beratung, klare Texte, professionelles Ergebnis.',
+    images: ['/logo_adler_notagline.png']
+  },
   appleWebApp: {
     capable: true,
     title: 'Karriereadler',
