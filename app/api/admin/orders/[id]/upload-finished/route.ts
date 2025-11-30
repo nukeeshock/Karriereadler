@@ -86,7 +86,7 @@ export async function POST(
       const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders`;
       await sendEmail({
         to: order.customerEmail,
-        subject: 'Deine Bewerbungsunterlagen sind fertig! | Karriereadler',
+        subject: 'Deine Bewerbungsunterlagen sind fertig | Karriereadler',
         html: `
           <!DOCTYPE html>
           <html>
@@ -95,25 +95,28 @@ export async function POST(
               <style>
                 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
                 .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                .header { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 40px 30px; text-align: center; color: white; }
-                .header h1 { margin: 0; font-size: 28px; }
+                .header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; color: white; }
+                .header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
+                .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
                 .content { padding: 40px 30px; }
-                .button { display: inline-block; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white !important; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 24px 0; }
-                .highlight-box { background: #dcfce7; border-left: 4px solid #16a34a; padding: 16px; margin: 24px 0; border-radius: 4px; }
+                .button { display: inline-block; background: #F76B6B; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 24px 0; }
+                .highlight-box { background: #FFE4E8; border-left: 4px solid #FFB6C1; padding: 16px; margin: 24px 0; border-radius: 4px; }
+                .highlight-box p { color: #D84949; margin: 8px 0; }
                 .footer { background: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
               </style>
             </head>
             <body>
               <div class="container">
                 <div class="header">
-                  <h1>✅ Deine Unterlagen sind fertig!</h1>
+                  <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
+                  <h1>Deine Unterlagen sind fertig</h1>
                 </div>
                 <div class="content">
                   <p>Hallo ${order.customerName || 'liebe/r Kunde/in'},</p>
                   <p>großartige Neuigkeiten! Deine professionell erstellten Bewerbungsunterlagen sind jetzt fertig und stehen zum Download bereit.</p>
 
                   <div class="highlight-box">
-                    <p><strong>🎉 Download jetzt verfügbar!</strong></p>
+                    <p><strong>Download jetzt verfügbar</strong></p>
                     <p>Du kannst deine fertigen Dokumente ab sofort in deinem Dashboard herunterladen.</p>
                   </div>
 
@@ -121,9 +124,9 @@ export async function POST(
                     <a href="${dashboardUrl}" class="button">Zu deinen Unterlagen</a>
                   </div>
 
-                  <p style="margin-top: 30px;">Mit deinen neuen, professionellen Bewerbungsunterlagen hast du jetzt die besten Voraussetzungen, um bei deinen Wunscharbeitgebern zu punkten!</p>
+                  <p style="margin-top: 30px;">Mit deinen neuen, professionellen Bewerbungsunterlagen hast du jetzt die besten Voraussetzungen, um bei deinen Wunscharbeitgebern zu punkten.</p>
 
-                  <p>Wir wünschen dir viel Erfolg bei deiner Bewerbung! 🚀</p>
+                  <p>Wir wünschen dir viel Erfolg bei deiner Bewerbung.</p>
 
                   <p>Viele Grüße,<br>Dein Karriereadler-Team</p>
                 </div>

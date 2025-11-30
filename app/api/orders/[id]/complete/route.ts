@@ -76,7 +76,7 @@ export async function POST(
 
       await sendEmail({
         to: adminEmail,
-        subject: `🆕 Neuer Auftrag bereit – ${productLabels[order.productType]} – ${order.customerName}`,
+        subject: `Neuer Auftrag bereit - ${productLabels[order.productType]} - ${order.customerName}`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -85,20 +85,22 @@ export async function POST(
               <style>
                 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
                 .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center; color: white; }
-                .header h1 { margin: 0; font-size: 28px; }
+                .header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; color: white; }
+                .header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
+                .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
                 .content { padding: 40px 30px; }
                 .info-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
                 .info-table td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
                 .info-table td:first-child { font-weight: 600; color: #6b7280; width: 40%; }
-                .button { display: inline-block; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 24px 0; }
+                .button { display: inline-block; background: #F76B6B; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 24px 0; }
                 .footer { background: #f9fafb; padding: 20px; text-align: center; color: #6b7280; font-size: 12px; }
               </style>
             </head>
             <body>
               <div class="container">
                 <div class="header">
-                  <h1>📄 Neuer Auftrag eingegangen!</h1>
+                  <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
+                  <h1>Neuer Auftrag eingegangen</h1>
                 </div>
                 <div class="content">
                   <p>Hallo,</p>
@@ -106,33 +108,33 @@ export async function POST(
 
                   <table class="info-table">
                     <tr>
-                      <td>📦 Produkt</td>
+                      <td>Produkt</td>
                       <td><strong>${productLabels[order.productType]}</strong></td>
                     </tr>
                     <tr>
-                      <td>👤 Kunde</td>
+                      <td>Kunde</td>
                       <td>${order.customerName || 'N/A'}</td>
                     </tr>
                     <tr>
-                      <td>✉️ E-Mail</td>
+                      <td>E-Mail</td>
                       <td>${order.customerEmail}</td>
                     </tr>
                     <tr>
-                      <td>📞 Telefon</td>
+                      <td>Telefon</td>
                       <td>${order.customerPhone || '—'}</td>
                     </tr>
                     <tr>
-                      <td>🆔 Auftrags-ID</td>
+                      <td>Auftrags-ID</td>
                       <td>#${order.id}</td>
                     </tr>
                     <tr>
-                      <td>📅 Bestellt am</td>
+                      <td>Bestellt am</td>
                       <td>${new Date(order.createdAt).toLocaleDateString('de-DE')}</td>
                     </tr>
                   </table>
 
                   <div style="text-align: center;">
-                    <a href="${adminUrl}" class="button">Auftrag jetzt bearbeiten →</a>
+                    <a href="${adminUrl}" class="button">Auftrag jetzt bearbeiten</a>
                   </div>
 
                   <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">
@@ -156,7 +158,7 @@ export async function POST(
     try {
       await sendEmail({
         to: order.customerEmail,
-        subject: 'Fragebogen erhalten – Wir arbeiten an deinen Unterlagen | Karriereadler',
+        subject: 'Fragebogen erhalten - Wir arbeiten an deinen Unterlagen | Karriereadler',
         html: `
           <!DOCTYPE html>
           <html>
@@ -165,24 +167,27 @@ export async function POST(
               <style>
                 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
                 .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center; color: white; }
-                .header h1 { margin: 0; font-size: 28px; }
+                .header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; color: white; }
+                .header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
+                .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
                 .content { padding: 40px 30px; }
-                .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 24px 0; border-radius: 4px; }
+                .info-box { background: #FFE4E8; border-left: 4px solid #FFB6C1; padding: 16px; margin: 24px 0; border-radius: 4px; }
+                .info-box p { color: #D84949; margin: 8px 0; }
                 .footer { background: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
               </style>
             </head>
             <body>
               <div class="container">
                 <div class="header">
-                  <h1>✅ Fragebogen erhalten!</h1>
+                  <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
+                  <h1>Fragebogen erhalten</h1>
                 </div>
                 <div class="content">
                   <p>Hallo ${order.customerName || 'liebe/r Kunde/in'},</p>
                   <p>vielen Dank für das Ausfüllen des Fragebogens! Wir haben alle Informationen erhalten und beginnen nun mit der professionellen Erstellung deiner Bewerbungsunterlagen.</p>
 
                   <div class="info-box">
-                    <p><strong>📅 Lieferzeit: 2-3 Werktage</strong></p>
+                    <p><strong>Lieferzeit: 2-3 Werktage</strong></p>
                     <p>Du erhältst die fertigen Unterlagen per E-Mail, sobald sie bereit sind.</p>
                   </div>
 
