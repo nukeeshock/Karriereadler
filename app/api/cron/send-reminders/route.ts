@@ -17,11 +17,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Find orders that:
+    // Find orders that need a reminder:
     // 1. Status is PAID (payment confirmed but questionnaire not filled)
     // 2. formData is null (questionnaire not completed)
     // 3. reminderSentAt is null (no reminder sent yet)
     // 4. createdAt is more than 3 hours ago
+    // 
+    // Note: This cron runs daily at 9:00 AM (Vercel Hobby plan limit).
+    // All qualifying orders will receive their reminder in the morning batch.
     const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
 
     const ordersNeedingReminder = await db
