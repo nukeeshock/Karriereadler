@@ -5,6 +5,7 @@ import { SWRConfig } from 'swr';
 import '@/lib/server-disable-localstorage';
 import Script from 'next/script';
 import AppProviders from './providers';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.BASE_URL ?? 'https://karriereadler.com'),
@@ -127,6 +128,7 @@ export default async function RootLayout({
         >
           <AppProviders>{children}</AppProviders>
         </SWRConfig>
+        <Analytics />
       </body>
     </html>
   );
