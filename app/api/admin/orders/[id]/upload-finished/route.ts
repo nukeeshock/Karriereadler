@@ -4,7 +4,7 @@ import { db } from '@/lib/db/drizzle';
 import { orderRequests, OrderStatus } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { put } from '@vercel/blob';
-import { sendEmail } from '@/lib/email';
+import { sendEmail, getEmailTemplate, emailComponents } from '@/lib/email';
 
 const ALLOWED_TYPES = ['application/pdf'];
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
@@ -84,59 +84,26 @@ export async function POST(
     // Send email notification to customer
     try {
       const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders`;
+      const { p, infoBox } = emailComponents;
+      
+      const bodyContent = `
+        ${p(`Hallo ${order.customerName || 'liebe/r Kunde/in'},`)}
+        ${p('großartige Neuigkeiten! Deine professionell erstellten Bewerbungsunterlagen sind jetzt fertig und stehen zum Download bereit.')}
+        ${infoBox('<strong>Download jetzt verfügbar</strong><br/>Du kannst deine fertigen Dokumente ab sofort in deinem Dashboard herunterladen.', 'success')}
+        ${p('Mit deinen neuen, professionellen Bewerbungsunterlagen hast du jetzt die besten Voraussetzungen, um bei deinen Wunscharbeitgebern zu punkten.', 'margin-top: 24px;')}
+        ${p('Wir wünschen dir viel Erfolg bei deiner Bewerbung.')}
+        ${p('Viele Grüße,<br/>Dein Karriereadler-Team')}
+      `;
+      
       await sendEmail({
         to: order.customerEmail,
         subject: 'Deine Bewerbungsunterlagen sind fertig | Karriereadler',
-        html: `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="utf-8">
-              <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
-                .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                .header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; color: white; }
-                .header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
-                .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
-                .content { padding: 40px 30px; }
-                .button { display: inline-block; background: #F76B6B; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 24px 0; }
-                .highlight-box { background: #FFE4E8; border-left: 4px solid #FFB6C1; padding: 16px; margin: 24px 0; border-radius: 4px; }
-                .highlight-box p { color: #D84949; margin: 8px 0; }
-                .footer { background: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="header">
-                  <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
-                  <h1>Deine Unterlagen sind fertig</h1>
-                </div>
-                <div class="content">
-                  <p>Hallo ${order.customerName || 'liebe/r Kunde/in'},</p>
-                  <p>großartige Neuigkeiten! Deine professionell erstellten Bewerbungsunterlagen sind jetzt fertig und stehen zum Download bereit.</p>
-
-                  <div class="highlight-box">
-                    <p><strong>Download jetzt verfügbar</strong></p>
-                    <p>Du kannst deine fertigen Dokumente ab sofort in deinem Dashboard herunterladen.</p>
-                  </div>
-
-                  <div style="text-align: center;">
-                    <a href="${dashboardUrl}" class="button">Zu deinen Unterlagen</a>
-                  </div>
-
-                  <p style="margin-top: 30px;">Mit deinen neuen, professionellen Bewerbungsunterlagen hast du jetzt die besten Voraussetzungen, um bei deinen Wunscharbeitgebern zu punkten.</p>
-
-                  <p>Wir wünschen dir viel Erfolg bei deiner Bewerbung.</p>
-
-                  <p>Viele Grüße,<br>Dein Karriereadler-Team</p>
-                </div>
-                <div class="footer">
-                  <p>© ${new Date().getFullYear()} Karriereadler. Alle Rechte vorbehalten.</p>
-                </div>
-              </div>
-            </body>
-          </html>
-        `
+        html: getEmailTemplate({
+          title: 'Deine Unterlagen sind fertig',
+          body: bodyContent,
+          buttonText: 'Zu deinen Unterlagen',
+          buttonUrl: dashboardUrl
+        })
       });
       console.log('[Admin Upload] Completion email sent to:', order.customerEmail);
     } catch (emailError) {

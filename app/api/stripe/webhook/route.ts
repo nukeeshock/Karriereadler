@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db/drizzle';
 import { stripeEvents, users, orderRequests, OrderStatus } from '@/lib/db/schema';
 import { and, eq, or, sql } from 'drizzle-orm';
-import { sendEmail } from '@/lib/email';
+import { sendEmail, getEmailTemplate, emailComponents } from '@/lib/email';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const webhookSecretTest = process.env.STRIPE_WEBHOOK_SECRET_TEST;
@@ -205,66 +205,28 @@ export async function POST(request: NextRequest) {
 
       // Send confirmation email asynchronously (don't block webhook response)
       const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders`;
+      const { p, h2, ol, infoBox } = emailComponents;
+      
+      const bodyContent = `
+        ${p(`Hallo ${order.customerName || 'liebe/r Kunde/in'},`)}
+        ${p('vielen Dank für deinen Kauf bei Karriereadler. Deine Zahlung wurde erfolgreich verarbeitet.')}
+        ${infoBox('<strong>Wichtig: Bitte fülle jetzt den Fragebogen aus.</strong><br/>Damit wir mit der Erstellung deiner Bewerbungsunterlagen beginnen können, benötigen wir noch einige Informationen von dir.', 'info')}
+        ${p('<strong>Nächste Schritte:</strong>')}
+        ${ol(['Gehe zu deinem Dashboard', 'Öffne den Bereich "Aufträge abschließen"', 'Fülle den Fragebogen vollständig aus'])}
+        ${p('Sobald wir deinen ausgefüllten Fragebogen erhalten haben, beginnen wir sofort mit der professionellen Erstellung deiner Unterlagen.', 'margin-top: 24px;')}
+        ${p('Bei Fragen stehen wir dir jederzeit gerne zur Verfügung.')}
+        ${p('Viele Grüße,<br/>Dein Karriereadler-Team')}
+      `;
+      
       sendEmail({
         to: order.customerEmail,
         subject: 'Zahlung bestätigt - Fragebogen ausfüllen | Karriereadler',
-        html: `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="utf-8">
-              <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
-                .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                .header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; color: white; }
-                .header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
-                .header h1 { margin: 0; font-size: 26px; font-weight: 600; }
-                .content { padding: 40px 30px; }
-                .button { display: inline-block; background: #F76B6B; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 24px 0; }
-                .info-box { background: #FFE4E8; border-left: 4px solid #FFB6C1; padding: 16px; margin: 24px 0; border-radius: 4px; }
-                .info-box p { color: #D84949; margin: 8px 0; }
-                .footer { background: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; }
-              </style>
-            </head>
-            <body>
-              <div class="container">
-                <div class="header">
-                  <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
-                  <h1>Zahlung bestätigt</h1>
-                </div>
-                <div class="content">
-                  <p>Hallo ${order.customerName || 'liebe/r Kunde/in'},</p>
-                  <p>vielen Dank für deinen Kauf bei Karriereadler. Deine Zahlung wurde erfolgreich verarbeitet.</p>
-
-                  <div class="info-box">
-                    <p><strong>Wichtig: Bitte fülle jetzt den Fragebogen aus.</strong></p>
-                    <p>Damit wir mit der Erstellung deiner Bewerbungsunterlagen beginnen können, benötigen wir noch einige Informationen von dir.</p>
-                  </div>
-
-                  <p><strong>Nächste Schritte:</strong></p>
-                  <ol>
-                    <li>Gehe zu deinem Dashboard</li>
-                    <li>Öffne den Bereich "Aufträge abschließen"</li>
-                    <li>Fülle den Fragebogen vollständig aus</li>
-                  </ol>
-
-                  <div style="text-align: center;">
-                    <a href="${dashboardUrl}" class="button">Zum Dashboard - Fragebogen ausfüllen</a>
-                  </div>
-
-                  <p style="margin-top: 30px;">Sobald wir deinen ausgefüllten Fragebogen erhalten haben, beginnen wir sofort mit der professionellen Erstellung deiner Unterlagen.</p>
-
-                  <p>Bei Fragen stehen wir dir jederzeit gerne zur Verfügung.</p>
-
-                  <p>Viele Grüße,<br>Dein Karriereadler-Team</p>
-                </div>
-                <div class="footer">
-                  <p>© ${new Date().getFullYear()} Karriereadler. Alle Rechte vorbehalten.</p>
-                </div>
-              </div>
-            </body>
-          </html>
-        `
+        html: getEmailTemplate({
+          title: 'Zahlung bestätigt',
+          body: bodyContent,
+          buttonText: 'Zum Dashboard - Fragebogen ausfüllen',
+          buttonUrl: dashboardUrl
+        })
       }).catch(emailError => {
         console.error('Failed to send customer confirmation email:', emailError);
         // Don't break the webhook - email is not critical

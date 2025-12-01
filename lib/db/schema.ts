@@ -169,6 +169,9 @@ export const orderRequests = pgTable('order_requests', {
   // Finished file (uploaded by admin when order is completed)
   finishedFileUrl: text('finished_file_url'),
 
+  // Reminder tracking (for questionnaire reminder emails)
+  reminderSentAt: timestamp('reminder_sent_at'),
+
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });

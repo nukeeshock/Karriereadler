@@ -21,81 +21,200 @@ export function getVerificationTokenExpiry(): Date {
   return new Date(Date.now() + 24 * 60 * 60 * 1000);
 }
 
+// Email component helpers for table-based layouts
+export const emailComponents = {
+  // Info box with left border (pink/warning style)
+  infoBox: (text: string, type: 'info' | 'warning' | 'success' = 'info') => {
+    const styles = {
+      info: { bg: '#FFE4E8', border: '#FFB6C1', text: '#D84949' },
+      warning: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' },
+      success: { bg: '#d1fae5', border: '#10b981', text: '#065f46' }
+    };
+    const s = styles[type];
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0;">
+      <tr><td style="background-color: ${s.bg}; padding: 12px 16px; border-radius: 4px; border-left: 4px solid ${s.border};">
+        <p style="margin: 0; color: ${s.text}; font-size: 14px; line-height: 1.5;">${text}</p>
+      </td></tr>
+    </table>`;
+  },
+  
+  // Link box for URLs
+  linkBox: (url: string) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 20px 0;">
+    <tr><td style="background-color: #f9fafb; padding: 12px 16px; border-radius: 8px; border: 1px solid #e5e7eb;">
+      <code style="color: #6b7280; font-size: 13px; font-family: 'Courier New', Courier, monospace; word-break: break-all; display: block;">${url}</code>
+    </td></tr>
+  </table>`,
+  
+  // Paragraph
+  p: (text: string, style?: string) => `<p style="margin: 0 0 16px 0; color: #4b5563; font-size: 16px; line-height: 1.6; ${style || ''}">${text}</p>`,
+  
+  // Heading
+  h2: (text: string) => `<h2 style="margin: 0 0 16px 0; color: #1f2937; font-size: 20px; font-weight: 600; line-height: 1.4;">${text}</h2>`,
+  
+  // Small text
+  small: (text: string) => `<p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px; line-height: 1.5;">${text}</p>`,
+  
+  // Ordered list
+  ol: (items: string[]) => `<ol style="margin: 16px 0; padding-left: 24px; color: #4b5563; font-size: 16px; line-height: 1.8;">${items.map(item => `<li style="margin-bottom: 8px;">${item}</li>`).join('')}</ol>`
+};
+
+// Reusable email template wrapper with table-based layout for maximum compatibility
+export function getEmailTemplate(content: {
+  title: string;
+  body: string;
+  buttonText?: string;
+  buttonUrl?: string;
+}): string {
+  const baseUrl = process.env.BASE_URL || 'https://karriereadler.com';
+  const year = new Date().getFullYear();
+  
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${content.title}</title>
+  <!--[if mso]>
+  <style type="text/css">
+    table { border-collapse: collapse; }
+    .button-td { padding: 0 !important; }
+    .button-a { padding: 14px 28px !important; }
+  </style>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <!-- Outer wrapper table -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3f4f6;">
+    <tr>
+      <td align="center" style="padding: 40px 16px;">
+        <!-- Main container -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px 20px;">
+              <img src="${baseUrl}/logo_adler_notagline.png" alt="Karriereadler" width="160" style="display: block; max-width: 160px; height: auto; margin-bottom: 16px;" />
+              <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 600; line-height: 1.3;">${content.title}</h1>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding: 32px 24px;">
+              ${content.body}
+              ${content.buttonText && content.buttonUrl ? `
+              <!-- Button -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
+                <tr>
+                  <td align="center" class="button-td">
+                    <a href="${content.buttonUrl}" target="_blank" class="button-a" style="display: inline-block; background-color: #F76B6B; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; line-height: 1.4;">${content.buttonText}</a>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 24px; border-top: 1px solid #e5e7eb;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="color: #6b7280; font-size: 14px; line-height: 1.6;">
+                    <p style="margin: 0 0 4px 0;"><strong style="color: #374151;">Karriereadler</strong> – Dein Partner für professionelle Bewerbungsunterlagen</p>
+                    <p style="margin: 0 0 12px 0;">© ${year} Karriereadler. Alle Rechte vorbehalten.</p>
+                    <p style="margin: 0;">
+                      <a href="${baseUrl}/datenschutz" style="color: #F76B6B; text-decoration: none;">Datenschutz</a>
+                      <span style="color: #9ca3af;"> • </span>
+                      <a href="${baseUrl}/impressum" style="color: #F76B6B; text-decoration: none;">Impressum</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 export async function sendVerificationEmail(
   email: string,
   token: string
 ): Promise<void> {
   const verificationUrl = `${process.env.BASE_URL}/verify-email?token=${token}`;
 
+  const bodyContent = `
+    <h2 style="margin: 0 0 16px 0; color: #1f2937; font-size: 20px; font-weight: 600; line-height: 1.4;">Bitte verifiziere deine Email-Adresse</h2>
+    <p style="margin: 0 0 16px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">Vielen Dank für deine Registrierung. Um deinen Account zu aktivieren, klicke bitte auf den folgenden Button:</p>
+    
+    <p style="margin: 24px 0 8px 0; color: #6b7280; font-size: 14px; line-height: 1.5;">Alternativ kannst du diesen Link in deinen Browser kopieren:</p>
+    <!-- Link Box -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 20px 0;">
+      <tr>
+        <td style="background-color: #f9fafb; padding: 12px 16px; border-radius: 8px; border: 1px solid #e5e7eb;">
+          <code style="color: #6b7280; font-size: 13px; font-family: 'Courier New', Courier, monospace; word-break: break-all; display: block;">${verificationUrl}</code>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- Info Box -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0;">
+      <tr>
+        <td style="background-color: #FFE4E8; padding: 12px 16px; border-radius: 4px; border-left: 4px solid #FFB6C1;">
+          <p style="margin: 0; color: #D84949; font-size: 14px; line-height: 1.5;"><strong>Hinweis:</strong> Dieser Link ist 24 Stunden gültig.</p>
+        </td>
+      </tr>
+    </table>
+    
+    <p style="margin: 20px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.5;">Falls du dich nicht registriert hast, kannst du diese Email ignorieren.</p>
+  `;
+
   await sendEmail({
     to: email,
     subject: 'Verifiziere deine Email-Adresse - Karriereadler',
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f3f4f6; }
-            .email-wrapper { width: 100%; padding: 40px 20px; }
-            .email-container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-            .email-header { background: linear-gradient(to bottom, #FFAFC1, #FF9A8B); padding: 30px; text-align: center; }
-            .email-header img { display: block; margin: 0 auto 20px; width: 180px; height: auto; }
-            .email-header h1 { color: white; margin: 0; font-size: 26px; font-weight: 600; }
-            .email-content { padding: 40px 30px; }
-            .email-content h2 { color: #1f2937; margin: 0 0 20px 0; font-size: 22px; }
-            .email-content p { color: #4b5563; margin: 0 0 16px 0; font-size: 16px; }
-            .button { display: inline-block; background: #F76B6B; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 24px 0; font-size: 16px; }
-            .button:hover { background: #E55B5B; }
-            .link-box { background: #f9fafb; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb; margin: 20px 0; word-break: break-all; }
-            .link-box code { color: #6b7280; font-size: 14px; font-family: 'Courier New', monospace; }
-            .info-box { background: #FFE4E8; border-left: 4px solid #FFB6C1; padding: 16px; margin: 24px 0; border-radius: 4px; }
-            .info-box p { color: #D84949; margin: 0; font-size: 14px; }
-            .email-footer { background: #f9fafb; padding: 30px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
-            .email-footer p { margin: 5px 0; }
-            .email-footer a { color: #F76B6B; text-decoration: none; }
-          </style>
-        </head>
-        <body>
-          <div class="email-wrapper">
-            <div class="email-container">
-              <div class="email-header">
-                <img src="${process.env.BASE_URL}/logo_adler_notagline.png" alt="Karriereadler" />
-                <h1>Willkommen bei Karriereadler</h1>
-              </div>
-              <div class="email-content">
-                <h2>Bitte verifiziere deine Email-Adresse</h2>
-                <p>Vielen Dank für deine Registrierung. Um deinen Account zu aktivieren, klicke bitte auf den folgenden Button:</p>
-                <div style="text-align: center;">
-                  <a href="${verificationUrl}" class="button">Email-Adresse verifizieren</a>
-                </div>
-                <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
-                  Alternativ kannst du diesen Link in deinen Browser kopieren:
-                </p>
-                <div class="link-box">
-                  <code>${verificationUrl}</code>
-                </div>
-                <div class="info-box">
-                  <p><strong>Hinweis:</strong> Dieser Link ist 24 Stunden gültig.</p>
-                </div>
-                <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
-                  Falls du dich nicht registriert hast, kannst du diese Email ignorieren.
-                </p>
-              </div>
-              <div class="email-footer">
-                <p><strong>Karriereadler</strong> – Dein Partner für professionelle Bewerbungsunterlagen</p>
-                <p>© ${new Date().getFullYear()} Karriereadler. Alle Rechte vorbehalten.</p>
-                <p style="margin-top: 12px;">
-                  <a href="${process.env.BASE_URL}/datenschutz">Datenschutz</a> •
-                  <a href="${process.env.BASE_URL}/impressum">Impressum</a>
-                </p>
-              </div>
-            </div>
-          </div>
-        </body>
-      </html>
-    `
+    html: getEmailTemplate({
+      title: 'Willkommen bei Karriereadler',
+      body: bodyContent,
+      buttonText: 'Email-Adresse verifizieren',
+      buttonUrl: verificationUrl
+    })
+  });
+}
+
+// Send reminder email for unfilled questionnaire
+export async function sendReminderEmail(
+  email: string,
+  orderId: number,
+  customerName: string | null
+): Promise<void> {
+  const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders/${orderId}/complete`;
+  const { p, h2, infoBox } = emailComponents;
+
+  const bodyContent = `
+    ${p(`Hallo ${customerName || 'liebe/r Kunde/in'},`)}
+    ${p('wir haben festgestellt, dass dein Fragebogen für deine Bewerbungsunterlagen noch nicht ausgefüllt wurde.')}
+    ${infoBox('<strong>Wichtiger Hinweis:</strong> Damit wir mit der Erstellung deines Lebenslaufs beginnen können, benötigen wir zunächst deine Angaben im Fragebogen.', 'warning')}
+    ${p('<strong>So geht es weiter:</strong>')}
+    <ol style="margin: 16px 0; padding-left: 24px; color: #4b5563; font-size: 16px; line-height: 1.8;">
+      <li style="margin-bottom: 8px;">Klicke auf den Button unten</li>
+      <li style="margin-bottom: 8px;">Fülle den kurzen Fragebogen vollständig aus</li>
+      <li style="margin-bottom: 8px;">Wir starten sofort mit der Erstellung deiner Unterlagen</li>
+    </ol>
+    ${p('Der Fragebogen dauert nur wenige Minuten und hilft uns, perfekt auf deine Stärken zugeschnittene Bewerbungsunterlagen zu erstellen.', 'margin-top: 24px;')}
+    ${p('Bei Fragen stehen wir dir gerne zur Verfügung.')}
+    ${p('Viele Grüße,<br/>Dein Karriereadler-Team')}
+  `;
+
+  await sendEmail({
+    to: email,
+    subject: 'Erinnerung: Bitte fülle deinen Fragebogen aus | Karriereadler',
+    html: getEmailTemplate({
+      title: 'Fragebogen noch offen',
+      body: bodyContent,
+      buttonText: 'Jetzt Fragebogen ausfüllen',
+      buttonUrl: dashboardUrl
+    })
   });
 }
 

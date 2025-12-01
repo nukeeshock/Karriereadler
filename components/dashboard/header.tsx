@@ -12,7 +12,9 @@ import {
   Settings,
   Shield,
   Activity,
-  FileText
+  FileText,
+  ShieldCheck,
+  Users
 } from 'lucide-react';
 import useSWR, { mutate } from 'swr';
 import { usePathname } from 'next/navigation';
@@ -29,12 +31,25 @@ import { signOut } from '@/app/(login)/actions';
 import { User } from '@/lib/db/schema';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 const accountLinks = [
   { href: '/dashboard/orders', label: 'Meine Aufträge', icon: FileText },
   { href: '/dashboard/general', label: 'Account-Informationen', icon: Settings },
   { href: '/dashboard/security', label: 'Sicherheit', icon: Shield },
   { href: '/dashboard/activity', label: 'Aktivitäten', icon: Activity }
 ];
+
+// Admin links - shown only for admin/owner roles
+const adminLinks = [
+  { href: '/admin/orders', label: 'Admin-Bereich', icon: ShieldCheck, roles: ['admin', 'owner'] as const },
+  { href: '/dashboard/owner', label: 'Rollenverwaltung', icon: Users, roles: ['owner'] as const }
+];
+
+// Filter admin links based on user role
+function getAdminLinksForRole(role: string | null | undefined) {
+  if (!role) return [];
+  return adminLinks.filter(link => (link.roles as readonly string[]).includes(role));
+}
 
 // NavLink mit Gradient-Underline
 function NavLink({ href, children, active = false }: { href: string; children: React.ReactNode; active?: boolean }) {
@@ -91,6 +106,23 @@ function UserMenu() {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
+        {/* Admin Links - only for admin/owner */}
+        {getAdminLinksForRole(user.role).length > 0 && (
+          <>
+            {getAdminLinksForRole(user.role).map((item) => {
+              const Icon = item.icon;
+              return (
+                <DropdownMenuItem key={item.href} asChild>
+                  <Link href={item.href} className="flex items-center gap-2 cursor-pointer">
+                    <Icon className="h-4 w-4 text-purple-600" />
+                    <span className="font-medium">{item.label}</span>
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
+            <DropdownMenuSeparator />
+          </>
+        )}
         {accountLinks.map((item) => {
           const Icon = item.icon;
           return (
@@ -301,6 +333,33 @@ export function DashboardHeader() {
                   {item.label}
                 </Link>
               ))}
+              {/* Admin Links for Mobile - only for admin/owner */}
+              {user && getAdminLinksForRole(user.role).length > 0 && (
+                <div className="pt-6 mt-4 border-t border-gray-200 space-y-2">
+                  <p className="text-xs font-semibold text-purple-600 uppercase tracking-wide px-1">
+                    Administration
+                  </p>
+                  {getAdminLinksForRole(user.role).map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname?.startsWith(item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 ${
+                          isActive
+                            ? 'bg-purple-50 text-purple-700 border-purple-100'
+                            : 'text-gray-700 border-transparent hover:bg-purple-50'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5 text-purple-600" />
+                        <span className="font-medium">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
               {user && (
                 <div className="pt-6 mt-4 border-t border-gray-200 space-y-2">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1">

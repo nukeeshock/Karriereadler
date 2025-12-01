@@ -13,6 +13,12 @@ import { Input } from '@/components/ui/input';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+// Utility function to safely normalize any value to an array
+function normalizeToArray<T>(value: T | T[] | null | undefined): T[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
 type Order = {
   id: number;
   userId: number | null;
@@ -373,16 +379,16 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                     )}
 
                     {/* Work Experience */}
-                    {order.formData.cv.workExperiences && order.formData.cv.workExperiences.length > 0 && (
+                    {normalizeToArray(order.formData?.cv?.workExperiences).length > 0 && (
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-3">Berufserfahrung</p>
                         <div className="space-y-4">
-                          {order.formData.cv.workExperiences.map((exp: any, index: number) => (
+                          {normalizeToArray(order.formData?.cv?.workExperiences).map((exp: any, index: number) => (
                             <div key={index} className="bg-orange-50 border border-orange-200 p-4 rounded-lg">
                               <div className="flex justify-between items-start mb-2">
                                 <div>
-                                  <h4 className="font-semibold text-gray-900">{exp.position}</h4>
-                                  <p className="text-gray-700">{exp.company}</p>
+                                  <h4 className="font-semibold text-gray-900">{exp.position || '—'}</h4>
+                                  <p className="text-gray-700">{exp.company || '—'}</p>
                                 </div>
                                 <span className="text-sm text-gray-600 whitespace-nowrap ml-4">
                                   {exp.startMonth && exp.startYear ? `${exp.startMonth} ${exp.startYear}` : exp.startYear || ''} -{' '}
@@ -407,16 +413,16 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                     )}
 
                     {/* Education */}
-                    {order.formData.cv.education && order.formData.cv.education.length > 0 && (
+                    {normalizeToArray(order.formData?.cv?.education).length > 0 && (
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-3">Ausbildung</p>
                         <div className="space-y-4">
-                          {order.formData.cv.education.map((edu: any, index: number) => (
+                          {normalizeToArray(order.formData?.cv?.education).map((edu: any, index: number) => (
                             <div key={index} className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
                               <div className="flex justify-between items-start mb-2">
                                 <div>
-                                  <h4 className="font-semibold text-gray-900">{edu.degree}</h4>
-                                  <p className="text-gray-700">{edu.institution}</p>
+                                  <h4 className="font-semibold text-gray-900">{edu.degree || '—'}</h4>
+                                  <p className="text-gray-700">{edu.institution || '—'}</p>
                                   {edu.field && (
                                     <p className="text-sm text-gray-600 italic">{edu.field}</p>
                                   )}
@@ -437,16 +443,16 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                     )}
 
                     {/* Voluntary Work */}
-                    {order.formData.cv.voluntaryWork && order.formData.cv.voluntaryWork.length > 0 && (
+                    {normalizeToArray(order.formData?.cv?.voluntaryWork).length > 0 && (
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-3">Ehrenamtliche Tätigkeiten</p>
                         <div className="space-y-4">
-                          {order.formData.cv.voluntaryWork.map((vol: any, index: number) => (
+                          {normalizeToArray(order.formData?.cv?.voluntaryWork).map((vol: any, index: number) => (
                             <div key={index} className="bg-green-50 border border-green-200 p-4 rounded-lg">
                               <div className="flex justify-between items-start mb-2">
                                 <div>
-                                  <h4 className="font-semibold text-gray-900">{vol.role}</h4>
-                                  <p className="text-gray-700">{vol.organization}</p>
+                                  <h4 className="font-semibold text-gray-900">{vol.role || '—'}</h4>
+                                  <p className="text-gray-700">{vol.organization || '—'}</p>
                                 </div>
                                 <span className="text-sm text-gray-600 whitespace-nowrap ml-4">
                                   {vol.startMonth && vol.startYear ? `${vol.startMonth} ${vol.startYear}` : vol.startYear || ''} -{' '}
@@ -530,11 +536,11 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-1">Ziel-Position</p>
-                        <p className="text-gray-900 font-semibold">{order.formData.coverLetter.jobTitle}</p>
+                        <p className="text-gray-900 font-semibold">{order.formData.coverLetter.jobTitle || '—'}</p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-1">Firma</p>
-                        <p className="text-gray-900 font-semibold">{order.formData.coverLetter.companyName}</p>
+                        <p className="text-gray-900 font-semibold">{order.formData.coverLetter.companyName || '—'}</p>
                       </div>
                     </div>
 

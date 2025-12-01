@@ -1,0 +1,1 @@
+ALTER TABLE "order_requests" ADD COLUMN "reminder_sent_at" timestamp;
