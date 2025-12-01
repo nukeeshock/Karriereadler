@@ -81,17 +81,20 @@ export async function POST(
       })
       .where(eq(orderRequests.id, orderId));
 
-    // Send email notification to customer
+    // Send email notification to customer with direct download link
     try {
       const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders`;
-      const { p, infoBox } = emailComponents;
+      const { p, infoBox, linkBox } = emailComponents;
       
       const bodyContent = `
         ${p(`Hallo ${order.customerName || 'liebe/r Kunde/in'},`)}
         ${p('großartige Neuigkeiten! Deine professionell erstellten Bewerbungsunterlagen sind jetzt fertig und stehen zum Download bereit.')}
-        ${infoBox('<strong>Download jetzt verfügbar</strong><br/>Du kannst deine fertigen Dokumente ab sofort in deinem Dashboard herunterladen.', 'success')}
+        ${infoBox('<strong>🎉 Deine Unterlagen sind fertig!</strong><br/>Klicke auf den Button unten, um deine Dokumente direkt herunterzuladen.', 'success')}
+        ${p('<strong>Direkter Download-Link:</strong>', 'margin-top: 24px;')}
+        ${linkBox(blob.url)}
+        ${p('Du kannst deine Unterlagen auch jederzeit in deinem Dashboard herunterladen.', 'margin-top: 16px;')}
         ${p('Mit deinen neuen, professionellen Bewerbungsunterlagen hast du jetzt die besten Voraussetzungen, um bei deinen Wunscharbeitgebern zu punkten.', 'margin-top: 24px;')}
-        ${p('Wir wünschen dir viel Erfolg bei deiner Bewerbung.')}
+        ${p('Wir wünschen dir viel Erfolg bei deiner Bewerbung!')}
         ${p('Viele Grüße,<br/>Dein Karriereadler-Team')}
       `;
       
@@ -101,8 +104,8 @@ export async function POST(
         html: getEmailTemplate({
           title: 'Deine Unterlagen sind fertig',
           body: bodyContent,
-          buttonText: 'Zu deinen Unterlagen',
-          buttonUrl: dashboardUrl
+          buttonText: 'Jetzt herunterladen',
+          buttonUrl: blob.url
         })
       });
       console.log('[Admin Upload] Completion email sent to:', order.customerEmail);
