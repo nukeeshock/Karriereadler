@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import { Suspense } from 'react';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Loader2, PlusCircle, FileText, Mail } from 'lucide-react';
+import { Loader2, PlusCircle, FileText, ClipboardList, Download, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 type ActionState = {
@@ -28,23 +28,12 @@ type ActionState = {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function SubscriptionSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
-
 function CreditsSkeleton() {
   return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Aufträge</CardTitle>
-      </CardHeader>
-    </Card>
+    <div className="space-y-6">
+      <div className="h-20 bg-gray-100 rounded-lg animate-pulse" />
+      <div className="h-48 bg-gray-100 rounded-lg animate-pulse" />
+    </div>
   );
 }
 
@@ -85,101 +74,105 @@ function UserCredits() {
 
   return (
     <div className="space-y-6">
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Button
-          asChild
-          size="lg"
-          className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white h-auto py-4"
-        >
-          <Link href="/kaufen" className="flex items-center justify-center gap-2">
-            <FileText className="w-5 h-5" />
-            <div className="text-left">
-              <div className="font-semibold">Service buchen</div>
-              <div className="text-xs text-orange-100">Lebenslauf, Anschreiben oder Bundle</div>
-            </div>
-          </Link>
-        </Button>
-
-        <Button
-          asChild
-          size="lg"
-          className="bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white h-auto py-4"
-        >
-          <Link
-            href={
-              questionnaireOrder
-                ? `/dashboard/orders/${questionnaireOrder.id}/complete`
-                : '/dashboard/orders'
-            }
-            className="flex items-center justify-center gap-2"
-          >
-            <Mail className="w-5 h-5" />
-            <div className="text-left">
-              <div className="font-semibold">
-                {questionnaireOrder ? 'Fragebogen ausfüllen' : 'Meine Aufträge'}
+      {/* Primary Action Banner - only show if questionnaire pending */}
+      {questionnaireOrder && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-orange-600" />
               </div>
-              <div className="text-xs text-orange-100">
-                {questionnaireOrder ? 'Bezahlt · Angaben ergänzen' : 'Status & Fragebogen'}
+              <div>
+                <p className="font-semibold text-gray-900">Fragebogen ausfüllen</p>
+                <p className="text-sm text-gray-600">Auftrag #{questionnaireOrder.id} – bezahlt, Angaben ausstehend</p>
               </div>
             </div>
-          </Link>
-        </Button>
-      </div>
+            <Link
+              href={`/dashboard/orders/${questionnaireOrder.id}/complete`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors text-sm"
+            >
+              Ausfüllen
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      )}
 
-      {/* Order status overview */}
-      <Card className="border-2 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl">Auftragsstatus</CardTitle>
+      {/* Completed Orders Banner */}
+      {completedOrders.length > 0 && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Download className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">
+                  {completedOrders.length} {completedOrders.length === 1 ? 'Dokument' : 'Dokumente'} zum Download bereit
+                </p>
+                <p className="text-sm text-gray-600">Deine fertigen Bewerbungsunterlagen warten auf dich</p>
+              </div>
+            </div>
+            <Link
+              href="/dashboard/orders"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors text-sm"
+            >
+              Herunterladen
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Order Status Overview */}
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Auftragsstatus</CardTitle>
+            <Link
+              href="/dashboard/orders"
+              className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+            >
+              Alle ansehen →
+            </Link>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-            <div className="p-4 rounded-xl bg-orange-50 border border-orange-100">
-              <p className="text-sm text-orange-700 mb-1">Gesamt</p>
-              <p className="text-3xl font-bold text-orange-900">{statusCounts.total}</p>
+          {/* Status Summary - with subtle boxes */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div className="p-4 bg-gray-50 border border-gray-100 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">Gesamt</p>
+              <p className="text-2xl font-bold text-gray-900">{statusCounts.total}</p>
             </div>
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-              <p className="text-sm text-amber-700 mb-1">Zahlung offen</p>
-              <p className="text-3xl font-bold text-amber-900">{statusCounts.pendingPayment}</p>
+            <div className="p-4 bg-amber-50/50 border border-amber-100 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">Zahlung offen</p>
+              <p className="text-2xl font-bold text-amber-700">{statusCounts.pendingPayment}</p>
             </div>
-            <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-              <p className="text-sm text-blue-700 mb-1">In Bearbeitung</p>
-              <p className="text-3xl font-bold text-blue-900">{statusCounts.inProgress}</p>
+            <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">In Bearbeitung</p>
+              <p className="text-2xl font-bold text-blue-700">{statusCounts.inProgress}</p>
             </div>
-            <div className="p-4 rounded-xl bg-green-50 border border-green-100">
-              <p className="text-sm text-green-700 mb-1">Abgeschlossen</p>
-              <p className="text-3xl font-bold text-green-900">{statusCounts.completed}</p>
+            <div className="p-4 bg-green-50/50 border border-green-100 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">Abgeschlossen</p>
+              <p className="text-2xl font-bold text-green-700">{statusCounts.completed}</p>
             </div>
           </div>
-          {completedOrders.length > 0 && (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-              <p className="text-green-800 font-semibold mb-1">
-                ✅ {completedOrders.length} {completedOrders.length === 1 ? 'Dokument' : 'Dokumente'} zum Download bereit!
-              </p>
-              <p className="text-sm text-green-700">
-                Deine fertigen Bewerbungsunterlagen kannst du unter "Alle Aufträge ansehen" herunterladen.
-              </p>
-            </div>
-          )}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button asChild variant="outline">
-              <Link href="/dashboard/orders">Alle Aufträge ansehen</Link>
-            </Button>
-            {questionnaireOrder && (
-              <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
-                <Link href={`/dashboard/orders/${questionnaireOrder.id}/complete`}>
-                  Fragebogen fortsetzen
-                </Link>
-              </Button>
-            )}
-          </div>
+
+          {/* Quick Action */}
+          <Link
+            href="/kaufen"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors text-sm"
+          >
+            <FileText className="w-4 h-4" />
+            Neuen Service buchen
+          </Link>
         </CardContent>
       </Card>
 
       {/* Purchase History */}
-      <Card className="border-2 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl">Kaufhistorie</CardTitle>
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Kaufhistorie</CardTitle>
         </CardHeader>
         <CardContent>
           {purchases && purchases.length > 0 ? (
@@ -189,15 +182,15 @@ function UserCredits() {
                 return (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-4 bg-orange-50 border border-orange-100 rounded-xl hover:bg-orange-100 transition-colors"
+                    className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-xl shadow-sm">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-lg border border-gray-100">
                         {productInfo.icon}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">{productInfo.name}</p>
-                        <p className="text-xs text-gray-600">
+                        <p className="font-medium text-gray-900">{productInfo.name}</p>
+                        <p className="text-xs text-gray-500">
                           {new Date(p.createdAt).toLocaleDateString('de-DE', {
                             day: '2-digit',
                             month: 'long',
@@ -206,32 +199,25 @@ function UserCredits() {
                         </p>
                       </div>
                     </div>
-                    <div className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                      Abgeschlossen
-                    </div>
+                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">
+                      Bezahlt
+                    </span>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-orange-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                  />
-                </svg>
+            <div className="text-center py-8">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <FileText className="w-6 h-6 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">Noch keine Käufe</h3>
-              <p className="text-sm text-gray-500">Deine Kaufhistorie erscheint hier</p>
+              <p className="text-gray-500 text-sm">Noch keine Käufe vorhanden</p>
+              <Link
+                href="/kaufen"
+                className="inline-block mt-3 text-sm text-orange-600 hover:text-orange-700 font-medium"
+              >
+                Jetzt Service buchen →
+              </Link>
             </div>
           )}
         </CardContent>
@@ -305,7 +291,6 @@ function TeamMembers() {
     FormData
   >(removeTeamMember, {});
 
-  // Check if current user is owner in the team
   const currentUserMembership = teamData?.teamMembers?.find(
     (member) => member.userId === user?.id
   );
@@ -335,19 +320,10 @@ function TeamMembers() {
       </CardHeader>
       <CardContent>
         <ul className="space-y-4">
-          {teamData.teamMembers.map((member, index) => (
+          {teamData.teamMembers.map((member) => (
             <li key={member.id} className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Avatar>
-                  {/* 
-                    This app doesn't save profile images, but here
-                    is how you'd show them:
-
-                    <AvatarImage
-                      src={member.user.image || ''}
-                      alt={getUserDisplayName(member.user)}
-                    />
-                  */}
                   <AvatarFallback>
                     {getUserDisplayName(member.user)
                       .split(' ')
@@ -366,8 +342,7 @@ function TeamMembers() {
               </div>
               {isOwner && member.role !== 'owner' ? (
                 <form action={removeAction}>
-                  <input
-            autoComplete="off" type="hidden" name="memberId" value={member.id} />
+                  <input autoComplete="off" type="hidden" name="memberId" value={member.id} />
                   <Button
                     type="submit"
                     variant="outline"
@@ -403,7 +378,6 @@ function InviteTeamMember() {
   const { data: user } = useSWR<User>('/api/user', fetcher);
   const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
 
-  // Check if current user is owner in the team (via teamMembers, not global role)
   const currentUserMembership = teamData?.teamMembers?.find(
     (member) => member.userId === user?.id
   );
@@ -489,14 +463,17 @@ function InviteTeamMember() {
 
 export default function SettingsPage() {
   return (
-    <section className="flex-1 p-8 lg:p-12">
-      <div className="mb-8">
-        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Deine Aufträge</h1>
-        <p className="text-gray-600">Überblick über Bestellungen, Status und Kaufhistorie</p>
+    <section className="flex-1 p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Deine Aufträge</h1>
+          <p className="text-gray-600 text-sm">Überblick über Bestellungen, Status und Kaufhistorie</p>
+        </div>
+        <Suspense fallback={<CreditsSkeleton />}>
+          <UserCredits />
+        </Suspense>
       </div>
-      <Suspense fallback={<CreditsSkeleton />}>
-        <UserCredits />
-      </Suspense>
     </section>
   );
 }
+

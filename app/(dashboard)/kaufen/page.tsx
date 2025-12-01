@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import useSWR from 'swr';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -124,28 +123,26 @@ export default function KaufenPage() {
 
   if (!user) {
     return (
-      <div className="flex-1 min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
-        <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+      <div className="flex-1 min-h-screen bg-gray-50">
+        <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Bitte anmelden, um zu kaufen
           </h1>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-gray-600 mb-8">
             Melde dich an oder registriere dich, um deinen Auftrag zu starten und die Zahlung sicher abzuschließen.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/sign-in"
-              className="group relative inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 bg-size-200 bg-pos-0 hover:bg-pos-100 rounded-lg shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 overflow-hidden"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors duration-200"
             >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-              <span className="relative z-10">Anmelden</span>
+              Anmelden
             </Link>
             <Link
               href="/sign-up"
-              className="group relative inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-gray-900 bg-white border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg overflow-hidden"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-gray-700 bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-lg transition-colors duration-200"
             >
-              <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-orange-500 to-amber-500 group-hover:w-full transition-all duration-300"></span>
-              <span className="relative z-10">Registrieren</span>
+              Registrieren
             </Link>
           </div>
         </section>
@@ -238,21 +235,21 @@ export default function KaufenPage() {
   }
 
   return (
-    <div className="flex-1 min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="flex-1 min-h-screen bg-gray-50">
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Wähle deinen Service
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600">
             Einmalige Zahlung, keine versteckten Kosten
           </p>
         </div>
 
         {/* Product Selection */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">1. Service auswählen</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">1. Service auswählen</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {products.map((product) => {
               const isSelected = selectedProduct === product.key;
@@ -261,38 +258,39 @@ export default function KaufenPage() {
                 <button
                   key={product.key}
                   onClick={() => setSelectedProduct(product.key)}
-                  className={`group relative p-6 rounded-xl border-2 transition-all duration-300 text-left transform hover:-translate-y-2 hover:shadow-2xl ${
+                  className={`relative p-5 rounded-lg border-2 transition-colors duration-200 text-left ${
                     isSelected
-                      ? 'border-orange-500 bg-orange-50 shadow-lg scale-105'
-                      : 'border-gray-200 bg-white hover:border-orange-300 hover:scale-105'
-                  } ${product.highlight && !isSelected ? 'ring-2 ring-orange-100' : ''}`}
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
                 >
                   {product.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap animate-pulse shadow-md">
+                    <div className="absolute -top-3 left-4">
+                      <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
                         Empfohlen
                       </span>
                     </div>
                   )}
-                  <div className="flex items-start gap-3 mb-3">
+                  <div className="flex items-start gap-3 mb-3 mt-1">
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                        isSelected ? 'bg-orange-500' : 'bg-orange-100 group-hover:bg-orange-200'
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        isSelected ? 'bg-orange-500' : 'bg-orange-100'
                       }`}
                     >
                       <ProductIcon
-                        className={`w-5 h-5 transition-all duration-300 ${
-                          isSelected ? 'text-white' : 'text-orange-600 group-hover:scale-110 group-hover:rotate-12'
+                        className={`w-5 h-5 ${
+                          isSelected ? 'text-white' : 'text-orange-600'
                         }`}
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">{product.title}</h3>
-                      <p className="text-sm text-gray-600">{product.description}</p>
+                      <h3 className="font-semibold text-gray-900">{product.title}</h3>
+                      <p className="text-sm text-gray-500">{product.description}</p>
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-900 group-hover:scale-105 transition-transform duration-300 origin-left">
-                    {product.price} €<span className="text-sm font-normal text-gray-600"> einmalig</span>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {product.price} €
+                    <span className="text-sm font-normal text-gray-500 ml-1">einmalig</span>
                   </div>
                 </button>
               );
@@ -303,7 +301,7 @@ export default function KaufenPage() {
         {/* Basic Data Form */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>2. Deine Daten</CardTitle>
+            <CardTitle className="text-lg">2. Deine Daten</CardTitle>
             <CardDescription>
               Diese Informationen helfen uns, deine Bewerbungsunterlagen optimal vorzubereiten
             </CardDescription>
@@ -422,7 +420,7 @@ export default function KaufenPage() {
         </Card>
 
         {/* Widerrufsrecht */}
-        <div className="mb-8">
+        <div className="mb-6">
           <WiderrufsCheckbox
             checked={widerrufsAccepted}
             onChange={setWiderrufsAccepted}
@@ -430,27 +428,27 @@ export default function KaufenPage() {
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
-            <p className="text-red-600 text-center">{error}</p>
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-600 text-center text-sm">{error}</p>
           </div>
         )}
 
         {/* Price Summary & Checkout */}
-        <Card className="bg-gradient-to-br from-orange-50 to-white border-orange-200">
+        <Card className="border-orange-200 bg-orange-50/50">
           <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 mb-1">Gewählter Service</p>
-                <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                   <Icon className="w-5 h-5 text-orange-600" />
-                  <p className="text-lg font-semibold text-gray-900">
-                    {selectedProductData.title}
-                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Gewählter Service</p>
+                  <p className="font-semibold text-gray-900">{selectedProductData.title}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-600 mb-1">Preis</p>
-                <p className="text-3xl font-bold text-orange-600">
+                <p className="text-sm text-gray-600">Preis</p>
+                <p className="text-2xl font-bold text-orange-600">
                   {selectedProductData.price} €
                 </p>
               </div>
@@ -458,8 +456,8 @@ export default function KaufenPage() {
 
             <ul className="space-y-2 mb-6">
               {selectedProductData.features.map((feature, index) => (
-                <li key={index} className="group/item flex items-start gap-2 text-sm text-gray-700 hover:text-gray-900 transition-colors duration-200">
-                  <Check className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0 group-hover/item:scale-125 transition-transform duration-300" />
+                <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                  <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span>{feature}</span>
                 </li>
               ))}
@@ -468,16 +466,15 @@ export default function KaufenPage() {
             <button
               onClick={handleCheckout}
               disabled={!widerrufsAccepted || loading}
-              className="group relative w-full py-6 text-lg font-semibold text-white bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 bg-size-200 bg-pos-0 hover:bg-pos-100 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100 disabled:hover:shadow-lg overflow-hidden"
+              className="w-full py-4 text-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500"
             >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
               {loading ? (
-                <span className="relative z-10 flex items-center justify-center">
+                <span className="flex items-center justify-center">
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Weiterleitung zur Zahlung...
                 </span>
               ) : (
-                <span className="relative z-10">Zur sicheren Zahlung</span>
+                <span>Zur sicheren Zahlung</span>
               )}
             </button>
 
