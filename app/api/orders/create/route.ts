@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
-import { orderRequests, ProductType } from '@/lib/db/schema';
+import { orderRequests, ProductType, OrderStatus } from '@/lib/db/schema';
 import { stripe } from '@/lib/payments/stripe';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
@@ -57,15 +57,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create OrderRequest with PENDING_PAYMENT status
-    console.log('[Order Create] Creating order for user:', { userId: user.id, email: user.email, productType });
-
+    // Step 1: Create order in database first
+    // External API calls (Stripe) should NOT be inside transactions to prevent:
+    // - Orphaned Stripe sessions if transaction rolls back after Stripe succeeds
+    // - Unnecessarily long transaction durations
     const [order] = await db
       .insert(orderRequests)
       .values({
         userId: user.id,
         productType,
-        status: 'PENDING_PAYMENT',
+        status: OrderStatus.PENDING_PAYMENT,
         customerName,
         customerEmail,
         customerPhone: customerPhone || null,
@@ -73,28 +74,34 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    console.log('[Order Create] Order created successfully:', { orderId: order.id, userId: order.userId });
-
-    // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1
+    // Step 2: Create Stripe checkout session (external API - outside transaction)
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1
+          }
+        ],
+        success_url: `${process.env.BASE_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.BASE_URL}/kaufen?checkout=cancelled`,
+        customer_email: customerEmail,
+        metadata: {
+          orderRequestId: order.id.toString(),
+          userId: user.id.toString(),
+          productType
         }
-      ],
-      success_url: `${process.env.BASE_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.BASE_URL}/kaufen?checkout=cancelled`,
-      customer_email: customerEmail,
-      metadata: {
-        orderRequestId: order.id.toString(),
-        userId: user.id.toString(),
-        productType
-      }
-    });
+      });
+    } catch (stripeError) {
+      // Stripe failed - cleanup the orphaned order
+      console.error('[Order Create] Stripe session creation failed, cleaning up order:', order.id);
+      await db.delete(orderRequests).where(eq(orderRequests.id, order.id));
+      throw stripeError;
+    }
 
-    // Update order with Stripe session ID
+    // Step 3: Update order with Stripe session ID
     await db
       .update(orderRequests)
       .set({
@@ -103,12 +110,26 @@ export async function POST(request: NextRequest) {
       })
       .where(eq(orderRequests.id, order.id));
 
+    const orderId = order.id;
+    const checkoutUrl = session.url;
+
+    console.log('[Order Create] Order created successfully:', { orderId, userId: user.id, productType });
+
     return NextResponse.json({
-      orderId: order.id,
-      checkoutUrl: session.url
+      orderId,
+      checkoutUrl
     });
   } catch (error) {
     console.error('Error creating order:', error);
+    
+    // Stripe errors are handled above with cleanup, but catch any remaining
+    if (error instanceof Error && (error.message.includes('stripe') || error.message.includes('Stripe'))) {
+      return NextResponse.json(
+        { error: 'Fehler bei der Zahlungsabwicklung. Bitte versuche es erneut.' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Fehler beim Erstellen der Bestellung.' },
       { status: 500 }

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
 import { orderRequests, OrderStatus } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import { isAdmin } from '@/lib/auth/roles';
 
 export async function POST(
   req: NextRequest,
@@ -15,7 +16,7 @@ export async function POST(
     }
 
     // Check if user is admin or owner
-    if (user.role !== 'admin' && user.role !== 'owner') {
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 });
     }
 
@@ -26,42 +27,48 @@ export async function POST(
       return NextResponse.json({ error: 'Ungültige Auftrags-ID' }, { status: 400 });
     }
 
-    // Get order
-    const [order] = await db
-      .select()
-      .from(orderRequests)
-      .where(eq(orderRequests.id, orderId))
-      .limit(1);
-
-    if (!order) {
-      return NextResponse.json({ error: 'Auftrag nicht gefunden' }, { status: 404 });
-    }
-
-    // Only start if status is READY_FOR_PROCESSING (questionnaire completed)
-    // Status flow: PENDING_PAYMENT → PAID → READY_FOR_PROCESSING → IN_PROGRESS → COMPLETED
-    if (order.status !== OrderStatus.READY_FOR_PROCESSING) {
-      console.log('[Auto Start] Order not eligible for auto-start:', { orderId, status: order.status });
-      return NextResponse.json({
-        message: 'Auftrag kann nur gestartet werden wenn Fragebogen ausgefüllt wurde',
-        status: order.status
-      });
-    }
-
-    // Update status to IN_PROGRESS
-    await db
+    // Atomic update: only update if status is READY_FOR_PROCESSING
+    // This prevents race conditions where two admins try to start the same order
+    const [updatedOrder] = await db
       .update(orderRequests)
       .set({
         status: OrderStatus.IN_PROGRESS,
         updatedAt: new Date()
       })
-      .where(eq(orderRequests.id, orderId));
+      .where(
+        and(
+          eq(orderRequests.id, orderId),
+          eq(orderRequests.status, OrderStatus.READY_FOR_PROCESSING)
+        )
+      )
+      .returning({ id: orderRequests.id, status: orderRequests.status });
 
-    console.log('[Auto Start] Order started:', { orderId, previousStatus: order.status });
+    if (!updatedOrder) {
+      // Order not found or status mismatch - check which one
+      const [order] = await db
+        .select({ status: orderRequests.status })
+        .from(orderRequests)
+        .where(eq(orderRequests.id, orderId))
+        .limit(1);
+
+      if (!order) {
+        return NextResponse.json({ error: 'Auftrag nicht gefunden' }, { status: 404 });
+      }
+
+      return NextResponse.json(
+        {
+          error: 'Auftrag kann nur gestartet werden wenn Fragebogen ausgefüllt wurde',
+          currentStatus: order.status
+        },
+        { status: 409 } // Conflict - status changed between check and update
+      );
+    }
+
+    console.log('[Auto Start] Order started:', { orderId, newStatus: OrderStatus.IN_PROGRESS });
 
     return NextResponse.json({
       success: true,
       message: 'Auftrag auf "In Bearbeitung" gesetzt',
-      previousStatus: order.status,
       newStatus: OrderStatus.IN_PROGRESS
     });
   } catch (error) {

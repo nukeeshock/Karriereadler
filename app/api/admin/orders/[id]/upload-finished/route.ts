@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
 import { orderRequests, OrderStatus } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { put } from '@vercel/blob';
 import { sendEmail, getEmailTemplate, emailComponents } from '@/lib/email';
+import { isAdmin } from '@/lib/auth/roles';
 
 const ALLOWED_TYPES = ['application/pdf'];
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
@@ -20,7 +21,7 @@ export async function POST(
     }
 
     // Check if user is admin or owner
-    if (user.role !== 'admin' && user.role !== 'owner') {
+    if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 });
     }
 
@@ -71,15 +72,31 @@ export async function POST(
 
     console.log('[Admin Upload] Blob created:', { url: blob.url, pathname: blob.pathname });
 
-    // Update order: set finishedFileUrl (Blob URL) and status to COMPLETED
-    await db
+    // Atomic update: only update if status is IN_PROGRESS to prevent race conditions
+    // This ensures we don't overwrite a COMPLETED or CANCELLED order
+    const [updatedOrder] = await db
       .update(orderRequests)
       .set({
         finishedFileUrl: blob.url,
         status: OrderStatus.COMPLETED,
         updatedAt: new Date()
       })
-      .where(eq(orderRequests.id, orderId));
+      .where(
+        and(
+          eq(orderRequests.id, orderId),
+          eq(orderRequests.status, OrderStatus.IN_PROGRESS)
+        )
+      )
+      .returning({ id: orderRequests.id });
+
+    if (!updatedOrder) {
+      console.error('[Admin Upload] Order status changed during upload:', { orderId, currentStatus: order.status });
+      // Note: File already uploaded to Blob - could implement cleanup here if needed
+      return NextResponse.json(
+        { error: 'Auftrag kann nur abgeschlossen werden wenn er "In Bearbeitung" ist' },
+        { status: 409 }
+      );
+    }
 
     // Send email notification to customer with direct download link
     try {
@@ -108,7 +125,7 @@ export async function POST(
           buttonUrl: blob.url
         })
       });
-      console.log('[Admin Upload] Completion email sent to:', order.customerEmail);
+      console.log('[Admin Upload] Completion email sent for order:', order.id);
     } catch (emailError) {
       console.error('[Admin Upload] Failed to send completion email:', emailError);
       // Don't fail the upload if email fails

@@ -11,7 +11,6 @@ import {
   X,
   Settings,
   Shield,
-  Activity,
   FileText,
   ShieldCheck,
   Users
@@ -35,8 +34,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const accountLinks = [
   { href: '/dashboard/orders', label: 'Meine Aufträge', icon: FileText },
   { href: '/dashboard/general', label: 'Account-Informationen', icon: Settings },
-  { href: '/dashboard/security', label: 'Sicherheit', icon: Shield },
-  { href: '/dashboard/activity', label: 'Aktivitäten', icon: Activity }
+  { href: '/dashboard/security', label: 'Sicherheit', icon: Shield }
 ];
 
 // Admin links - shown only for admin/owner roles

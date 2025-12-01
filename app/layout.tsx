@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
-import { getUser, getTeamForUser } from '@/lib/db/queries';
+import { getUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
 import '@/lib/server-disable-localstorage';
 import Script from 'next/script';
@@ -68,10 +68,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // Await the data before passing to SWR fallback to prevent hydration issues
-  const [user, team] = await Promise.all([
-    getUser(),
-    getTeamForUser()
-  ]);
+  const user = await getUser();
 
   return (
     <html
@@ -124,8 +121,7 @@ export default async function RootLayout({
         <SWRConfig
           value={{
             fallback: {
-              '/api/user': user,
-              '/api/team': team
+              '/api/user': user
             }
           }}
         >

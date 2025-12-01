@@ -3,6 +3,7 @@ import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
 import { orderRequests } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { isAdmin } from '@/lib/auth/roles';
 
 export async function GET(
   request: NextRequest,
@@ -21,7 +22,7 @@ export async function GET(
       return NextResponse.json({ error: 'Ungültige Auftrags-ID' }, { status: 400 });
     }
 
-    // Get order and verify ownership
+    // Get order and verify ownership or admin access
     const [order] = await db
       .select()
       .from(orderRequests)
@@ -32,7 +33,8 @@ export async function GET(
       return NextResponse.json({ error: 'Auftrag nicht gefunden' }, { status: 404 });
     }
 
-    if (order.userId !== user.id) {
+    // Allow access if user owns the order OR is an admin
+    if (order.userId !== user.id && !isAdmin(user)) {
       return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 });
     }
 

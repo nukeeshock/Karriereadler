@@ -187,9 +187,9 @@ export default function CompleteOrderPage({ params }: { params: Promise<{ id: st
       if (order.productType === 'CV' || order.productType === 'BUNDLE') {
         formData.cv = {
           jobDescription,
-          workExperience: JSON.stringify(workExperiences),
-          education: JSON.stringify(educationEntries),
-          voluntaryWork: JSON.stringify(voluntaryWork),
+          workExperience: workExperiences,  // Store as array, not JSON string
+          education: educationEntries,       // Store as array, not JSON string
+          voluntaryWork: voluntaryWork,      // Store as array, not JSON string
           skills,
           linkedinUrl: linkedinUrl || null,
           resumePath: resumePath || null,

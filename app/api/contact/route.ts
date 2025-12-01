@@ -11,6 +11,18 @@ const schema = z.object({
   message: z.string().min(1)
 });
 
+// Escape HTML special characters to prevent injection
+function escapeHtml(text: string): string {
+  const htmlEscapes: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return text.replace(/[&<>"']/g, (char) => htmlEscapes[char]);
+}
+
 export async function POST(request: Request) {
   try {
     const json = await request.json();
@@ -23,25 +35,30 @@ export async function POST(request: Request) {
       message: data.message
     });
 
-    // Forward contact mail if configured; otherwise log
+    // Forward contact mail if configured; otherwise log (without PII)
     if (process.env.CONTACT_FORWARD_EMAIL) {
+      // Escape user input before embedding in HTML
+      const safeName = escapeHtml(data.name);
+      const safeEmail = escapeHtml(data.email);
+      const safeMessage = escapeHtml(data.message).replace(/\n/g, '<br/>');
+      
       await sendEmail({
         to: process.env.CONTACT_FORWARD_EMAIL,
         subject: `[Karriereadler] ${data.subject}`,
         html: `
-          <p><strong>Name:</strong> ${data.name}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Name:</strong> ${safeName}</p>
+          <p><strong>Email:</strong> ${safeEmail}</p>
           <p><strong>Nachricht:</strong></p>
-          <p>${data.message.replace(/\n/g, '<br/>')}</p>
+          <p>${safeMessage}</p>
         `
       });
     } else {
-      console.log('New contact message (no CONTACT_FORWARD_EMAIL set)', data);
+      console.log('New contact message received (no CONTACT_FORWARD_EMAIL set)');
     }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('Contact error', error);
+    console.error('Contact form error');
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
   }
 }

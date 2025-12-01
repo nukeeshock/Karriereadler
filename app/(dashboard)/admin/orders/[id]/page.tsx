@@ -14,8 +14,21 @@ import { Input } from '@/components/ui/input';
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 // Utility function to safely normalize any value to an array
-function normalizeToArray<T>(value: T | T[] | null | undefined): T[] {
+// Handles both JSON strings and actual arrays
+function normalizeToArray<T>(value: T | T[] | string | null | undefined): T[] {
   if (!value) return [];
+  
+  // If it's a JSON string, parse it first
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      // Not valid JSON, return empty array
+      return [];
+    }
+  }
+  
   return Array.isArray(value) ? value : [value];
 }
 
@@ -360,153 +373,160 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
           </Card>
         )}
 
-        {/* Form Data */}
+        {/* Form Data - Always show all fields, even if empty */}
         {order.formData && (
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Fragebogen-Daten</CardTitle>
             </CardHeader>
             <CardContent>
-              {order.formData.cv && (
+              {/* CV Section - show if productType includes CV */}
+              {(order.productType === 'CV' || order.productType === 'BUNDLE') && (
                 <div className="mb-6">
                   <h3 className="font-semibold text-lg mb-4 text-orange-600">Lebenslauf-Informationen</h3>
                   <div className="space-y-6">
-                    {order.formData.cv.jobDescription && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Zielposition / Jobbeschreibung</p>
-                        <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
-                          {order.formData.cv.jobDescription}
-                        </p>
-                      </div>
-                    )}
+                    {/* Zielposition */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Zielposition / Jobbeschreibung</p>
+                      <p className={`whitespace-pre-wrap bg-gray-50 p-3 rounded-lg ${order.formData?.cv?.jobDescription ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+                        {order.formData?.cv?.jobDescription || 'Nicht ausgefüllt'}
+                      </p>
+                    </div>
 
                     {/* Work Experience */}
-                    {normalizeToArray(order.formData?.cv?.workExperiences).length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-3">Berufserfahrung</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-3">Berufserfahrung</p>
+                      {normalizeToArray(order.formData?.cv?.workExperience || order.formData?.cv?.workExperiences).length > 0 ? (
                         <div className="space-y-4">
-                          {normalizeToArray(order.formData?.cv?.workExperiences).map((exp: any, index: number) => (
-                            <div key={index} className="bg-orange-50 border border-orange-200 p-4 rounded-lg">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h4 className="font-semibold text-gray-900">{exp.position || '—'}</h4>
-                                  <p className="text-gray-700">{exp.company || '—'}</p>
+                          {normalizeToArray(order.formData?.cv?.workExperience || order.formData?.cv?.workExperiences).map((exp: any, index: number) => (
+                            <div key={index} className="bg-orange-50 border border-orange-200 p-3 sm:p-4 rounded-lg">
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2 mb-2">
+                                <div className="min-w-0 flex-1">
+                                  <h4 className="font-semibold text-gray-900 break-words">{exp.position || '—'}</h4>
+                                  <p className="text-gray-700 break-words">{exp.company || '—'}</p>
                                 </div>
-                                <span className="text-sm text-gray-600 whitespace-nowrap ml-4">
-                                  {exp.startMonth && exp.startYear ? `${exp.startMonth} ${exp.startYear}` : exp.startYear || ''} -{' '}
+                                <span className="text-sm text-gray-600 sm:whitespace-nowrap sm:ml-4 flex-shrink-0">
+                                  {exp.startMonth && exp.startYear ? `${exp.startMonth}/${exp.startYear}` : exp.startYear || '—'} -{' '}
                                   {exp.isCurrent ? (
                                     <span className="text-orange-600 font-medium">Aktuell</span>
                                   ) : exp.endMonth && exp.endYear ? (
-                                    `${exp.endMonth} ${exp.endYear}`
+                                    `${exp.endMonth}/${exp.endYear}`
                                   ) : (
-                                    exp.endYear || ''
+                                    exp.endYear || '—'
                                   )}
                                 </span>
                               </div>
-                              {exp.responsibilities && (
-                                <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap">
-                                  {exp.responsibilities}
+                              <div className="mt-2">
+                                <p className="text-xs font-medium text-gray-500 mb-1">Tätigkeiten & Erfolge:</p>
+                                <p className={`text-sm whitespace-pre-wrap break-words ${exp.responsibilities ? 'text-gray-700' : 'text-gray-400 italic'}`}>
+                                  {exp.responsibilities || 'Nicht ausgefüllt'}
                                 </p>
-                              )}
+                              </div>
                             </div>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="text-gray-400 italic bg-gray-50 p-3 rounded-lg">Keine Einträge</p>
+                      )}
+                    </div>
 
                     {/* Education */}
-                    {normalizeToArray(order.formData?.cv?.education).length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-3">Ausbildung</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-3">Ausbildung / Studium</p>
+                      {normalizeToArray(order.formData?.cv?.education).length > 0 ? (
                         <div className="space-y-4">
                           {normalizeToArray(order.formData?.cv?.education).map((edu: any, index: number) => (
-                            <div key={index} className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h4 className="font-semibold text-gray-900">{edu.degree || '—'}</h4>
-                                  <p className="text-gray-700">{edu.institution || '—'}</p>
-                                  {edu.field && (
-                                    <p className="text-sm text-gray-600 italic">{edu.field}</p>
-                                  )}
+                            <div key={index} className="bg-blue-50 border border-blue-200 p-3 sm:p-4 rounded-lg">
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2 mb-2">
+                                <div className="min-w-0 flex-1">
+                                  <h4 className="font-semibold text-gray-900 break-words">{edu.degree || '—'}</h4>
+                                  <p className="text-gray-700 break-words">{edu.institution || '—'}</p>
+                                  <p className="text-sm text-gray-600 italic break-words">{edu.field || '—'}</p>
                                 </div>
-                                <span className="text-sm text-gray-600 whitespace-nowrap ml-4">
-                                  {edu.startYear} - {edu.endYear}
+                                <span className="text-sm text-gray-600 sm:whitespace-nowrap sm:ml-4 flex-shrink-0">
+                                  {edu.startYear || '—'} - {edu.endYear || '—'}
                                 </span>
                               </div>
-                              {edu.description && (
-                                <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap">
-                                  {edu.description}
+                              <div className="mt-2">
+                                <p className="text-xs font-medium text-gray-500 mb-1">Beschreibung:</p>
+                                <p className={`text-sm whitespace-pre-wrap break-words ${edu.description ? 'text-gray-700' : 'text-gray-400 italic'}`}>
+                                  {edu.description || 'Nicht ausgefüllt'}
                                 </p>
-                              )}
+                              </div>
                             </div>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="text-gray-400 italic bg-gray-50 p-3 rounded-lg">Keine Einträge</p>
+                      )}
+                    </div>
 
                     {/* Voluntary Work */}
-                    {normalizeToArray(order.formData?.cv?.voluntaryWork).length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-3">Ehrenamtliche Tätigkeiten</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-3">Engagements & Ehrenämter</p>
+                      {normalizeToArray(order.formData?.cv?.voluntaryWork).length > 0 ? (
                         <div className="space-y-4">
                           {normalizeToArray(order.formData?.cv?.voluntaryWork).map((vol: any, index: number) => (
-                            <div key={index} className="bg-green-50 border border-green-200 p-4 rounded-lg">
-                              <div className="flex justify-between items-start mb-2">
-                                <div>
-                                  <h4 className="font-semibold text-gray-900">{vol.role || '—'}</h4>
-                                  <p className="text-gray-700">{vol.organization || '—'}</p>
+                            <div key={index} className="bg-green-50 border border-green-200 p-3 sm:p-4 rounded-lg">
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-2 mb-2">
+                                <div className="min-w-0 flex-1">
+                                  <h4 className="font-semibold text-gray-900 break-words">{vol.role || '—'}</h4>
+                                  <p className="text-gray-700 break-words">{vol.organization || '—'}</p>
                                 </div>
-                                <span className="text-sm text-gray-600 whitespace-nowrap ml-4">
-                                  {vol.startMonth && vol.startYear ? `${vol.startMonth} ${vol.startYear}` : vol.startYear || ''} -{' '}
+                                <span className="text-sm text-gray-600 sm:whitespace-nowrap sm:ml-4 flex-shrink-0">
+                                  {vol.startMonth && vol.startYear ? `${vol.startMonth}/${vol.startYear}` : vol.startYear || '—'} -{' '}
                                   {vol.isCurrent ? (
                                     <span className="text-green-600 font-medium">Aktuell</span>
                                   ) : vol.endMonth && vol.endYear ? (
-                                    `${vol.endMonth} ${vol.endYear}`
+                                    `${vol.endMonth}/${vol.endYear}`
                                   ) : (
-                                    vol.endYear || ''
+                                    vol.endYear || '—'
                                   )}
                                 </span>
                               </div>
-                              {vol.description && (
-                                <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap">
-                                  {vol.description}
+                              <div className="mt-2">
+                                <p className="text-xs font-medium text-gray-500 mb-1">Beschreibung:</p>
+                                <p className={`text-sm whitespace-pre-wrap break-words ${vol.description ? 'text-gray-700' : 'text-gray-400 italic'}`}>
+                                  {vol.description || 'Nicht ausgefüllt'}
                                 </p>
-                              )}
+                              </div>
                             </div>
                           ))}
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="text-gray-400 italic bg-gray-50 p-3 rounded-lg">Keine Einträge</p>
+                      )}
+                    </div>
 
                     {/* Skills */}
-                    {order.formData.cv.skills && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Fähigkeiten & Kompetenzen</p>
-                        <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
-                          {order.formData.cv.skills}
-                        </p>
-                      </div>
-                    )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Fähigkeiten & Kenntnisse</p>
+                      <p className={`whitespace-pre-wrap bg-gray-50 p-3 rounded-lg ${order.formData?.cv?.skills ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+                        {order.formData?.cv?.skills || 'Nicht ausgefüllt'}
+                      </p>
+                    </div>
 
                     {/* LinkedIn */}
-                    {order.formData.cv.linkedinUrl && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">LinkedIn-Profil</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">LinkedIn-Profil</p>
+                      {order.formData?.cv?.linkedinUrl ? (
                         <a
-                          href={order.formData.cv.linkedinUrl}
+                          href={order.formData.cv.linkedinUrl.startsWith('http') ? order.formData.cv.linkedinUrl : `https://${order.formData.cv.linkedinUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline"
                         >
                           {order.formData.cv.linkedinUrl}
                         </a>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="text-gray-400 italic">Nicht angegeben</p>
+                      )}
+                    </div>
 
                     {/* Resume Upload */}
-                    {order.formData.cv.resumePath && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Hochgeladener Lebenslauf</p>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Hochgeladener Lebenslauf</p>
+                      {order.formData?.cv?.resumePath ? (
                         <a
                           href={order.formData.cv.resumePath}
                           target="_blank"
@@ -514,90 +534,117 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
                           className="inline-flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg text-sm transition-colors"
                         >
                           <FileText className="w-4 h-4 mr-2" />
-                          {order.formData.cv.resumeFileName || 'Lebenslauf ansehen'}
+                          Lebenslauf ansehen
                         </a>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="text-gray-400 italic">Keine Datei hochgeladen</p>
+                      )}
+                    </div>
 
-                    {order.formData.cv.additionalInfo && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Zusätzliche Informationen</p>
-                        <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
-                          {order.formData.cv.additionalInfo}
-                        </p>
-                      </div>
-                    )}
+                    {/* Additional Info */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Zusätzliche Informationen</p>
+                      <p className={`whitespace-pre-wrap bg-gray-50 p-3 rounded-lg ${order.formData?.cv?.additionalInfo ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+                        {order.formData?.cv?.additionalInfo || 'Nicht ausgefüllt'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {order.formData.coverLetter && (
-                <div className="border-t pt-6">
+              {/* Cover Letter Section - show if productType includes Cover Letter */}
+              {(order.productType === 'COVER_LETTER' || order.productType === 'BUNDLE') && (
+                <div className={order.productType === 'BUNDLE' ? 'border-t pt-6' : ''}>
                   <h3 className="font-semibold text-lg mb-4 text-orange-600">Anschreiben-Informationen</h3>
                   <div className="space-y-4">
+                    {/* Position & Company */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-1">Ziel-Position</p>
-                        <p className="text-gray-900 font-semibold">{order.formData.coverLetter.jobTitle || '—'}</p>
+                        <p className={`font-semibold ${order.formData?.coverLetter?.jobTitle ? 'text-gray-900' : 'text-gray-400 italic font-normal'}`}>
+                          {order.formData?.coverLetter?.jobTitle || 'Nicht ausgefüllt'}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-1">Firma</p>
-                        <p className="text-gray-900 font-semibold">{order.formData.coverLetter.companyName || '—'}</p>
+                        <p className={`font-semibold ${order.formData?.coverLetter?.companyName ? 'text-gray-900' : 'text-gray-400 italic font-normal'}`}>
+                          {order.formData?.coverLetter?.companyName || 'Nicht ausgefüllt'}
+                        </p>
                       </div>
                     </div>
 
-                    {order.formData.coverLetter.jobPostingUrl && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Stellenanzeige</p>
+                    {/* Job Posting URL */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Link zur Stellenanzeige</p>
+                      {order.formData?.coverLetter?.jobPostingUrl ? (
                         <a
-                          href={order.formData.coverLetter.jobPostingUrl}
+                          href={order.formData.coverLetter.jobPostingUrl.startsWith('http') ? order.formData.coverLetter.jobPostingUrl : `https://${order.formData.coverLetter.jobPostingUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline break-all"
                         >
                           {order.formData.coverLetter.jobPostingUrl}
                         </a>
-                      </div>
-                    )}
+                      ) : (
+                        <p className="text-gray-400 italic">Nicht angegeben</p>
+                      )}
+                    </div>
 
-                    {order.formData.coverLetter.jobDescriptionText && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Stellenbeschreibung</p>
-                        <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
-                          {order.formData.coverLetter.jobDescriptionText}
-                        </p>
-                      </div>
-                    )}
+                    {/* Job Description */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Stellenbeschreibung / Anforderungen</p>
+                      <p className={`whitespace-pre-wrap bg-gray-50 p-3 rounded-lg ${order.formData?.coverLetter?.jobDescriptionText ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+                        {order.formData?.coverLetter?.jobDescriptionText || 'Nicht ausgefüllt'}
+                      </p>
+                    </div>
 
-                    {order.formData.coverLetter.experiencesToHighlight && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Erfahrungen hervorheben</p>
-                        <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
-                          {order.formData.coverLetter.experiencesToHighlight}
-                        </p>
-                      </div>
-                    )}
+                    {/* Experiences to Highlight */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Erfahrungen hervorheben</p>
+                      <p className={`whitespace-pre-wrap bg-gray-50 p-3 rounded-lg ${order.formData?.coverLetter?.experiencesToHighlight ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+                        {order.formData?.coverLetter?.experiencesToHighlight || 'Nicht ausgefüllt'}
+                      </p>
+                    </div>
 
-                    {order.formData.coverLetter.strengths && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Stärken</p>
-                        <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
-                          {order.formData.coverLetter.strengths}
-                        </p>
-                      </div>
-                    )}
+                    {/* Strengths */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Stärken</p>
+                      <p className={`whitespace-pre-wrap bg-gray-50 p-3 rounded-lg ${order.formData?.coverLetter?.strengths ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+                        {order.formData?.coverLetter?.strengths || 'Nicht ausgefüllt'}
+                      </p>
+                    </div>
 
-                    {order.formData.coverLetter.additionalInfo && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Zusätzliche Hinweise</p>
-                        <p className="text-gray-900 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg">
-                          {order.formData.coverLetter.additionalInfo}
-                        </p>
-                      </div>
-                    )}
+                    {/* Additional Info */}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-1">Zusätzliche Hinweise</p>
+                      <p className={`whitespace-pre-wrap bg-gray-50 p-3 rounded-lg ${order.formData?.coverLetter?.additionalInfo ? 'text-gray-900' : 'text-gray-400 italic'}`}>
+                        {order.formData?.coverLetter?.additionalInfo || 'Nicht ausgefüllt'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
+
+              {/* Show message if no formData yet */}
+              {!order.formData?.cv && !order.formData?.coverLetter && (
+                <p className="text-gray-500 italic text-center py-4">
+                  Der Kunde hat den Fragebogen noch nicht ausgefüllt.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Show card if formData is null */}
+        {!order.formData && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Fragebogen-Daten</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-500 italic text-center py-4">
+                Der Kunde hat den Fragebogen noch nicht ausgefüllt.
+              </p>
             </CardContent>
           </Card>
         )}

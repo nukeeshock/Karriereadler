@@ -80,9 +80,8 @@ export const teamMembers = pgTable('team_members', {
 
 export const activityLogs = pgTable('activity_logs', {
   id: serial('id').primaryKey(),
-  teamId: integer('team_id')
-    .notNull()
-    .references(() => teams.id),
+  // teamId is nullable - teams are deprecated but kept for backward compatibility
+  teamId: integer('team_id').references(() => teams.id),
   userId: integer('user_id').references(() => users.id),
   action: text('action').notNull(),
   timestamp: timestamp('timestamp').notNull().defaultNow(),
@@ -113,6 +112,10 @@ export const contactMessages = pgTable('contact_messages', {
   handled: boolean('handled').notNull().default(false)
 });
 
+// NOTE: analyticsEvents table has been removed from the application.
+// The table definition is kept commented out for reference during migration cleanup.
+// TODO: Create a migration to drop the analytics_events table if it exists in production.
+/*
 export const analyticsEvents = pgTable('analytics_events', {
   id: serial('id').primaryKey(),
   visitorId: varchar('visitor_id', { length: 64 }).notNull(),
@@ -125,6 +128,7 @@ export const analyticsEvents = pgTable('analytics_events', {
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').notNull().defaultNow()
 });
+*/
 
 // Order Requests - Replaces credit-based system
 export enum ProductType {
@@ -188,6 +192,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   cvRequests: many(cvRequests),
   letterRequests: many(letterRequests),
   orderRequests: many(orderRequests),
+  stripeEvents: many(stripeEvents),
 }));
 
 export const invitationsRelations = relations(invitations, ({ one }) => ({
@@ -331,6 +336,13 @@ export const letterRequestsRelations = relations(letterRequests, ({ one }) => ({
 export const orderRequestsRelations = relations(orderRequests, ({ one }) => ({
   user: one(users, {
     fields: [orderRequests.userId],
+    references: [users.id],
+  }),
+}));
+
+export const stripeEventsRelations = relations(stripeEvents, ({ one }) => ({
+  user: one(users, {
+    fields: [stripeEvents.userId],
     references: [users.id],
   }),
 }));

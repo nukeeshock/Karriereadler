@@ -9,9 +9,15 @@ const CRON_SECRET = process.env.CRON_SECRET;
 
 export async function GET(request: NextRequest) {
   // Verify cron secret (Vercel sends this automatically)
+  // SECURITY: Always require authentication - reject if no secret configured
   const authHeader = request.headers.get('authorization');
   
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (!CRON_SECRET) {
+    console.error('[Cron Reminder] CRON_SECRET not configured - rejecting request');
+    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
+  }
+  
+  if (authHeader !== `Bearer ${CRON_SECRET}`) {
     console.log('[Cron Reminder] Unauthorized request');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -65,7 +71,7 @@ export async function GET(request: NextRequest) {
           .where(eq(orderRequests.id, order.id));
 
         sentCount++;
-        console.log(`[Cron Reminder] Sent reminder for order #${order.id} to ${order.customerEmail}`);
+        console.log(`[Cron Reminder] Sent reminder for order #${order.id}`);
       } catch (emailError) {
         errorCount++;
         console.error(`[Cron Reminder] Failed to send reminder for order #${order.id}:`, emailError);

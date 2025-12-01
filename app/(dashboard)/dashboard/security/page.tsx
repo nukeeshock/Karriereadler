@@ -9,9 +9,6 @@ import { useActionState } from 'react';
 import { updatePassword } from '@/app/(login)/actions';
 
 type PasswordState = {
-  currentPassword?: string;
-  newPassword?: string;
-  confirmPassword?: string;
   error?: string;
   success?: string;
 };
@@ -23,24 +20,24 @@ export default function SecurityPage() {
   >(updatePassword, {});
 
   return (
-    <section className="flex-1 p-8 lg:p-12">
-      <div className="mb-8">
-        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Sicherheitseinstellungen</h1>
-        <p className="text-gray-600">Verwalte dein Passwort und Account-Sicherheit</p>
+    <section className="flex-1 p-4 sm:p-8 lg:p-12">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Sicherheitseinstellungen</h1>
+        <p className="text-sm sm:text-base text-gray-600">Verwalte dein Passwort und Account-Sicherheit</p>
       </div>
 
       <div className="max-w-2xl space-y-6">
         {/* Password Update Card */}
         <Card className="border-2 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 border-b">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                <Lock className="w-5 h-5 text-white" />
+          <CardHeader className="bg-gradient-to-r from-orange-50 to-orange-100 border-b p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               Passwort ändern
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <form className="space-y-6" action={passwordAction}>
               <div>
                 <Label htmlFor="current-password" className="text-sm font-medium mb-2 block">
@@ -54,7 +51,6 @@ export default function SecurityPage() {
                   required
                   minLength={8}
                   maxLength={100}
-                  defaultValue={passwordState.currentPassword}
                   className="h-12"
                 />
               </div>
@@ -70,7 +66,6 @@ export default function SecurityPage() {
                   required
                   minLength={8}
                   maxLength={100}
-                  defaultValue={passwordState.newPassword}
                   className="h-12"
                 />
                 <p className="text-xs text-gray-500 mt-1">Mindestens 8 Zeichen</p>
@@ -87,7 +82,6 @@ export default function SecurityPage() {
                   required
                   minLength={8}
                   maxLength={100}
-                  defaultValue={passwordState.confirmPassword}
                   className="h-12"
                 />
               </div>
@@ -103,17 +97,17 @@ export default function SecurityPage() {
               )}
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-6 text-base font-semibold rounded-xl shadow-lg"
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 sm:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-lg"
                 disabled={isPasswordPending}
               >
                 {isPasswordPending ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
                     Wird aktualisiert...
                   </>
                 ) : (
                   <>
-                    <Lock className="mr-2 h-5 w-5" />
+                    <Lock className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                     Passwort aktualisieren
                   </>
                 )}

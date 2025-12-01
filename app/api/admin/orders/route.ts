@@ -3,6 +3,7 @@ import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
 import { orderRequests } from '@/lib/db/schema';
 import { desc } from 'drizzle-orm';
+import { isAdmin } from '@/lib/auth/roles';
 
 export async function GET() {
   try {
@@ -12,8 +13,8 @@ export async function GET() {
     }
 
     // Check if user is admin or owner
-    if (user.role !== 'admin' && user.role !== 'owner') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!isAdmin(user)) {
+      return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 });
     }
 
     const orders = await db

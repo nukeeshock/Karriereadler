@@ -113,6 +113,13 @@
       "when": 1764609099212,
       "tag": "0015_light_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1764621980291,
+      "tag": "0016_parched_warpath",
+      "breakpoints": true
     }
   ]
 }
