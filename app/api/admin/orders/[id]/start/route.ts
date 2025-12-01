@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
 import { db } from '@/lib/db/drizzle';
 import { orderRequests, OrderStatus } from '@/lib/db/schema';
-import { eq, or } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 export async function POST(
   req: NextRequest,
@@ -37,11 +37,12 @@ export async function POST(
       return NextResponse.json({ error: 'Auftrag nicht gefunden' }, { status: 404 });
     }
 
-    // Only start if status is PAID or READY_FOR_PROCESSING
-    if (order.status !== OrderStatus.PAID && order.status !== OrderStatus.READY_FOR_PROCESSING) {
+    // Only start if status is READY_FOR_PROCESSING (questionnaire completed)
+    // Status flow: PENDING_PAYMENT → PAID → READY_FOR_PROCESSING → IN_PROGRESS → COMPLETED
+    if (order.status !== OrderStatus.READY_FOR_PROCESSING) {
       console.log('[Auto Start] Order not eligible for auto-start:', { orderId, status: order.status });
       return NextResponse.json({
-        message: 'Auftrag bereits in Bearbeitung oder abgeschlossen',
+        message: 'Auftrag kann nur gestartet werden wenn Fragebogen ausgefüllt wurde',
         status: order.status
       });
     }

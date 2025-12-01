@@ -140,9 +140,11 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
 
   const user = userData;
 
-  // Auto-start order when admin opens it (if status is PAID or READY_FOR_PROCESSING)
+  // Auto-start order when admin opens it (only if READY_FOR_PROCESSING)
+  // Status flow: PENDING_PAYMENT → PAID → READY_FOR_PROCESSING → IN_PROGRESS → COMPLETED
+  // Only orders with completed questionnaire (READY_FOR_PROCESSING) can be started
   useEffect(() => {
-    if (data?.order && (data.order.status === 'PAID' || data.order.status === 'READY_FOR_PROCESSING')) {
+    if (data?.order && data.order.status === 'READY_FOR_PROCESSING') {
       fetch(`/api/admin/orders/${resolvedParams.id}/start`, {
         method: 'POST'
       })
