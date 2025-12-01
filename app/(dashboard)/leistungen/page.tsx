@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 export const metadata = {
   title: 'Bewerbungsunterlagen erstellen lassen – So funktioniert Karriereadler',
   description:
-    'Professionelle Lebenslauf- und Anschreiben-Erstellung von Experten. Individuell, ATS-optimiert, in 2-3 Werktagen, inklusive Korrekturschleife.',
+    'Professionelle Lebenslauf- und Anschreiben-Erstellung von Experten. Individuell, ATS-optimiert, in 2–3 Werktagen, inklusive Korrekturschleife.',
   alternates: {
     canonical: '/leistungen'
   }
@@ -22,7 +22,8 @@ export default function LeistungenPage() {
               So funktioniert der Karriereadler-Service
             </h1>
             <p className="text-xl text-orange-50 leading-relaxed">
-              Wir erstellen professionelle Bewerbungsunterlagen – komplett für dich.
+              Du brauchst professionelle Bewerbungsunterlagen, hast aber keine Zeit oder Erfahrung?
+              Wir übernehmen das für dich – komplett und professionell.
               Kein Template-Tool, sondern echte Experten, die deine Karriere verstehen.
             </p>
           </div>
@@ -36,7 +37,7 @@ export default function LeistungenPage() {
             {
               href: '/lebenslauf-schreiben-lassen',
               title: 'Lebenslauf schreiben lassen',
-              desc: 'Individuell erstellt ab 20 €, ATS-optimiert, 2–3 Werktage Lieferzeit.',
+              desc: 'Individuell erstellt ab 20 €, ATS-optimiert, 2–3 Werktage Lieferzeit.',
               cta: 'Zum Lebenslauf-Service'
             },
             {
@@ -68,8 +69,8 @@ export default function LeistungenPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Was macht Karriereadler anders?</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Wir sind <strong>kein Template-Generator</strong>. Bei uns erstellen echte Menschen
-              deine Bewerbungsunterlagen – individuell auf deine Zielstelle zugeschnitten.
+              Wir sind kein Template-Generator. Bei uns erstellen erfahrene HR-Profis
+              deine Bewerbungsunterlagen – individuell auf deine Zielstelle abgestimmt.
             </p>
           </div>
 
@@ -81,7 +82,7 @@ export default function LeistungenPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-3">Von Experten erstellt</h3>
               <p className="text-gray-600">
                 Erfahrene HR-Profis und Branchenkenner schreiben deine Unterlagen.
-                Kein Algorithmus, sondern echtes Fachwissen.
+                Menschen mit Fachwissen, keine Software.
               </p>
             </div>
 
@@ -91,8 +92,8 @@ export default function LeistungenPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Individuell & ATS-optimiert</h3>
               <p className="text-gray-600">
-                Maßgeschneidert auf deine Zielstelle und Branche.
-                Optimiert für Bewerbermanagementsysteme (ATS).
+                Individuell auf deine Zielstelle und Branche abgestimmt.
+                Optimiert für Bewerbungssoftware (ATS).
               </p>
             </div>
 
@@ -102,7 +103,7 @@ export default function LeistungenPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Schnell & unkompliziert</h3>
               <p className="text-gray-600">
-                Deine fertigen Unterlagen erhältst du in 2-3 Werktagen per E-Mail.
+                In 2–3 Werktagen erhältst du deine fertigen Unterlagen per E-Mail.
                 Sofort einsatzbereit.
               </p>
             </div>
@@ -131,9 +132,8 @@ export default function LeistungenPage() {
                       <h3 className="text-xl font-bold text-gray-900">Formular ausfüllen</h3>
                     </div>
                     <p className="text-gray-600">
-                      Gib deine Daten ein: Berufserfahrung, Ausbildung, Fähigkeiten.
-                      Optional kannst du die Stellenausschreibung hochladen, damit wir deine
-                      Unterlagen perfekt darauf abstimmen können.
+                      Fülle ein kurzes Formular aus: Berufserfahrung, Ausbildung, Zielstelle.
+                      Optional kannst du die Stellenanzeige hochladen.
                     </p>
                   </div>
                 </div>
@@ -149,16 +149,16 @@ export default function LeistungenPage() {
               {/* Step 2 */}
               <div className="relative flex flex-col md:flex-row-reverse items-center mb-12">
                 <div className="md:w-1/2 md:pl-12 mb-6 md:mb-0">
-                  <div className="bg-white rounded-xl p-8 shadow-lg border-2 border-orange-200">
-                    <div className="flex items-center mb-4">
-                      <div className="w-10 h-10 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-lg mr-4">
-                        2
+                    <div className="bg-white rounded-xl p-8 shadow-lg border-2 border-orange-200">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-lg mr-4">
+                          2
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">Paket wählen</h3>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900">Paket wählen</h3>
-                    </div>
-                    <p className="text-gray-600">
-                      Wähle zwischen Lebenslauf (20 €), Anschreiben (20 €) oder unserem
-                      Bundle (30 €, spart 10 €). Einmalige Zahlung, kein Abo.
+                      <p className="text-gray-600">
+                      Wähle zwischen Lebenslauf, Anschreiben oder Bundle.
+                      Einmalige Zahlung, kein Abo.
                     </p>
                   </div>
                 </div>
@@ -182,8 +182,8 @@ export default function LeistungenPage() {
                       <h3 className="text-xl font-bold text-gray-900">Zurücklehnen</h3>
                     </div>
                     <p className="text-gray-600">
-                      Unsere Experten erstellen deine Unterlagen. In 2-3 Werktagen erhältst du
-                      sie per E-Mail – professionell, individuell und sofort einsatzbereit.
+                      Unsere Experten erstellen deine Unterlagen. In 2–3 Werktagen erhältst du
+                      sie per E-Mail – professionell, individuell, sofort einsatzbereit.
                     </p>
                   </div>
                 </div>
@@ -216,7 +216,7 @@ export default function LeistungenPage() {
               <div className="flex items-start">
                 <Clock className="w-6 h-6 text-orange-600 mr-3 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">Lieferzeit 2-3 Werktage</h3>
+                  <h3 className="font-bold text-gray-900 mb-1">Lieferzeit 2–3 Werktage</h3>
                   <p className="text-gray-600">Schnelle Bearbeitung, damit du keine Zeit verlierst</p>
                 </div>
               </div>
@@ -241,8 +241,8 @@ export default function LeistungenPage() {
             <div className="mt-8 p-6 bg-white rounded-xl border border-orange-200">
               <h3 className="font-bold text-gray-900 mb-2">📦 Bundle-Vorteil</h3>
               <p className="text-gray-600">
-                <strong>Lebenslauf + Anschreiben (2×) im Bundle für nur 30 €</strong> –
-                du sparst 10 € und hast eine durchgängig professionelle Bewerbung.
+                <strong>Lebenslauf + Anschreiben (2×) im Bundle für nur 30 €</strong> –
+                du sparst 10 € und hast eine durchgängig professionelle Bewerbung.
               </p>
             </div>
           </div>
@@ -258,15 +258,14 @@ export default function LeistungenPage() {
               </h3>
               <div className="space-y-3 text-gray-700">
                 <p>
-                  Du erhältst keine 08/15-Vorlage, sondern <strong>individuell überarbeitete Unterlagen</strong>.
+                  Du erhältst individuell erstellte Unterlagen – keine Standardvorlage.
                 </p>
                 <p>
-                  Bist du mit Struktur, Layout oder Formulierungen nicht zufrieden, kannst du{' '}
-                  <strong>innerhalb von 14 Tagen nach Erhalt</strong> eine Überarbeitung anfordern –
-                  bis zu <strong>1 Überarbeitungsrunde ist inklusive</strong>.
+                  Nicht zufrieden? Innerhalb von 14 Tagen kannst du Änderungen anfordern –
+                  eine Korrekturschleife ist inklusive.
                 </p>
                 <p className="text-sm text-gray-600 bg-white/60 rounded-lg p-3 border border-green-200">
-                  <strong>Wichtig:</strong> Ein Anspruch auf Rückerstattung besteht nicht, sofern wir die vereinbarte Leistung erbracht und Nachbesserungen angeboten haben. Dies entspricht der gesetzlichen Regelung für vollständig erbrachte digitale Dienstleistungen.
+                  <strong>Wichtig:</strong> Eine Rückerstattung ist nicht möglich, wenn wir die Leistung erbracht und Nachbesserungen angeboten haben.
                 </p>
               </div>
             </div>
@@ -290,16 +289,16 @@ export default function LeistungenPage() {
               <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
                 <h3 className="font-bold text-gray-900 mb-2">Wie funktioniert die Korrekturschleife?</h3>
                 <p className="text-gray-600">
-                  Nach Erhalt deiner Unterlagen kannst du einmalig Änderungswünsche äußern
-                  (z. B. Formulierungen anpassen, Details ergänzen). Wir setzen das zeitnah um.
+                  Nach der ersten Version gibst du uns Feedback.
+                  Wir setzen eine Änderungsrunde für dich um und schicken dir die aktualisierten Dateien.
                 </p>
               </div>
 
               <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
                 <h3 className="font-bold text-gray-900 mb-2">Sind die Unterlagen ATS-tauglich?</h3>
                 <p className="text-gray-600">
-                  Ja! Wir optimieren Formatierung und Keywords für Bewerbermanagementsysteme (ATS),
-                  damit deine Bewerbung auch automatische Screenings besteht.
+                  Ja! Wir optimieren Format und Inhalt für Bewerbungssoftware (ATS),
+                  damit deine Bewerbung auch automatische Prüfungen besteht.
                 </p>
               </div>
 
@@ -322,7 +321,7 @@ export default function LeistungenPage() {
           <div className="bg-gradient-to-r from-orange-600 to-amber-500 rounded-2xl p-12 text-white">
             <h2 className="text-3xl font-bold mb-4">Bereit für deine professionelle Bewerbung?</h2>
             <p className="text-xl text-orange-50 mb-8 max-w-2xl mx-auto">
-              Wähle dein Paket und erhalte in 2-3 Werktagen deine fertigen Unterlagen.
+              Wähle dein Paket und erhalte in 2–3 Werktagen deine fertigen Unterlagen.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-orange-600 hover:bg-orange-50 text-lg px-8 py-6 rounded-full font-bold shadow-lg">

@@ -4,9 +4,9 @@ import Script from 'next/script';
 import { Check, Star, Clock, RefreshCw, FileText, Globe, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Lebenslauf & Anschreiben Preise – Professionelle Erstellung ab 20 €',
+  title: 'Lebenslauf & Anschreiben Preise – Professionelle Erstellung ab 20 €',
   description:
-    'Preise für Lebenslauf, Anschreiben und Bundle: ab 20 €, manuell erstellt, 2–3 Werktage Lieferzeit, Korrekturschleife inklusive.',
+    'Preise für Lebenslauf, Anschreiben und Bundle: ab 20 €, manuell erstellt, 2–3 Werktage Lieferzeit, Korrekturschleife inklusive.',
   alternates: {
     canonical: '/pricing'
   }
@@ -16,16 +16,16 @@ const products = [
   {
     name: 'Lebenslauf-Service',
     priceEuro: 20,
-    description: 'Dein Lebenslauf wird professionell von uns gefertigt.',
-    features: ['1x Lebenslauf', 'Individuell erstellt von Experten', 'Word (.docx) + PDF', 'Lieferzeit: 2-3 Werktage', '1x Korrekturschleife inklusive', 'Deutsch oder Englisch'],
+    description: 'Professionell erstellter Lebenslauf ab 20 €.',
+    features: ['1x Lebenslauf', 'Individuell erstellt von Experten', 'Word (.docx) + PDF', 'Lieferzeit: 2–3 Werktage', '1x Korrekturschleife inklusive', 'Deutsch oder Englisch'],
     productType: 'cv',
     recommended: false
   },
   {
     name: 'Anschreiben-Service',
     priceEuro: 20,
-    description: 'Ein individuelles Anschreiben für deine Zielposition.',
-    features: ['1x Anschreiben', 'Ton & Struktur nach Vorgabe', 'Word (.docx) + PDF', 'Lieferzeit: 2-3 Werktage', '1x Korrekturschleife inklusive', 'Deutsch oder Englisch'],
+    description: 'Individuell formuliertes Anschreiben ab 20 €.',
+    features: ['1x Anschreiben', 'Ton & Struktur nach Vorgabe', 'Word (.docx) + PDF', 'Lieferzeit: 2–3 Werktage', '1x Korrekturschleife inklusive', 'Deutsch oder Englisch'],
     productType: 'cover',
     recommended: false
   },
@@ -33,7 +33,7 @@ const products = [
     name: 'Bundle: Lebenslauf + Anschreiben',
     priceEuro: 30,
     description: 'Lebenslauf-Service und Anschreiben zusammen zum Vorteilspreis.',
-    features: ['1x Lebenslauf', '1x Anschreiben', '10 € gespart gegenüber Einzelkauf', 'Word (.docx) + PDF', 'Lieferzeit: 2-3 Werktage', '1x Korrekturschleife inklusive', 'Deutsch oder Englisch'],
+    features: ['1x Lebenslauf', '1x Anschreiben', '10 € gespart gegenüber Einzelkauf', 'Word (.docx) + PDF', 'Lieferzeit: 2–3 Werktage', '1x Korrekturschleife inklusive', 'Deutsch oder Englisch'],
     productType: 'bundle',
     recommended: true
   }
@@ -111,7 +111,7 @@ export default function PricingPage() {
               <Clock className="h-6 w-6 text-orange-600" />
             </div>
             <h3 className="font-semibold text-gray-900 mb-1">Schnelle Lieferung</h3>
-            <p className="text-sm text-gray-600">2-3 Werktage Bearbeitungszeit – damit du keine Zeit verlierst</p>
+            <p className="text-sm text-gray-600">2–3 Werktage Bearbeitungszeit – damit du keine Zeit verlierst</p>
           </div>
           <div className="flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
@@ -139,15 +139,14 @@ export default function PricingPage() {
           </h3>
           <div className="space-y-2 text-gray-700 text-sm">
             <p>
-              Du erhältst keine 08/15-Vorlage, sondern <strong>individuell überarbeitete Unterlagen</strong>.
+              Du erhältst individuell erstellte Unterlagen – keine Standardvorlage.
             </p>
             <p>
-              Bist du mit Struktur, Layout oder Formulierungen nicht zufrieden, kannst du{' '}
-              <strong>innerhalb von 14 Tagen nach Erhalt</strong> eine Überarbeitung anfordern –
-              bis zu <strong>1 Überarbeitungsrunde ist inklusive</strong>.
+              Nicht zufrieden? Innerhalb von 14 Tagen kannst du Änderungen anfordern –
+              eine Korrekturschleife ist inklusive.
             </p>
-            <p className="text-gray-500 bg-white/60 rounded p-2 border border-green-100 mt-3">
-              <strong>Hinweis:</strong> Ein Anspruch auf Rückerstattung besteht nicht, sofern wir die vereinbarte Leistung erbracht und Nachbesserungen angeboten haben.
+            <p className="text-sm text-gray-500 bg-white/60 rounded p-2 border border-green-100 mt-3">
+              <strong>Hinweis:</strong> Eine Rückerstattung ist nicht möglich, wenn wir die Leistung erbracht und Nachbesserungen angeboten haben.
             </p>
           </div>
         </div>
@@ -176,9 +175,8 @@ function PricingCard({
         : 'Bundle-Leistungen ansehen';
 
   return (
-    <article className={`flex flex-col p-6 bg-white rounded-lg border-2 relative ${
-      isRecommended ? 'border-orange-500 bg-orange-50/30' : 'border-gray-200'
-    }`}>
+    <article className={`flex flex-col p-6 bg-white rounded-lg border-2 relative ${isRecommended ? 'border-orange-500 bg-orange-50/30' : 'border-gray-200'
+      }`}>
       {isRecommended && (
         <div className="absolute -top-3 left-4">
           <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
@@ -186,17 +184,17 @@ function PricingCard({
           </span>
         </div>
       )}
-      
+
       <h2 className="text-xl font-semibold text-gray-900 mb-1 mt-1">
         {product.name}
       </h2>
       <p className="text-sm text-gray-600 mb-4">{product.description}</p>
-      
+
       <p className="text-3xl font-bold text-gray-900 mb-6">
-        {product.priceEuro} €
+        {product.priceEuro} €
         <span className="text-base font-normal text-gray-500 ml-1">einmalig</span>
       </p>
-      
+
       <ul className="space-y-3 mb-6 flex-grow">
         {product.features.map((feature, index) => (
           <li key={index} className="flex items-start">
@@ -205,19 +203,18 @@ function PricingCard({
           </li>
         ))}
       </ul>
-      
+
       <div className="space-y-3 mt-auto">
         <Link
           href={`/kaufen?product=${product.productType}`}
-          className={`block w-full text-center py-3 px-4 font-semibold rounded-lg transition-colors duration-200 ${
-            isRecommended 
-              ? 'bg-orange-500 hover:bg-orange-600 text-white' 
-              : 'bg-gray-900 hover:bg-gray-800 text-white'
-          }`}
+          className={`block w-full text-center py-3 px-4 font-semibold rounded-lg transition-colors duration-200 ${isRecommended
+            ? 'bg-orange-500 hover:bg-orange-600 text-white'
+            : 'bg-gray-900 hover:bg-gray-800 text-white'
+            }`}
         >
           Jetzt kaufen
         </Link>
-        
+
         {product.productType !== 'bundle' && (
           <Link
             href={detailLink}

@@ -12,14 +12,14 @@ const aggregateRating = {
 };
 
 export const metadata: Metadata = {
-  title: 'Lebenslauf schreiben lassen ab 20 € – Professionelle Erstellung | Karriereadler',
+  title: 'Lebenslauf schreiben lassen ab 20 € – Professionelle Erstellung | Karriereadler',
   description:
-    'Lass deinen Lebenslauf professionell schreiben – ab 20 €, manuell von HR-Experten. ATS-optimiert, 2–3 Werktage Lieferzeit, inkl. Korrekturschleife.',
+    'Lass deinen Lebenslauf professionell schreiben – ab 20 €, manuell von HR-Experten. ATS-optimiert, 2–3 Werktage Lieferzeit, inkl. Korrekturschleife.',
   alternates: {
     canonical: '/'
   },
   openGraph: {
-    title: 'Lebenslauf schreiben lassen ab 20 € | Karriereadler',
+    title: 'Lebenslauf schreiben lassen ab 20 € | Karriereadler',
     description: 'Professioneller Lebenslauf von HR-Experten erstellt. ATS-optimiert, 2–3 Werktage, Korrekturschleife inklusive.',
     url: baseUrl,
     siteName: 'Karriereadler',
@@ -116,15 +116,15 @@ export default async function HomePage() {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">
                 Lebenslauf schreiben lassen
                 <span className="block text-orange-500 mt-1">
-                  ab 20 € – von Experten erstellt
+                  Professionell erstellt – ab 20 €
                 </span>
               </h1>
-              
+
               {/* SEO-optimized intro paragraph */}
               <p className="mt-6 text-lg text-gray-600 max-w-xl">
-                Lass deinen <strong>Lebenslauf professionell erstellen</strong> – manuell von HR-Experten, 
-                individuell auf deine Zielstelle zugeschnitten. ATS-optimiert, 
-                Lieferung in 2–3 Werktagen, Korrekturschleife inklusive.
+                Du brauchst einen <strong>professionellen Lebenslauf</strong>, hast aber keine Zeit oder Erfahrung beim Schreiben?
+                Wir übernehmen das für dich. ATS-optimiert, individuell auf deine Zielstelle abgestimmt,
+                fertig in 2–3 Werktagen.
               </p>
 
               {/* CTAs */}
@@ -148,7 +148,7 @@ export default async function HomePage() {
               {/* Trust Signal */}
               <div className="mt-6 flex items-center gap-2 text-sm text-gray-600">
                 <Star className="h-4 w-4 fill-orange-500 text-orange-500" />
-                <span>4.8/5 Bewertung · 200+ zufriedene Kunden</span>
+                <span>4.8/5 Bewertung · 200+ erfolgreiche Bewerbungen</span>
               </div>
             </div>
 
@@ -158,10 +158,10 @@ export default async function HomePage() {
                 <p className="text-sm font-medium text-orange-600 uppercase tracking-wide mb-4">
                   So funktioniert's
                 </p>
-                
+
                 <div className="bg-gray-50 rounded-lg px-4 py-3 mb-6">
                   <p className="text-sm font-semibold text-gray-900">
-                    Lebenslauf 20 € · Anschreiben 20 € · Bundle 30 €
+                    Lebenslauf 20 € · Anschreiben 20 € · Bundle 30 €
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
                     Einmalige Zahlung – kein Abo, keine versteckten Kosten
@@ -190,7 +190,7 @@ export default async function HomePage() {
                       3
                     </span>
                     <p className="text-sm text-gray-700">
-                      <strong>Fertig!</strong> – Professionelle Unterlagen in 2–3 Werktagen per E-Mail
+                      <strong>Fertig!</strong> – Professionelle Unterlagen in 2–3 Werktagen
                     </p>
                   </div>
                 </div>
@@ -220,35 +220,35 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Warum deinen Lebenslauf von Karriereadler schreiben lassen?
+              Warum Karriereadler?
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Ein professioneller Lebenslauf ist der Schlüssel zum Traumjob. Unsere HR-Experten wissen, worauf Personaler achten.
+              Weil eine professionelle Bewerbung über Erfolg oder Absage entscheidet – und wir wissen, worauf es ankommt.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <article className="p-6 bg-white border border-gray-100 rounded-lg">
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Struktur statt Chaos</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Klare Struktur</h3>
               <p className="text-sm text-gray-600">
-                Deine Stationen werden so sortiert, dass sie einen roten Faden ergeben – perfekt für den ersten Eindruck.
+                Wir bringen deine Stationen in die richtige Reihenfolge – für einen überzeugenden ersten Eindruck.
               </p>
             </article>
             <article className="p-6 bg-white border border-gray-100 rounded-lg">
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Authentische Formulierungen</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Professionelle Formulierungen</h3>
               <p className="text-sm text-gray-600">
-                Kein Phrasen-Bingo – sondern Texte, die zu dir passen und deine Stärken hervorheben.
+                Wir finden die passenden Worte – authentisch, aber professionell.
               </p>
             </article>
             <article className="p-6 bg-white border border-gray-100 rounded-lg">
               <h3 className="text-base font-semibold text-gray-900 mb-2">ATS-optimiert</h3>
               <p className="text-sm text-gray-600">
-                Dein Lebenslauf wird von Bewerbermanagementsystemen korrekt erkannt – höhere Einladungsquote.
+                Optimiert für Bewerbungssoftware – damit dein Lebenslauf auch automatische Screenings besteht.
               </p>
             </article>
             <article className="p-6 bg-white border border-gray-100 rounded-lg">
               <h3 className="text-base font-semibold text-gray-900 mb-2">Korrekturschleife inklusive</h3>
               <p className="text-sm text-gray-600">
-                Nicht 100% zufrieden? Eine Überarbeitungsrunde ist bei jedem Paket mit dabei.
+                Eine Überarbeitungsrunde ist bei jedem Paket inklusive.
               </p>
             </article>
           </div>
@@ -260,31 +260,31 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Erfahrungen unserer Kunden
+              Das sagen unsere Kunden
             </h2>
             <p className="text-gray-600">
-              Über 200 zufriedene Kunden haben ihren Lebenslauf von Karriereadler erstellen lassen
+              Über 200 erfolgreiche Bewerbungen mit Karriereadler
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                quote: "Der Lebenslauf war perfekt auf die Stelle zugeschnitten. Nach nur zwei Wochen hatte ich drei Vorstellungsgespräche!",
+                quote: "Professioneller Service! Nach nur zwei Wochen hatte ich drei Vorstellungsgespräche. Der Lebenslauf war perfekt auf die Stellen zugeschnitten.",
                 name: "Sarah K.",
-                role: "Marketing Manager",
+                role: "Marketing",
                 initials: "SK"
               },
               {
-                quote: "Endlich kein stundenlanger Kampf mit Formatierungen! Das Anschreiben klang professionell und persönlich – genau richtig.",
+                quote: "Schnell, unkompliziert und das Ergebnis war top. Kann ich jedem empfehlen, der keine Zeit zum Bewerbung schreiben hat.",
                 name: "Michael H.",
-                role: "Software-Entwickler",
+                role: "IT",
                 initials: "MH"
               },
               {
-                quote: "Als Quereinsteiger war ich unsicher, wie ich meine Erfahrungen darstellen soll. Das Team hat das perfekt gelöst!",
+                quote: "Als Berufseinsteiger war ich unsicher. Karriereadler hat mir geholfen, meine Erfahrungen richtig darzustellen. Danke!",
                 name: "Laura M.",
-                role: "Projektmanagerin",
+                role: "Vertrieb",
                 initials: "LM"
               }
             ].map((testimonial, i) => (
@@ -319,13 +319,13 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              So lässt du deinen Lebenslauf professionell schreiben
+              Warum Karriereadler?
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              In nur drei Schritten zu deinen fertigen Bewerbungsunterlagen
+              Weil eine professionelle Bewerbung über Erfolg oder Absage entscheidet – und wir wissen, worauf es ankommt.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             <article>
               <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-orange-100 text-orange-600 mb-4">
@@ -335,8 +335,8 @@ export default async function HomePage() {
                 Fragebogen ausfüllen
               </h3>
               <p className="text-gray-600">
-                Gib deine Daten, beruflichen Erfahrungen, Ausbildung und Wunschposition an. 
-                Je mehr Details, desto besser können wir deinen Lebenslauf auf die Stelle zuschneiden.
+                Teile uns deine beruflichen Stationen, Ausbildung und Zielstelle mit.
+                Je mehr Details, desto besser das Ergebnis.
               </p>
             </article>
 
@@ -345,11 +345,11 @@ export default async function HomePage() {
                 <span className="text-xl font-bold">2</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Experten erstellen deine Unterlagen
+                Wir erstellen deine Unterlagen
               </h3>
               <p className="text-gray-600">
-                Unsere HR-Experten analysieren dein Profil und erstellen einen individuellen, 
-                ATS-optimierten Lebenslauf – keine Vorlagen, sondern maßgeschneiderte Texte.
+                Unsere Experten erstellen deinen individuellen, ATS-optimierten Lebenslauf –
+                keine Vorlage, sondern maßgeschneidert auf dich.
               </p>
             </article>
 
@@ -361,12 +361,12 @@ export default async function HomePage() {
                 Fertige Dokumente erhalten
               </h3>
               <p className="text-gray-600">
-                In 2–3 Werktagen erhältst du deine fertigen Unterlagen per E-Mail als Word- und PDF-Datei. 
-                Eine Korrekturschleife ist inklusive.
+                In 2–3 Werktagen erhältst du deine Unterlagen per E-Mail (Word + PDF).
+                Sofort einsatzbereit. Eine Korrekturschleife ist inklusive.
               </p>
             </article>
           </div>
-          
+
         </div>
       </section>
 
@@ -374,10 +374,10 @@ export default async function HomePage() {
       <section className="py-12 bg-orange-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Bereit für den perfekten Lebenslauf?
+            Bereit für deine professionelle Bewerbung?
           </h2>
           <p className="text-orange-100 mb-8 max-w-2xl mx-auto">
-            Professioneller Lebenslauf ab 20 € – von HR-Experten erstellt, ATS-optimiert, in 2–3 Werktagen fertig.
+            Lebenslauf ab 20 € – professionell erstellt, ATS-optimiert, in 2–3 Werktagen fertig.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

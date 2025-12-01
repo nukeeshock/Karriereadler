@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle, Mail, Clock, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Anschreiben schreiben lassen – Individuell ab 20 € | Karriereadler',
+  title: 'Anschreiben schreiben lassen ab 20 € – Professionell in 2–3 Werktagen',
   description:
-    'Anschreiben schreiben lassen: Individuell formuliert von HR-Profis, angepasst an deine Zielstelle, Lieferzeit 2–3 Werktage, inkl. Korrekturschleife.',
+    'Professionelles Anschreiben ab 20 €. Wir schreiben dein Anschreiben – individuell auf die Zielstelle abgestimmt, fertig in 2–3 Werktagen.',
   alternates: {
     canonical: '/anschreiben-schreiben-lassen'
   }
@@ -22,11 +22,11 @@ export default function AnschreibenLandingPage() {
               Anschreiben-Service
             </p>
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
-              Anschreiben schreiben lassen – präzise auf die Stelle abgestimmt
+              Anschreiben schreiben lassen – professionell formuliert
             </h1>
             <p className="text-lg text-gray-700">
-              Wir formulieren dein Anschreiben individuell, mit klarer Argumentation und passender Tonalität für deine Wunschposition.
-              Fertig in 2–3 Werktagen, inklusive einer Feedback-Runde.
+              Du brauchst ein überzeugendes Anschreiben, weißt aber nicht, wie du formulieren sollst?
+              Wir übernehmen das für dich. Individuell auf die Zielstelle abgestimmt, fertig in 2–3 Werktagen.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
@@ -45,7 +45,7 @@ export default function AnschreibenLandingPage() {
             </div>
             <div className="flex flex-wrap gap-4 text-sm text-gray-700">
               <span className="inline-flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-orange-500" /> Ab 20 € einmalig
+                <CheckCircle className="w-5 h-5 text-orange-500" /> Ab 20 € einmalig
               </span>
               <span className="inline-flex items-center gap-2">
                 <Clock className="w-5 h-5 text-orange-500" /> Lieferung in 2–3 Werktagen
@@ -63,7 +63,7 @@ export default function AnschreibenLandingPage() {
                 <p className="text-2xl font-bold text-gray-900">Anschreiben schreiben lassen</p>
               </div>
             </div>
-            <div className="text-4xl font-semibold text-gray-900">20 €</div>
+            <div className="text-4xl font-semibold text-gray-900">20 €</div>
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-start gap-2">
                 <CheckCircle className="w-5 h-5 text-orange-500 mt-0.5" />
@@ -90,8 +90,8 @@ export default function AnschreibenLandingPage() {
             desc: 'Wir spiegeln Anforderungen der Stellenausschreibung und highlighten relevante Erfolge.'
           },
           {
-            title: 'Klarer roter Faden',
-            desc: 'Argumentation, warum du passt – in klaren, recruiterfreundlichen Sätzen.'
+            title: 'Passende Tonalität',
+            desc: 'Sprache und Aufbau passend zu Branche und Seniorität – professionell und ohne Floskeln.'
           },
           {
             title: 'Schnell & persönlich',
@@ -114,9 +114,9 @@ export default function AnschreibenLandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { title: '1. Infos teilen', desc: 'Zielstelle, Lebenslauf und besondere Schwerpunkte mitgeben.' },
-              { title: '2. Wir formulieren', desc: 'Storyline, Nutzenargumente und Tonalität werden individuell ausgearbeitet.' },
-              { title: '3. Erhalten & feinjustieren', desc: 'Du bekommst Word & PDF – inkl. einer Korrekturschleife.' }
+              { title: '1. Formular ausfüllen', desc: 'Zielstelle, bisherige Erfahrungen und wichtige Punkte angeben.' },
+              { title: '2. Wir formulieren', desc: 'Wir schreiben dein Anschreiben – individuell und überzeugend.' },
+              { title: '3. Unterlagen erhalten', desc: 'Word + PDF per E-Mail. Eine Korrekturschleife inklusive.' }
             ].map((step, index) => (
               <div key={step.title} className="p-6 bg-white border border-orange-100 rounded-xl shadow-sm">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
@@ -133,9 +133,9 @@ export default function AnschreibenLandingPage() {
           <h3 className="text-2xl font-bold text-gray-900 text-center">Das ist im Anschreiben-Service enthalten</h3>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
-              'Individuelle Argumentation für die Zielstelle',
-              'Passende Tonalität & klare Struktur',
-              'Word (.docx) & PDF, editierbar',
+              'Überzeugende Argumentation für die Zielstelle',
+              'Passende Tonalität – professionell aber authentisch',
+              'Word + PDF – editierbar',
               'Eine Korrekturschleife inklusive'
             ].map((item) => (
               <div key={item} className="flex items-start gap-2 text-gray-700">
@@ -152,8 +152,8 @@ export default function AnschreibenLandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-wide text-orange-50 font-semibold">Jetzt starten</p>
-            <h3 className="text-3xl font-bold">Anschreiben schreiben lassen ab 20 €</h3>
-            <p className="text-orange-50 mt-2">Einmalig zahlen, 2–3 Werktage Lieferzeit, Korrekturschleife inklusive.</p>
+            <h3 className="text-3xl font-bold">Anschreiben schreiben lassen ab 20 €</h3>
+            <p className="text-orange-50 mt-2">Professionell formuliert in 2–3 Werktagen. Kein Abo, keine versteckten Kosten.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link

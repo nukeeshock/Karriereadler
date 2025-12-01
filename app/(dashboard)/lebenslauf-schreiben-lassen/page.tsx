@@ -3,9 +3,9 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle, FileText, Clock, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Lebenslauf schreiben lassen – Professionelle Erstellung ab 20 € | Karriereadler',
+  title: 'Lebenslauf schreiben lassen ab 20 € – Professionell in 2–3 Werktagen',
   description:
-    'Lebenslauf schreiben lassen: Manuell erstellt von HR-Experten, ATS-optimiert, Lieferzeit 2–3 Werktage, Korrekturschleife inklusive.',
+    'Professioneller Lebenslauf ab 20 €. Wir schreiben deinen Lebenslauf – ATS-optimiert, individuell auf die Zielstelle abgestimmt, fertig in 2–3 Werktagen.',
   alternates: {
     canonical: '/lebenslauf-schreiben-lassen'
   }
@@ -22,11 +22,11 @@ export default function LebenslaufLandingPage() {
               Lebenslauf-Service
             </p>
             <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
-              Lebenslauf schreiben lassen – von HR-Profis, nicht von Tools
+              Lebenslauf schreiben lassen – professionell erstellt
             </h1>
             <p className="text-lg text-gray-700">
-              Wir erstellen deinen Lebenslauf manuell: klar strukturiert, ATS-optimiert und auf deine Zielstelle zugeschnitten.
-              In 2–3 Werktagen erhältst du dein fertiges Dokument als Word & PDF.
+              Du brauchst einen professionellen Lebenslauf, hast aber keine Zeit oder Erfahrung beim Schreiben?
+              Wir übernehmen das für dich. ATS-optimiert, individuell, fertig in 2–3 Werktagen.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
@@ -45,7 +45,7 @@ export default function LebenslaufLandingPage() {
             </div>
             <div className="flex flex-wrap gap-4 text-sm text-gray-700">
               <span className="inline-flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-orange-500" /> Ab 20 € einmalig
+                <CheckCircle className="w-5 h-5 text-orange-500" /> Ab 20 € einmalig
               </span>
               <span className="inline-flex items-center gap-2">
                 <Clock className="w-5 h-5 text-orange-500" /> Lieferung in 2–3 Werktagen
@@ -63,7 +63,7 @@ export default function LebenslaufLandingPage() {
                 <p className="text-2xl font-bold text-gray-900">Lebenslauf schreiben lassen</p>
               </div>
             </div>
-            <div className="text-4xl font-semibold text-gray-900">20 €</div>
+            <div className="text-4xl font-semibold text-gray-900">20 €</div>
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-start gap-2">
                 <CheckCircle className="w-5 h-5 text-orange-500 mt-0.5" />
@@ -71,7 +71,7 @@ export default function LebenslaufLandingPage() {
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="w-5 h-5 text-orange-500 mt-0.5" />
-                Word (.docx) & PDF, sofort einsatzbereit
+                Word + PDF – sofort einsatzbereit
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="w-5 h-5 text-orange-500 mt-0.5" />
@@ -86,16 +86,16 @@ export default function LebenslaufLandingPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid md:grid-cols-3 gap-6">
         {[
           {
-            title: 'HR-Expertise statt KI-Template',
-            desc: 'Erfahrene Recruiter und Texter formulieren deinen Lebenslauf von Hand – inkl. Keyword-Fit für ATS.'
+            title: 'Von Experten geschrieben',
+            desc: 'HR-Profis mit Erfahrung schreiben deinen Lebenslauf. Die wissen, worauf Personaler achten.'
           },
           {
             title: 'Auf deine Zielstelle zugeschnitten',
             desc: 'Wir richten Aufbau, Bullet Points und Tonalität an der gewünschten Position aus.'
           },
           {
-            title: 'Schnell & transparent',
-            desc: 'Lieferung in 2–3 Werktagen, klare Kommunikation und eine Feedback-Runde inklusive.'
+            title: 'Schnell & unkompliziert',
+            desc: '2–3 Werktage Lieferzeit. Eine Änderungsrunde ist inklusive.'
           }
         ].map((item) => (
           <div key={item.title} className="p-6 border border-orange-100 rounded-xl shadow-sm bg-white">
@@ -114,9 +114,9 @@ export default function LebenslaufLandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { title: '1. Infos teilen', desc: 'Berufserfahrung, Zielrolle und bisherige Unterlagen hochladen.' },
-              { title: '2. Wir schreiben', desc: 'HR-Experten strukturieren, formulieren und optimieren deinen Lebenslauf.' },
-              { title: '3. Erhalten & anpassen', desc: 'Du bekommst Word & PDF, inkl. einer Korrekturschleife.' }
+              { title: '1. Formular ausfüllen', desc: 'Berufserfahrung, Ausbildung, Zielstelle angeben.' },
+              { title: '2. Wir schreiben', desc: 'Wir erstellen deinen individuellen, ATS-optimierten Lebenslauf.' },
+              { title: '3. Unterlagen erhalten', desc: 'Word + PDF per E-Mail. Eine Korrekturschleife inklusive.' }
             ].map((step, index) => (
               <div key={step.title} className="p-6 bg-white border border-orange-100 rounded-xl shadow-sm">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
@@ -133,9 +133,9 @@ export default function LebenslaufLandingPage() {
           <h3 className="text-2xl font-bold text-gray-900 text-center">Das ist im Lebenslauf-Service enthalten</h3>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
-              'Word (.docx) & PDF, editierbar',
-              'Layout & Struktur an die Zielrolle angepasst',
-              'ATS-optimierte Keywords & klare Bullet Points',
+              'Word + PDF – editierbar',
+              'Professionelle Struktur und Layout',
+              'ATS-optimiert für Bewerbungssoftware',
               'Eine Korrekturschleife inklusive'
             ].map((item) => (
               <div key={item} className="flex items-start gap-2 text-gray-700">
@@ -152,8 +152,8 @@ export default function LebenslaufLandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-wide text-orange-50 font-semibold">Jetzt starten</p>
-            <h3 className="text-3xl font-bold">Lebenslauf schreiben lassen ab 20 €</h3>
-            <p className="text-orange-50 mt-2">Einmalig zahlen, 2–3 Werktage Lieferzeit, Korrekturschleife inklusive.</p>
+            <h3 className="text-3xl font-bold">Lebenslauf schreiben lassen ab 20 €</h3>
+            <p className="text-orange-50 mt-2">Professionell erstellt in 2–3 Werktagen. Kein Abo, keine versteckten Kosten.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
