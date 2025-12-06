@@ -25,4 +25,3 @@ export function canAccessOrder(orderUserId: number, currentUser: User | null): b
   if (!currentUser) return false;
   return isAdmin(currentUser) || orderUserId === currentUser.id;
 }
-

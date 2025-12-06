@@ -1,6 +1,6 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, desc, sql, inArray } from 'drizzle-orm';
 import { db } from './drizzle';
-import { teams, users } from './schema';
+import { teams, users, orderRequests, OrderStatus, type OrderRequest } from './schema';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/session';
 
@@ -30,6 +30,14 @@ export async function getUser() {
     .limit(1);
 
   if (user.length === 0) {
+    return null;
+  }
+
+  // Verify session version matches (for session invalidation on password change)
+  // Allow sessions without version for backward compatibility during migration
+  const sessionVersion = sessionData.user.sessionVersion;
+  if (sessionVersion !== undefined && user[0].sessionVersion !== sessionVersion) {
+    // Session was invalidated (e.g., password was changed)
     return null;
   }
 
@@ -69,4 +77,141 @@ export async function updateTeamSubscription(
       updatedAt: new Date()
     })
     .where(eq(teams.id, teamId));
+}
+
+// ============================================================================
+// Order Queries
+// ============================================================================
+
+/**
+ * Get a single order by ID
+ */
+export async function getOrderById(orderId: number): Promise<OrderRequest | null> {
+  const [order] = await db
+    .select()
+    .from(orderRequests)
+    .where(eq(orderRequests.id, orderId))
+    .limit(1);
+
+  return order || null;
+}
+
+/**
+ * Get orders for a specific user with pagination
+ */
+export async function getOrdersByUserId(
+  userId: number,
+  options: { page?: number; limit?: number } = {}
+): Promise<{ orders: OrderRequest[]; total: number }> {
+  const { page = 1, limit = 20 } = options;
+  const offset = (page - 1) * limit;
+
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(orderRequests)
+    .where(eq(orderRequests.userId, userId));
+
+  const orders = await db
+    .select()
+    .from(orderRequests)
+    .where(eq(orderRequests.userId, userId))
+    .orderBy(desc(orderRequests.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  return { orders, total: count };
+}
+
+/**
+ * Get all orders (admin) with pagination
+ */
+export async function getAllOrders(
+  options: { page?: number; limit?: number; status?: OrderStatus[] } = {}
+): Promise<{ orders: OrderRequest[]; total: number }> {
+  const { page = 1, limit = 50, status } = options;
+  const offset = (page - 1) * limit;
+
+  const whereClause = status?.length
+    ? inArray(orderRequests.status, status)
+    : undefined;
+
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(orderRequests)
+    .where(whereClause);
+
+  const orders = await db
+    .select()
+    .from(orderRequests)
+    .where(whereClause)
+    .orderBy(desc(orderRequests.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  return { orders, total: count };
+}
+
+/**
+ * Update order status with optimistic locking
+ * Returns the updated order or null if the status didn't match
+ */
+export async function updateOrderStatus(
+  orderId: number,
+  fromStatus: OrderStatus,
+  toStatus: OrderStatus,
+  additionalData?: Partial<OrderRequest>
+): Promise<OrderRequest | null> {
+  const [updated] = await db
+    .update(orderRequests)
+    .set({
+      status: toStatus,
+      updatedAt: new Date(),
+      ...additionalData
+    })
+    .where(
+      and(
+        eq(orderRequests.id, orderId),
+        eq(orderRequests.status, fromStatus)
+      )
+    )
+    .returning();
+
+  return updated || null;
+}
+
+/**
+ * Get orders pending questionnaire (PAID status, no formData)
+ * Used for sending reminder emails
+ */
+export async function getOrdersPendingQuestionnaire(): Promise<OrderRequest[]> {
+  return db
+    .select()
+    .from(orderRequests)
+    .where(
+      and(
+        eq(orderRequests.status, OrderStatus.PAID),
+        isNull(orderRequests.formData)
+      )
+    )
+    .orderBy(orderRequests.createdAt);
+}
+
+/**
+ * Get order count by status for a user (for dashboard stats)
+ */
+export async function getOrderCountsByStatus(userId: number): Promise<Record<string, number>> {
+  const counts = await db
+    .select({
+      status: orderRequests.status,
+      count: sql<number>`count(*)::int`
+    })
+    .from(orderRequests)
+    .where(eq(orderRequests.userId, userId))
+    .groupBy(orderRequests.status);
+
+  const result: Record<string, number> = {};
+  for (const row of counts) {
+    result[row.status] = row.count;
+  }
+  return result;
 }

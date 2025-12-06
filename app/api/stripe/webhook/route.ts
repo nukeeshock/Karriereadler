@@ -240,14 +240,39 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ received: true });
   } catch (error) {
     // CRITICAL: Log webhook processing failures for manual recovery
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
     console.error('CRITICAL: Stripe webhook processing failed', {
       eventId: event?.id,
       eventType: event?.type,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
+      error: errorMessage,
+      stack: errorStack
     });
 
-    // TODO: Add Sentry.captureException(error) or email notification for production alerting
+    // Send alert email for critical webhook failures
+    const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || process.env.EMAIL_FROM;
+    if (adminEmail) {
+      const { p, infoBox } = emailComponents;
+      const bodyContent = `
+        ${p('A critical Stripe webhook processing error occurred.')}
+        ${infoBox(`<strong>Event ID:</strong> ${event?.id || 'unknown'}<br/><strong>Event Type:</strong> ${event?.type || 'unknown'}`, 'warning')}
+        ${p(`<strong>Error:</strong> ${errorMessage}`)}
+        ${errorStack ? `<pre style="background: #f3f4f6; padding: 12px; border-radius: 4px; font-size: 12px; overflow-x: auto;">${errorStack}</pre>` : ''}
+        ${p('Please investigate this issue immediately. Stripe will retry the webhook automatically.')}
+      `;
+
+      sendEmail({
+        to: adminEmail,
+        subject: `[CRITICAL] Stripe Webhook Failed - ${event?.type || 'Unknown Event'}`,
+        html: getEmailTemplate({
+          title: 'Stripe Webhook Error',
+          body: bodyContent
+        })
+      }).catch(emailErr => {
+        console.error('Failed to send webhook error alert email:', emailErr);
+      });
+    }
 
     // Return 500 so Stripe will retry the webhook
     return NextResponse.json(

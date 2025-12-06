@@ -37,6 +37,11 @@ import {
   getVerificationTokenExpiry,
   sendVerificationEmail
 } from '@/lib/email';
+import {
+  checkRateLimit,
+  resetRateLimit,
+  getRateLimitKey
+} from '@/lib/auth/rate-limit';
 
 // Log user activity (no team dependency - teams are deprecated)
 async function logActivity(
@@ -68,6 +73,17 @@ const signInSchema = z.object({
 export const signIn = validatedAction(signInSchema, async (data, formData) => {
   const email = data.email.trim().toLowerCase();
   const { password } = data;
+
+  // Rate limit by email to prevent brute force attacks
+  const rateLimitKey = getRateLimitKey('email', email);
+  const rateLimitResult = checkRateLimit(rateLimitKey);
+
+  if (!rateLimitResult.success) {
+    return {
+      error: `Zu viele Anmeldeversuche. Bitte versuche es in ${rateLimitResult.retryAfterSeconds} Sekunden erneut.`,
+      email
+    };
+  }
 
   // Simplified: direct user lookup, no team joins
   const [foundUser] = await db
@@ -104,6 +120,9 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
     };
   }
 
+  // Reset rate limit on successful login
+  resetRateLimit(rateLimitKey);
+
   await Promise.all([
     setSession(foundUser),
     logActivity(foundUser.id, ActivityType.SIGN_IN)
@@ -121,6 +140,16 @@ export const resendVerificationEmail = validatedAction(
   async (data) => {
     const { email: rawEmail } = data;
     const email = rawEmail.trim().toLowerCase();
+
+    // Rate limit to prevent email spam
+    const rateLimitKey = getRateLimitKey('email', `resend:${email}`);
+    const rateLimitResult = checkRateLimit(rateLimitKey);
+
+    if (!rateLimitResult.success) {
+      return {
+        error: `Zu viele Anfragen. Bitte versuche es in ${rateLimitResult.retryAfterSeconds} Sekunden erneut.`
+      };
+    }
 
     // Find user
     const [user] = await db
@@ -200,6 +229,25 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   } = data;
 
   const email = rawEmail.trim().toLowerCase();
+
+  // Rate limit signups by email to prevent spam
+  const rateLimitKey = getRateLimitKey('email', email);
+  const rateLimitResult = checkRateLimit(rateLimitKey);
+
+  if (!rateLimitResult.success) {
+    return {
+      error: `Zu viele Registrierungsversuche. Bitte versuche es in ${rateLimitResult.retryAfterSeconds} Sekunden erneut.`,
+      email,
+      firstName,
+      lastName,
+      birthDate,
+      street,
+      houseNumber,
+      zipCode,
+      city,
+      country
+    };
+  }
 
   const birthDateValue = typeof birthDate === 'string' ? birthDate : '';
 
@@ -369,16 +417,25 @@ export const updatePassword = validatedActionWithUser(
 
     const newPasswordHash = await hashPassword(newPassword);
 
+    // Increment session version to invalidate all existing sessions
+    const newSessionVersion = (user.sessionVersion ?? 1) + 1;
+
     await Promise.all([
       db
         .update(users)
-        .set({ passwordHash: newPasswordHash })
+        .set({
+          passwordHash: newPasswordHash,
+          sessionVersion: newSessionVersion
+        })
         .where(eq(users.id, user.id)),
       logActivity(user.id, ActivityType.UPDATE_PASSWORD)
     ]);
 
+    // Delete current session - user will need to log in again
+    await deleteSession();
+
     return {
-      success: 'Password updated successfully.'
+      success: 'Passwort erfolgreich geändert. Bitte melde dich erneut an.'
     };
   }
 );
@@ -622,33 +679,3 @@ export const updateAccount = validatedActionWithUser(
   }
 );
 
-// ============================================================================
-// DEPRECATED: Team-related functions
-// Teams are no longer used in this application. These functions are kept for
-// backward compatibility but will return errors if called.
-// ============================================================================
-
-const removeTeamMemberSchema = z.object({
-  memberId: z.number()
-});
-
-/** @deprecated Teams are no longer used */
-export const removeTeamMember = validatedActionWithUser(
-  removeTeamMemberSchema,
-  async () => {
-    return { error: 'Teams werden nicht mehr unterstützt.' };
-  }
-);
-
-const inviteTeamMemberSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  role: z.enum(['member', 'owner'])
-});
-
-/** @deprecated Teams are no longer used */
-export const inviteTeamMember = validatedActionWithUser(
-  inviteTeamMemberSchema,
-  async () => {
-    return { error: 'Teams werden nicht mehr unterstützt.' };
-  }
-);

@@ -643,3 +643,4 @@ Diese Design-Vereinfachung hat das UI der Karriereadler-Webanwendung deutlich ru
 
 **Status:** ✅ Fertig, bereit zum Testen
 
+

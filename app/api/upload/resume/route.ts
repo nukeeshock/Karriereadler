@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import crypto from 'crypto';
+import { put } from '@vercel/blob';
 
 const ALLOWED_TYPES = [
   'application/pdf',
@@ -47,24 +45,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const randomName = crypto.randomBytes(16).toString('hex');
-    const fileName = `${user.id}_${randomName}.${ext}`;
+    // Generate unique filename for Blob Storage
+    const fileName = `resumes/${user.id}_${Date.now()}.${ext}`;
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'resumes');
-    await mkdir(uploadDir, { recursive: true });
-
-    const filePath = join(uploadDir, fileName);
-    await writeFile(filePath, buffer);
-
-    const publicPath = `/uploads/resumes/${fileName}`;
+    // Upload to Vercel Blob Storage
+    const blob = await put(fileName, file, {
+      access: 'public',
+      addRandomSuffix: true
+    });
 
     return NextResponse.json({
       success: true,
-      path: publicPath,
-      fileName
+      path: blob.url,
+      fileName: blob.pathname
     });
   } catch (error) {
     console.error('Resume upload error:', error);

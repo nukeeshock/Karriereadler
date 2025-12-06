@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUser } from '@/lib/db/queries';
-import { db } from '@/lib/db/drizzle';
-import { orderRequests } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { getUser, getOrderById } from '@/lib/db/queries';
 import { isAdmin } from '@/lib/auth/roles';
 
 export async function GET(
@@ -15,7 +12,6 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is admin or owner
     if (!isAdmin(user)) {
       return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 });
     }
@@ -27,12 +23,7 @@ export async function GET(
       return NextResponse.json({ error: 'Ungültige Auftrags-ID' }, { status: 400 });
     }
 
-    // Get order
-    const [order] = await db
-      .select()
-      .from(orderRequests)
-      .where(eq(orderRequests.id, orderId))
-      .limit(1);
+    const order = await getOrderById(orderId);
 
     if (!order) {
       return NextResponse.json({ error: 'Auftrag nicht gefunden' }, { status: 404 });

@@ -39,6 +39,8 @@ export const users = pgTable('users', {
   verificationTokenExpiry: timestamp('verification_token_expiry'),
   passwordResetToken: text('password_reset_token'),
   passwordResetTokenExpiry: timestamp('password_reset_token_expiry'),
+  // Session versioning for invalidation on password change
+  sessionVersion: integer('session_version').notNull().default(1),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
@@ -54,6 +56,13 @@ export const stripeEvents = pgTable('stripe_events', {
   createdAt: timestamp('created_at').notNull().defaultNow()
 });
 
+/**
+ * @deprecated Teams are no longer used in this application.
+ * This table is kept only for:
+ * 1. Foreign key relationships with activity_logs
+ * 2. Legacy Stripe subscription handling for old customers
+ * TODO: Drop this table after verifying no active subscriptions exist
+ */
 export const teams = pgTable('teams', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
@@ -66,6 +75,11 @@ export const teams = pgTable('teams', {
   subscriptionStatus: varchar('subscription_status', { length: 20 }),
 });
 
+/**
+ * @deprecated Team members are no longer used.
+ * This table is kept only for hard delete user cleanup.
+ * TODO: Drop this table after all legacy team data is removed
+ */
 export const teamMembers = pgTable('team_members', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
@@ -88,6 +102,11 @@ export const activityLogs = pgTable('activity_logs', {
   ipAddress: varchar('ip_address', { length: 45 }),
 });
 
+/**
+ * @deprecated Invitations are no longer used.
+ * This table is kept only for hard delete user cleanup.
+ * TODO: Drop this table after all legacy invitation data is removed
+ */
 export const invitations = pgTable('invitations', {
   id: serial('id').primaryKey(),
   teamId: integer('team_id')
@@ -246,7 +265,11 @@ export type TeamDataWithMembers = Team & {
   })[];
 };
 
-// CV Requests Table
+/**
+ * @deprecated CV Requests are replaced by orderRequests.
+ * This table is kept only for hard delete user cleanup and legacy data.
+ * TODO: Migrate any remaining data to orderRequests and drop this table
+ */
 export const cvRequests = pgTable('cv_requests', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
@@ -285,7 +308,11 @@ export const cvRequests = pgTable('cv_requests', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
-// Cover Letter Requests Table
+/**
+ * @deprecated Letter Requests are replaced by orderRequests.
+ * This table is kept only for hard delete user cleanup and legacy data.
+ * TODO: Migrate any remaining data to orderRequests and drop this table
+ */
 export const letterRequests = pgTable('letter_requests', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')

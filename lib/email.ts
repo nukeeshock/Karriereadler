@@ -223,13 +223,28 @@ type SendEmailParams = {
   subject: string;
   html: string;
   text?: string;
+  retries?: number;
 };
 
+const MAX_RETRIES = 3;
+const INITIAL_RETRY_DELAY_MS = 1000;
+
+/**
+ * Sleep for a given number of milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Send email with retry logic and exponential backoff
+ */
 export async function sendEmail({
   to,
   subject,
   html,
-  text
+  text,
+  retries = MAX_RETRIES
 }: SendEmailParams): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
 
@@ -244,31 +259,72 @@ export async function sendEmail({
     return;
   }
 
-  try {
-    const response = await fetch(RESEND_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        from: FROM_ADDRESS,
-        to,
-        subject,
-        html,
-        text
-      })
-    });
+  let lastError: Error | null = null;
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('Resend API error:', error);
-      throw new Error('Failed to send email via Resend');
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(RESEND_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          from: FROM_ADDRESS,
+          to,
+          subject,
+          html,
+          text
+        })
+      });
+
+      if (response.ok) {
+        return; // Success
+      }
+
+      const errorText = await response.text();
+
+      // Don't retry on client errors (4xx) except rate limiting (429)
+      if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+        console.error('Resend API client error (no retry):', {
+          status: response.status,
+          error: errorText,
+          to: Array.isArray(to) ? to.join(', ') : to,
+          subject
+        });
+        throw new Error(`Email API error: ${response.status}`);
+      }
+
+      lastError = new Error(`Resend API error: ${response.status} - ${errorText}`);
+
+      // Log retry attempt
+      if (attempt < retries) {
+        const delayMs = INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt);
+        console.warn(`Email send failed (attempt ${attempt + 1}/${retries + 1}), retrying in ${delayMs}ms...`, {
+          status: response.status,
+          to: Array.isArray(to) ? to.join(', ') : to
+        });
+        await sleep(delayMs);
+      }
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Network errors are retryable
+      if (attempt < retries) {
+        const delayMs = INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt);
+        console.warn(`Email send network error (attempt ${attempt + 1}/${retries + 1}), retrying in ${delayMs}ms...`);
+        await sleep(delayMs);
+      }
     }
-  } catch (error) {
-    console.error('Error sending email via Resend:', error);
-    throw error;
   }
+
+  // All retries exhausted
+  console.error('Email send failed after all retries:', {
+    to: Array.isArray(to) ? to.join(', ') : to,
+    subject,
+    error: lastError?.message
+  });
+  throw lastError || new Error('Failed to send email after retries');
 }
 
 export const FROM_EMAIL = FROM_ADDRESS;

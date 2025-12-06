@@ -6,6 +6,7 @@ import { eq, and } from 'drizzle-orm';
 import { put } from '@vercel/blob';
 import { sendEmail, getEmailTemplate, emailComponents } from '@/lib/email';
 import { isAdmin } from '@/lib/auth/roles';
+import { generateSignedDownloadUrl } from '@/lib/utils/signed-url';
 
 const ALLOWED_TYPES = ['application/pdf'];
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
@@ -98,23 +99,33 @@ export async function POST(
       );
     }
 
-    // Send email notification to customer with direct download link
+    // Send email notification to customer with signed download link
     try {
-      const dashboardUrl = `${process.env.BASE_URL}/dashboard/orders`;
-      const { p, infoBox, linkBox } = emailComponents;
-      
+      const baseUrl = process.env.BASE_URL || 'https://karriereadler.com';
+      const dashboardUrl = `${baseUrl}/dashboard/orders`;
+
+      // Generate signed download URL (valid for 7 days)
+      const signedDownloadUrl = await generateSignedDownloadUrl(
+        baseUrl,
+        orderId,
+        order.userId,
+        blob.url,
+        60 * 24 * 7 // 7 days in minutes
+      );
+
+      const { p, infoBox } = emailComponents;
+
       const bodyContent = `
         ${p(`Hallo ${order.customerName || 'liebe/r Kunde/in'},`)}
         ${p('großartige Neuigkeiten! Deine professionell erstellten Bewerbungsunterlagen sind jetzt fertig und stehen zum Download bereit.')}
-        ${infoBox('<strong>🎉 Deine Unterlagen sind fertig!</strong><br/>Klicke auf den Button unten, um deine Dokumente direkt herunterzuladen.', 'success')}
-        ${p('<strong>Direkter Download-Link:</strong>', 'margin-top: 24px;')}
-        ${linkBox(blob.url)}
+        ${infoBox('<strong>Deine Unterlagen sind fertig!</strong><br/>Klicke auf den Button unten, um deine Dokumente direkt herunterzuladen.', 'success')}
         ${p('Du kannst deine Unterlagen auch jederzeit in deinem Dashboard herunterladen.', 'margin-top: 16px;')}
+        ${p('<em>Hinweis: Der Download-Link in dieser Email ist 7 Tage gültig.</em>', 'color: #6b7280; font-size: 14px;')}
         ${p('Mit deinen neuen, professionellen Bewerbungsunterlagen hast du jetzt die besten Voraussetzungen, um bei deinen Wunscharbeitgebern zu punkten.', 'margin-top: 24px;')}
         ${p('Wir wünschen dir viel Erfolg bei deiner Bewerbung!')}
         ${p('Viele Grüße,<br/>Dein Karriereadler-Team')}
       `;
-      
+
       await sendEmail({
         to: order.customerEmail,
         subject: 'Deine Bewerbungsunterlagen sind fertig | Karriereadler',
@@ -122,7 +133,7 @@ export async function POST(
           title: 'Deine Unterlagen sind fertig',
           body: bodyContent,
           buttonText: 'Jetzt herunterladen',
-          buttonUrl: blob.url
+          buttonUrl: signedDownloadUrl
         })
       });
       console.log('[Admin Upload] Completion email sent for order:', order.id);

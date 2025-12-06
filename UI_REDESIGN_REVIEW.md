@@ -443,3 +443,4 @@ Die geänderten Seiten zeigen eine konsequente Vereinfachung des Designs. Die Ha
 2. Andere Seiten auf neues Design-System umstellen
 3. Badge- und Button-Text-Konsistenz klären
 
+
